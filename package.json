@@ -42,7 +42,7 @@
     "initVersion": "7.32.1"
   },
   "engines": {
-    "node": ">=20.11.1"
+    "node": "18.20.2"
   },
   "packageManager": "pnpm@8.15.4"
 }
