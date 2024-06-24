@@ -1,6 +1,9 @@
 import "~/styles/globals.css";
 
 import { Inter } from "next/font/google";
+import SessionGuard from "./_components/session-guard";
+import { SessionProvider } from "next-auth/react";
+import { Toaster } from "~/components/ui/sonner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -20,7 +23,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`font-sans ${inter.variable}`}>{children}</body>
+      <body className={`font-sans ${inter.variable}`}>
+        <SessionProvider refetchInterval={4 * 60}>
+          <SessionGuard>
+            <>
+              {children}
+              <Toaster />
+            </>
+          </SessionGuard>
+        </SessionProvider>
+      </body>
     </html>
   );
 }
