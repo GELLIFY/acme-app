@@ -5,12 +5,17 @@
   "type": "module",
   "scripts": {
     "build": "next build",
+    "clean": "git clean -xdf node_modules .next",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx src/server/db/seed.ts",
     "ui-add": "pnpm dlx shadcn-ui add && prettier src --write --list-different",
     "dev": "next dev",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
     "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "typecheck": "tsc --noEmit",
     "start": "next start"
   },
   "dependencies": {
