@@ -1,7 +1,8 @@
 "use server";
 
-import { desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { desc, eq } from "drizzle-orm";
+
 import { CreatePostSchema, deletePostSchema } from "~/lib/validators";
 import { auth } from "~/server/auth";
 import { db, schema } from "~/server/db";

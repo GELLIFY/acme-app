@@ -1,6 +1,6 @@
-import federatedLogout from "~/server/auth/federated-logout";
-import { auth, signIn } from "~/server/auth";
 import { Button } from "~/components/ui/button";
+import { auth, signIn } from "~/server/auth";
+import federatedLogout from "~/server/auth/federated-logout";
 
 export async function AuthShowcase() {
   const session = await auth();

@@ -1,9 +1,9 @@
 import { drizzle } from "drizzle-orm/postgres-js";
+import { connectionStr } from "drizzle.config";
 import postgres from "postgres";
 
 import { schema } from ".";
 import { postsMock } from "./data/posts-mock";
-import { connectionStr } from "drizzle.config";
 
 const queryClient = postgres(connectionStr.toString());
 const db = drizzle(queryClient);

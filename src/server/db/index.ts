@@ -1,10 +1,10 @@
 import { Pool } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-serverless";
+import { connectionStr } from "drizzle.config";
 
 import { env } from "~/env";
 import * as auth from "./schema/auth";
 import * as post from "./schema/post";
-import { connectionStr } from "drizzle.config";
 
 /**
  * Cache the database connection in development. This avoids creating a new connection on every HMR
