@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": "18.19.1"
+  },
+  "packageManager": "pnpm@9.4.0",
   "scripts": {
     "build": "next build",
     "clean": "git clean -xdf node_modules .next",
@@ -65,9 +69,5 @@
   },
   "ct3aMetadata": {
     "initVersion": "7.32.1"
-  },
-  "engines": {
-    "node": "18.19.1"
-  },
-  "packageManager": "pnpm@8.15.4"
+  }
 }
