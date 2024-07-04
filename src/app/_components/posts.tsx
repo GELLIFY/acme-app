@@ -3,7 +3,7 @@
 import { use } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
+import { type z } from "zod";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -15,8 +15,8 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { cn } from "~/lib/utils";
-import { CreatePostSchema } from "~/lib/validators";
-import { schema } from "~/server/db";
+import { type CreatePostSchema } from "~/lib/validators";
+import { type schema } from "~/server/db";
 import { createPost, deletePost } from "../actions";
 
 export function CreatePostForm() {
