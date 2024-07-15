@@ -28,7 +28,17 @@ Below you can find a diagram representing an high level overview of architecture
 
 ### Architecture - App Layer
 
-TODO
+The application is build following all of the latest Next.js 14 best practices and guidelines. Plese refer to [Next.js](https://nextjs.org) official docs to get a better understanding of the available features.
+
+The standard Next.js application layer features:
+
+- [Middleware](https://nextjs.org/docs/app/building-your-application/routing/middleware) -> `middleware.ts` single point of ingress into the app
+- [API Routes](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) -> `/app/api/**/route.ts` REST APIs
+- [Server Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations) -> `/app/actions.ts` new way to handle data querying and mutation
+- [RSC](https://nextjs.org/docs/app/building-your-application/rendering/server-components) (React Server Component) -> `/app/**/*.tsx` default or annotated with `use server`
+- [RCC](https://nextjs.org/docs/app/building-your-application/rendering/client-components) (React Client Component) -> `/app/**/*.tsx` annotated with `use client`
+
+All of the above are just the basic features of a modern Next.js application. You can and should make a deeper deep dive into the official docs to learn about other usefull features and guidelines on how to build with this stack.
 
 ### Architecture - Auth Layer
 
