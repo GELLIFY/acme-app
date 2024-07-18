@@ -1,6 +1,8 @@
 "use client";
 
-import { use } from "react";
+import { use, useEffect, useRef } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useFormState } from "react-dom";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { type z } from "zod";
@@ -15,35 +17,44 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { cn } from "~/lib/utils";
-import { type CreatePostSchema } from "~/lib/validators";
+import { CreatePostSchema } from "~/lib/validators";
 import { type schema } from "~/server/db";
-import { createPost, deletePost } from "../actions";
+import { createPostAction, deletePost } from "../actions";
 
 export function CreatePostForm() {
-  const form = useForm<z.infer<typeof CreatePostSchema>>({
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const [state, formAction] = useFormState(createPostAction, {
+    message: "",
+  });
+
+  const form = useForm<z.output<typeof CreatePostSchema>>({
+    resolver: zodResolver(CreatePostSchema),
     defaultValues: {
       content: "",
       title: "",
+      ...(state?.fields ?? {}),
     },
   });
 
-  const createPostAction = async (formData: FormData) => {
-    try {
-      await createPost(formData);
-    } catch (err) {
-      toast.error(
-        (err as Error).message === "UNAUTHORIZED"
-          ? "You must be logged in to create a post"
-          : "Failed to create post",
-      );
-    }
-  };
+  // NOTE: use effect could be avoided if we inline error message in the form
+  useEffect(() => {
+    if (state.message && state.errors) toast.error(state.message);
+    if (state.message && !state.errors) toast.success(state.message);
+  }, [state]);
 
   return (
     <Form {...form}>
       <form
         className="flex w-full max-w-2xl flex-col gap-4"
-        action={createPostAction}
+        ref={formRef}
+        action={formAction}
+        onSubmit={(evt) => {
+          evt.preventDefault();
+          void form.handleSubmit(() => {
+            formAction(new FormData(formRef.current!));
+          })(evt);
+        }}
       >
         <FormField
           control={form.control}
