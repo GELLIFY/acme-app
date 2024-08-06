@@ -99,3 +99,9 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 
 - [From 0 to Production - The Modern React Tutorial (RSCs, Next.js, Shadui, Drizzle, TS and more)](https://www.youtube.com/watch?v=d5x0JCZbAJs)
 - [React Hook Form & React 19 Form Actions, The Right Way](https://www.youtube.com/watch?v=VLk45JBe8L8)
+
+## TODO
+
+- [ ] update create form with safe action
+- [ ] install server-only and move fetch there
+- [ ] example of caching and revalidation
