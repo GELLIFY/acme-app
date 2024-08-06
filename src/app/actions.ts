@@ -1,19 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { desc, eq } from "drizzle-orm";
 
 import type { FormState } from "~/lib/validators";
-import { CreatePostSchema, deletePostSchema } from "~/lib/validators";
+import { CreatePostSchema } from "~/lib/validators";
 import { auth } from "~/server/auth";
 import { db, schema } from "~/server/db";
-
-export async function readPostList() {
-  return db.query.post.findMany({
-    orderBy: desc(schema.post.id),
-    limit: 10,
-  });
-}
 
 export async function createPostAction(
   _prevState: FormState,
@@ -22,7 +14,7 @@ export async function createPostAction(
   const session = await auth();
 
   // Authenticate request
-  if (!session?.user.id) {
+  if (!session?.access_token) {
     return {
       message: "You must be logged in to create a post",
     };
@@ -60,29 +52,4 @@ export async function createPostAction(
       message: "Failed to create post",
     };
   }
-}
-
-export async function deletePost(postId: number) {
-  const session = await auth();
-
-  // Authenticate request
-  if (!session?.access_token) throw new Error("UNAUTHORIZED");
-
-  const validatedFields = deletePostSchema.safeParse({
-    id: postId,
-  });
-
-  // Return early if the form data is invalid
-  if (!validatedFields.success) {
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-    };
-  }
-  // Mutate data
-  await db
-    .delete(schema.post)
-    .where(eq(schema.post.id, validatedFields.data.id));
-
-  // Invalidate cache
-  revalidatePath("/");
 }

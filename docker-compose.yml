@@ -1,10 +1,36 @@
 services:
+  # app:
+  #   platform: "linux/amd64"
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #     args:
+  #       NEXT_PUBLIC_CLIENTVAR: "clientvar"
+  #   depends_on:
+  #     - pg_proxy
+  #   working_dir: /app
+  #   ports:
+  #     - "3000:3000"
+  #   image: acme-app
+  #   environment:
+  #     DB_HOST: "${DB_HOST}"
+  #     DB_NAME: "${DB_NAME}"
+  #     DB_USERNAME: "${DB_USERNAME}"
+  #     DB_PASSWORD: "${DB_PASSWORD}"
+  #     AUTH_SECRET: "${AUTH_SECRET}"
+  #     AUTH_URL: "${AUTH_URL}"
+  #     KEYCLOAK_ADMIN: "${KEYCLOAK_ADMIN}"
+  #     KEYCLOAK_ADMIN_PASSWORD: "${KEYCLOAK_ADMIN_PASSWORD}"
+  #     KEYCLOAK_CLIENT_ID: "${KEYCLOAK_CLIENT_ID}"
+  #     KEYCLOAK_CLIENT_SECRET: "${KEYCLOAK_CLIENT_SECRET}"
+  #     KEYCLOAK_ISSUER: "${KEYCLOAK_ISSUER}"
+
   postgres:
-    image: "postgres:16.2-alpine"
+    image: "postgres:16.3-alpine"
     environment:
-      POSTGRES_USER: "${DB_USERNAME}"
-      POSTGRES_PASSWORD: "${DB_PASSWORD}"
-      POSTGRES_DB: "${DB_NAME}"
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -31,7 +57,7 @@ services:
       - "5433:80"
 
   keycloak:
-    image: "quay.io/keycloak/keycloak:24.0"
+    image: "quay.io/keycloak/keycloak:25.0"
     depends_on:
       postgres:
         condition: service_healthy
