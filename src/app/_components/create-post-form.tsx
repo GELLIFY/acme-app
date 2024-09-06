@@ -1,58 +1,50 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFormState } from "react-dom";
+import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { type z } from "zod";
 
-import { createPostAction } from "~/app/actions";
-import { CreatePostSchema } from "~/lib/validators";
-import { Button } from "../ui/button";
+import { createPostAction } from "~/app/actions/create-post-action";
+import { createPostSchema } from "~/lib/validators";
+import { Button } from "../../components/ui/button";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "../ui/form";
-import { Input } from "../ui/input";
+} from "../../components/ui/form";
+import { Input } from "../../components/ui/input";
 
 export function CreatePostForm() {
-  const formRef = useRef<HTMLFormElement>(null);
-
-  const [state, formAction] = useFormState(createPostAction, {
-    message: "",
-  });
-
-  const form = useForm<z.output<typeof CreatePostSchema>>({
-    resolver: zodResolver(CreatePostSchema),
-    defaultValues: {
-      content: "",
-      title: "",
-      ...(state?.fields ?? {}),
+  const { execute, isExecuting } = useAction(createPostAction, {
+    onError: ({ error }) => {
+      toast.error(error.serverError, {
+        duration: 3500,
+      });
+    },
+    onSuccess: () => {
+      toast.success("Post creato!", {
+        duration: 3500,
+      });
     },
   });
 
-  // NOTE: use effect could be avoided if we inline error message in the form
-  useEffect(() => {
-    if (state.message && state.errors) toast.error(state.message);
-    if (state.message && !state.errors) toast.success(state.message);
-  }, [state]);
+  const form = useForm<z.output<typeof createPostSchema>>({
+    resolver: zodResolver(createPostSchema),
+    defaultValues: {
+      title: "",
+      content: "",
+    },
+  });
 
   return (
     <Form {...form}>
       <form
         className="flex w-full max-w-2xl flex-col gap-4"
-        ref={formRef}
-        action={formAction}
-        onSubmit={(evt) => {
-          evt.preventDefault();
-          void form.handleSubmit(() => {
-            formAction(new FormData(formRef.current!));
-          })(evt);
-        }}
+        onSubmit={form.handleSubmit(execute)}
       >
         <FormField
           control={form.control}
@@ -78,7 +70,9 @@ export function CreatePostForm() {
             </FormItem>
           )}
         />
-        <Button>Create</Button>
+        <Button disabled={!form.formState.isValid || isExecuting}>
+          Create
+        </Button>
       </form>
     </Form>
   );

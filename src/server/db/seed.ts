@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { connectionStr } from "drizzle.config";
 import postgres from "postgres";
@@ -9,9 +10,16 @@ const queryClient = postgres(connectionStr.toString());
 const db = drizzle(queryClient);
 
 console.log("Seed start");
-// eslint-disable-next-line drizzle/enforce-delete-with-where
-await db.delete(schema.post);
-await db.insert(schema.post).values(postsMock);
+await db
+  .insert(schema.post)
+  .values(postsMock)
+  .onConflictDoUpdate({
+    target: schema.post.id,
+    set: {
+      title: sql`excluded.title`,
+      content: sql`excluded.content`,
+    },
+  });
 console.log("Seed done");
 
 // closing connection

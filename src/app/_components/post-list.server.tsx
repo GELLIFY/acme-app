@@ -1,13 +1,8 @@
-import { desc } from "drizzle-orm";
-
-import { db, schema } from "~/server/db";
+import { getPosts } from "~/server/db/queries/cached-query";
 import { DeletePosts } from "./delete-posts";
 
-export async function BasePostsServer() {
-  const posts = await db.query.post.findMany({
-    orderBy: desc(schema.post.id),
-    limit: 10,
-  });
+export async function PostListServer() {
+  const posts = await getPosts();
 
   if (posts.length === 0) {
     return (

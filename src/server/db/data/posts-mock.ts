@@ -4,7 +4,7 @@ import type { schema } from "..";
 
 export const postsMock = [
   {
-    id: 1,
+    id: 999,
     title: "title",
     content: "content",
   },

@@ -48,10 +48,9 @@ export const accounts = pgTable(
 export const sessions = pgTable(
   "session",
   {
-    id: text("id")
+    sessionToken: text("sessionToken")
       .primaryKey()
       .$defaultFn(() => createId()),
-    sessionToken: text("sessionToken").notNull().unique(),
     userId: text("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),

@@ -1,6 +1,6 @@
 import { Skeleton } from "~/components/ui/skeleton";
 
-export function Loading() {
+export function PostListLoading() {
   return (
     <div className="flex justify-between gap-4">
       <div className="flex flex-1 flex-col gap-2">
