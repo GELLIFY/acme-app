@@ -1,5 +1,7 @@
 import { Suspense } from "react";
+import { ErrorBoundary } from "next/dist/client/components/error-boundary";
 
+import { ErrorFallback } from "~/components/error-fallback";
 import { AuthShowcase } from "./_components/auth-showcase";
 import { CreatePostForm } from "./_components/create-post-form";
 import { PostListLoading } from "./_components/post-list.loading";
@@ -19,9 +21,11 @@ export default function HomePage() {
       <div className="flex flex-col items-center justify-center gap-4">
         <CreatePostForm />
         <div className="w-full max-w-2xl overflow-y-scroll">
-          <Suspense fallback={<PostListLoading />}>
-            <PostListServer />
-          </Suspense>
+          <ErrorBoundary errorComponent={ErrorFallback}>
+            <Suspense fallback={<PostListLoading />}>
+              <PostListServer />
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </div>
     </main>
