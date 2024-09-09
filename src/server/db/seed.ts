@@ -16,7 +16,7 @@ await db
   .onConflictDoUpdate({
     target: schema.post.id,
     set: {
-      title: sql`excluded.title`,
+      title: sql`excluded.name`,
       content: sql`excluded.content`,
     },
   });
