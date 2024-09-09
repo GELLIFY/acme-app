@@ -102,6 +102,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 
 ## TODO
 
-- [ ] update create form with safe action
-- [ ] install server-only and move fetch there
-- [ ] example of caching and revalidation
+- [x] update create form with safe action
+- [x] install server-only and move fetch there
+- [x] example of caching and revalidation
+- [ ] remove ws-proxy
