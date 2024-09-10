@@ -1,22 +1,6 @@
 {
   "realm": "local",
   "enabled": true,
-  "revokeRefreshToken": true,
-  "refreshTokenMaxReuse": 0,
-  "accessTokenLifespan": 900,
-  "accessTokenLifespanForImplicitFlow": 1800,
-  "ssoSessionIdleTimeout": 1800,
-  "ssoSessionMaxLifespan": 86400,
-  "ssoSessionIdleTimeoutRememberMe": 0,
-  "ssoSessionMaxLifespanRememberMe": 0,
-  "offlineSessionIdleTimeout": 2592000,
-  "offlineSessionMaxLifespanEnabled": false,
-  "offlineSessionMaxLifespan": 5184000,
-  "clientSessionIdleTimeout": 0,
-  "clientSessionMaxLifespan": 0,
-  "clientOfflineSessionIdleTimeout": 0,
-  "clientOfflineSessionMaxLifespan": 0,
-  "oauth2DeviceCodeLifespan": 600,
   "users": [
     {
       "username": "user",
