@@ -72,7 +72,7 @@ services:
       KC_DB_PASSWORD: "${DB_PASSWORD}"
       KC_DB_USERNAME: "${DB_USERNAME}"
       KC_DB_SCHEMA: "keycloak"
-      KC_HEALTH_ENABLED: true
+      KC_HEALTH_ENABLED: "true"
       KEYCLOAK_ADMIN: "${KEYCLOAK_ADMIN}"
       KEYCLOAK_ADMIN_PASSWORD: "${KEYCLOAK_ADMIN_PASSWORD}"
     volumes:
