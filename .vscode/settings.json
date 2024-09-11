@@ -13,7 +13,8 @@
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.preferences.autoImportFileExcludePatterns": [
     "next/router.d.ts",
-    "next/dist/client/router.d.ts"
+    "next/dist/client/router.d.ts",
+    "@radix-ui/**" // exclude auto imports from radix-ui
   ],
   "typescript.tsdk": "node_modules/typescript/lib"
 }
