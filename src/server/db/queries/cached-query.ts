@@ -6,6 +6,9 @@ export async function getPosts() {
   return unstable_cache(
     async () => {
       return await getPostsQuery();
+
+      // NOTE: do whatever you want here, map, aggregate filter...
+      // result will be cached and typesafety preserved
     },
     ["posts"],
     {

@@ -4,7 +4,7 @@ import { Inter } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
 
 import { Toaster } from "~/components/ui/sonner";
-import SessionGuard from "./_components/session-guard";
+import SessionGuard from "../components/session-guard";
 
 const inter = Inter({
   subsets: ["latin"],
