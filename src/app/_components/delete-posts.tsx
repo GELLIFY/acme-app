@@ -13,7 +13,6 @@ export function DeletePosts(props: { post: typeof schema.post.$inferSelect }) {
 
   useEffect(() => {
     if (result.data?.message) toast.success(result.data?.message);
-    if (result.fetchError) toast.error(result.fetchError);
     if (result.serverError) toast.error(result.serverError);
   }, [result]);
 
