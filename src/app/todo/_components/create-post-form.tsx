@@ -6,17 +6,17 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { type z } from "zod";
 
-import { createPostAction } from "~/app/actions/create-post-action";
-import { createPostSchema } from "~/lib/validators";
-import { Button } from "../../components/ui/button";
+import { Button } from "~/components/ui/button";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "../../components/ui/form";
-import { Input } from "../../components/ui/input";
+} from "~/components/ui/form";
+import { Input } from "~/components/ui/input";
+import { createPostSchema } from "~/lib/validators";
+import { createPostAction } from "~/server/actions/create-post-action";
 
 export function CreatePostForm() {
   const { execute, isExecuting } = useAction(createPostAction, {

@@ -5,8 +5,8 @@ import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 
 import { Button } from "~/components/ui/button";
+import { deletePostAction } from "~/server/actions/delete-post-action";
 import { type schema } from "~/server/db";
-import { deletePostAction } from "../actions/delete-post-action";
 
 export function DeletePosts(props: { post: typeof schema.post.$inferSelect }) {
   const { execute, result } = useAction(deletePostAction);

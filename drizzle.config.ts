@@ -15,18 +15,10 @@ if (!process.env.VERCEL_ENV) {
   neonConfig.pipelineConnect = false;
 }
 
-// Push requires SSL so use URL instead of username/password
-export const connectionStr = new URL(
-  `postgresql://${env.DB_HOST}/${env.DB_NAME}`,
-);
-connectionStr.username = env.DB_USERNAME;
-connectionStr.password = env.DB_PASSWORD;
-// connectionStr.searchParams.set("sslmode", 'require');
-
 export default {
   dialect: "postgresql", // "postgresql" | "mysql"
   dbCredentials: {
-    url: connectionStr.toString(),
+    url: env.DATABASE_URL_EXTERNAL,
   },
   schema: "./src/server/db/schema",
 } satisfies Config;

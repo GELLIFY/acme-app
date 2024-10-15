@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": "18.19.1"
+    "node": "20.16.0"
   },
-  "packageManager": "pnpm@9.4.0",
+  "packageManager": "pnpm@9.12.1",
   "scripts": {
     "build": "next build",
     "clean": "git clean -xdf node_modules .next",
@@ -20,7 +20,7 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "typecheck": "tsc --noEmit",
-    "start": "next start"
+    "start": "node .next/standalone/server.js"
   },
   "dependencies": {
     "@auth/core": "^0.34.2",
