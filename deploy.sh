@@ -16,7 +16,8 @@ DOMAIN_NAME="188.245.198.233" # replace with your own domain or ip
 EMAIL="matteo.badini@gellify.com" # replace with your own
 
 # Script Vars
-REPO_URL="https://github.com/GELLIFY/acme-app.git"
+REPO_URL="git@github.com:GELLIFY/acme-app.git"
+BRANCH_NAME=feature/self-host
 APP_DIR=~/acme-app
 SWAP_SIZE="1G"  # Swap size of 1GB
 
@@ -66,13 +67,16 @@ fi
 sudo systemctl enable docker
 sudo systemctl start docker
 
-# Clone the Git repository
+# Clone the Git repository or pull latest changes
 if [ -d "$APP_DIR" ]; then
-  echo "Directory $APP_DIR already exists. Pulling latest changes..."
-  cd $APP_DIR && git pull
+  echo "Directory $APP_DIR already exists. Pulling latest changes from branch $BRANCH_NAME..."
+  cd $APP_DIR
+  git fetch origin
+  git checkout $BRANCH_NAME
+  git pull origin $BRANCH_NAME
 else
-  echo "Cloning repository from $REPO_URL..."
-  git clone $REPO_URL $APP_DIR
+  echo "Cloning repository from $REPO_URL (branch: $BRANCH_NAME)..."
+  git clone --branch $BRANCH_NAME $REPO_URL $APP_DIR
   cd $APP_DIR
 fi
 
