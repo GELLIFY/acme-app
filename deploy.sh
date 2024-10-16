@@ -3,7 +3,7 @@
 # Env Vars
 POSTGRES_DB="acme-app"
 POSTGRES_USER="user"
-POSTGRES_PASSWORD=$(openssl rand -base64 12)  # Generate a random 12-character password
+POSTGRES_PASSWORD="password" # $(openssl rand -base64 12) # Generate a random 12-character password
 AUTH_SECRET="supersecret" # for the demo app
 AUTH_URL=http://188.245.198.233 # replace with your own domain or ip
 KEYCLOAK_ADMIN="admin"
