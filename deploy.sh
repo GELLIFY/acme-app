@@ -172,12 +172,12 @@ server {
     # Serve Keycloak under the path '/auth'
     location /auth/ {
         proxy_pass http://localhost:8080; # Keycloak instance running on port 8080
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header Host \$host;
 
-        rewrite ^/auth(/.*)$ $1 break; # Ensure the '/auth' prefix is stripped before passing to Keycloak
+        rewrite ^/auth(/.*)$ \$1 break; # Ensure the '/auth' prefix is stripped before passing to Keycloak
     }
 }
 EOL
