@@ -5,14 +5,14 @@ POSTGRES_DB="acme-app"
 POSTGRES_USER="user"
 POSTGRES_PASSWORD="password" # $(openssl rand -base64 12) # Generate a random 12-character password
 AUTH_SECRET="supersecret" # for the demo app
-AUTH_URL=http://188.245.198.233 # replace with your own domain or ip
+AUTH_URL=http://acme-app.gellify.dev # replace with your own domain or ip
 KEYCLOAK_ADMIN="admin"
 KEYCLOAK_ADMIN_PASSWORD="password"
 KEYCLOAK_CLIENT_ID="nextjs"
 KEYCLOAK_CLIENT_SECRET="secret"
 KEYCLOAK_ISSUER="http://keycloak:8080/realms/local"
 NEXT_PUBLIC_CLIENTVAR="not_so_secret_key" # for the demo app
-DOMAIN_NAME="188.245.198.233" # replace with your own domain or ip
+DOMAIN_NAME="acme-app.gellify.dev" # replace with your own domain or ip
 EMAIL="matteo.badini@gellify.com" # replace with your own
 
 # Script Vars
@@ -134,26 +134,25 @@ fi
 sudo cat > /etc/nginx/sites-available/acme-app <<EOL
 limit_req_zone \$binary_remote_addr zone=mylimit:10m rate=10r/s;
 
-# server {
-#     listen 80;
-#     server_name $DOMAIN_NAME;
-
-#     # Redirect all HTTP requests to HTTPS
-#     return 301 https://\$host\$request_uri;
-# }
-
 server {
     listen 80;
-    # listen 443 ssl;
     server_name $DOMAIN_NAME;
 
-    # ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
-    # ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;
-    # include /etc/letsencrypt/options-ssl-nginx.conf;
-    # ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+    # Redirect all HTTP requests to HTTPS
+    return 301 https://\$host\$request_uri;
+}
 
-    # # Enable rate limiting
-    # limit_req zone=mylimit burst=20 nodelay;
+server {
+    listen 443 ssl;
+    server_name $DOMAIN_NAME;
+
+    ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    # Enable rate limiting
+    limit_req zone=mylimit burst=20 nodelay;
 
     # Serve Next.js app at the root (default location '/')
     location / {
@@ -168,17 +167,24 @@ server {
         proxy_buffering off;
         proxy_set_header X-Accel-Buffering no;
     }
+}
 
-    # Serve Keycloak under the path '/auth'
-    location /auth/ {
+server {
+    listen 443 ssl;
+    server_name keycloak.$DOMAIN_NAME;
+
+    location / {
         proxy_pass http://localhost:8080; # Keycloak instance running on port 8080
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
         proxy_set_header Host \$host;
-
-        rewrite ^/auth(/.*)$ \$1 break; # Ensure the '/auth' prefix is stripped before passing to Keycloak
     }
+
+    # Optional: Let's Encrypt SSL configuration for Keycloak
+    # location /.well-known/acme-challenge/ {
+    #     root /var/www/html;
+    # }
 }
 EOL
 
