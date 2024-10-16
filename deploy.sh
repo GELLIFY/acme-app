@@ -154,8 +154,9 @@ server {
     # Enable rate limiting
     limit_req zone=mylimit burst=20 nodelay;
 
+    # Serve Next.js app at the root (default location '/')
     location / {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://localhost:3000; # Next.js app running on port 3000
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -167,13 +168,15 @@ server {
         proxy_set_header X-Accel-Buffering no;
     }
 
-    location /keycloak {
-        proxy_pass http://localhost:8080;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host \$host;
-        proxy_cache_bypass \$http_upgrade;
+    # Serve Keycloak under the path '/auth'
+    location /auth/ {
+        proxy_pass http://localhost:8080; # Keycloak instance running on port 8080
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $host;
+
+        rewrite ^/auth(/.*)$ $1 break; # Ensure the '/auth' prefix is stripped before passing to Keycloak
     }
 }
 EOL
@@ -195,8 +198,7 @@ if ! sudo docker-compose ps | grep "Up"; then
 fi
 
 # Output final message
-cat <<EOF
-Deployment complete. Your Next.js app and PostgreSQL database are now running. 
+echo "Deployment complete. Your Next.js app and PostgreSQL database are now running. 
 Next.js is available at https://$DOMAIN_NAME, and the PostgreSQL database is accessible from the web service.
 
 The .env file has been created with the following values:
@@ -212,5 +214,4 @@ The .env file has been created with the following values:
 - KEYCLOAK_CLIENT_ID
 - KEYCLOAK_CLIENT_SECRET
 - KEYCLOAK_ISSUER
-- NEXT_PUBLIC_CLIENTVAR
-EOF
+- NEXT_PUBLIC_CLIENTVAR"
