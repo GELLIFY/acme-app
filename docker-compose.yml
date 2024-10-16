@@ -60,7 +60,7 @@ services:
       - acme_network
 
   keycloak:
-    image: "quay.io/keycloak/keycloak:26.0"
+    image: "quay.io/keycloak/keycloak:25.0"
     depends_on:
       postgres:
         condition: service_healthy

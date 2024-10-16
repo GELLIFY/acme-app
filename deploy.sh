@@ -132,7 +132,7 @@ fi
 
 # Create Nginx config with reverse proxy, SSL support, rate limiting, and streaming support
 sudo cat > /etc/nginx/sites-available/acme-app <<EOL
-limit_req_zone \$binary_remote_addr zone=mylimit:10m rate=20r/s;
+limit_req_zone \$binary_remote_addr zone=mylimit:10m rate=25r/s;
 
 server {
     listen 80;
@@ -152,7 +152,7 @@ server {
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
     # Enable rate limiting
-    limit_req zone=mylimit burst=40 nodelay;
+    limit_req zone=mylimit burst=50 nodelay;
     limit_req_status 429;
 
     # Serve Next.js app at the root (default location '/')
