@@ -2,6 +2,7 @@
 FROM --platform=linux/amd64 node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
+RUN npm i -g pnpm
 COPY package.json pnpm-lock.yaml\* ./
 RUN pnpm i
 
@@ -10,6 +11,7 @@ FROM --platform=linux/amd64 node:20-alpine AS builder
 ARG DATABASE_URL
 ARG NEXT_PUBLIC_CLIENTVAR
 WORKDIR /app
+RUN npm i -g pnpm
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # ENV NEXT_TELEMETRY_DISABLED 1
