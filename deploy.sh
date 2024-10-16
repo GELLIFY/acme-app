@@ -10,7 +10,7 @@ KEYCLOAK_ADMIN="admin"
 KEYCLOAK_ADMIN_PASSWORD="password"
 KEYCLOAK_CLIENT_ID="nextjs"
 KEYCLOAK_CLIENT_SECRET="secret"
-KEYCLOAK_ISSUER="http://keycloak:8080/realms/local"
+KEYCLOAK_ISSUER="http://acme-app.gellify.dev/auth/realms/local"
 NEXT_PUBLIC_CLIENTVAR="not_so_secret_key" # for the demo app
 DOMAIN_NAME="acme-app.gellify.dev" # replace with your own domain or ip
 EMAIL="matteo.badini@gellify.com" # replace with your own
@@ -132,7 +132,7 @@ fi
 
 # Create Nginx config with reverse proxy, SSL support, rate limiting, and streaming support
 sudo cat > /etc/nginx/sites-available/acme-app <<EOL
-limit_req_zone \$binary_remote_addr zone=mylimit:20m rate=20r/s;
+limit_req_zone \$binary_remote_addr zone=mylimit:10m rate=20r/s;
 
 server {
     listen 80;
