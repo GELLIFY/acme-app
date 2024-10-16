@@ -1,17 +1,20 @@
 #!/bin/bash
 
 # Script Vars
-REPO_URL="https://github.com/GELLIFY/acme-app.git"
+REPO_URL="git@github.com:GELLIFY/acme-app.git"
+BRANCH_NAME=feature/self-host
 APP_DIR=~/acme-app
 
 # Pull the latest changes from the Git repository
 if [ -d "$APP_DIR" ]; then
   echo "Pulling latest changes from the repository..."
   cd $APP_DIR
-  git pull origin main
+  git fetch origin
+  git checkout $BRANCH_NAME
+  git pull origin $BRANCH_NAME
 else
-  echo "Cloning repository from $REPO_URL..."
-  git clone $REPO_URL $APP_DIR
+  echo "Cloning repository from $REPO_URL (branch: $BRANCH_NAME)..."
+  git clone --branch $BRANCH_NAME $REPO_URL $APP_DIR
   cd $APP_DIR
 fi
 

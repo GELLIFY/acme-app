@@ -195,7 +195,8 @@ if ! sudo docker-compose ps | grep "Up"; then
 fi
 
 # Output final message
-echo "Deployment complete. Your Next.js app and PostgreSQL database are now running. 
+cat <<EOF
+Deployment complete. Your Next.js app and PostgreSQL database are now running. 
 Next.js is available at https://$DOMAIN_NAME, and the PostgreSQL database is accessible from the web service.
 
 The .env file has been created with the following values:
@@ -212,3 +213,4 @@ The .env file has been created with the following values:
 - KEYCLOAK_CLIENT_SECRET
 - KEYCLOAK_ISSUER
 - NEXT_PUBLIC_CLIENTVAR
+EOF
