@@ -1,5 +1,5 @@
 # Stage 1: Install dependencies
-FROM --platform=linux/amd64 node:20-alpine AS deps
+FROM node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 RUN npm i -g pnpm
@@ -7,7 +7,7 @@ COPY package.json pnpm-lock.yaml\* ./
 RUN pnpm i
 
 # Stage 2: Build the application
-FROM --platform=linux/amd64 node:20-alpine AS builder
+FROM node:20-alpine AS builder
 ARG DATABASE_URL
 ARG NEXT_PUBLIC_CLIENTVAR
 WORKDIR /app
@@ -18,7 +18,7 @@ COPY . .
 RUN SKIP_ENV_VALIDATION=1 pnpm run build
 
 # Stage 3: Production server
-FROM --platform=linux/amd64 gcr.io/distroless/nodejs20-debian12 AS runner
+FROM gcr.io/distroless/nodejs20-debian12 AS runner
 WORKDIR /app
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1

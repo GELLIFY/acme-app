@@ -132,7 +132,7 @@ fi
 
 # Create Nginx config with reverse proxy, SSL support, rate limiting, and streaming support
 sudo cat > /etc/nginx/sites-available/acme-app <<EOL
-limit_req_zone \$binary_remote_addr zone=mylimit:10m rate=10r/s;
+limit_req_zone \$binary_remote_addr zone=mylimit:20m rate=20r/s;
 
 server {
     listen 80;
@@ -152,7 +152,8 @@ server {
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
     # Enable rate limiting
-    limit_req zone=mylimit burst=20 nodelay;
+    limit_req zone=mylimit burst=40 nodelay;
+    limit_req_status 429;
 
     # Serve Next.js app at the root (default location '/')
     location / {
@@ -167,24 +168,15 @@ server {
         proxy_buffering off;
         proxy_set_header X-Accel-Buffering no;
     }
-}
 
-server {
-    listen 443 ssl;
-    server_name keycloak.$DOMAIN_NAME;
-
-    location / {
-        proxy_pass http://localhost:8080; # Keycloak instance running on port 8080
+    # Serve Keycloak from /auth
+    location /auth/ {
+        proxy_pass http://localhost:8080/auth/; # Keycloak instance running on port 8080
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
         proxy_set_header Host \$host;
     }
-
-    # Optional: Let's Encrypt SSL configuration for Keycloak
-    # location /.well-known/acme-challenge/ {
-    #     root /var/www/html;
-    # }
 }
 EOL
 

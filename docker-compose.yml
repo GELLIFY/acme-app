@@ -60,7 +60,7 @@ services:
       - acme_network
 
   keycloak:
-    image: "quay.io/keycloak/keycloak:25.0"
+    image: "quay.io/keycloak/keycloak:26.0"
     depends_on:
       postgres:
         condition: service_healthy
@@ -77,6 +77,11 @@ services:
       KC_DB_USERNAME: "${POSTGRES_USER}"
       KC_DB_SCHEMA: "keycloak"
       KC_HEALTH_ENABLED: "true"
+      KC_HTTP_RELATIVE_PATH: "/auth" # Specifica il percorso
+      KC_HTTP_MANAGEMENT_RELATIVE_PATH: "/auth"
+      KC_PROXY_PROTOCOL_ENABLED: "true"
+      KC_PROXY_HEADERS: "xforwarded"
+      KC_HTTP_ENABLED: "true" # Abilita HTTP
       KEYCLOAK_ADMIN: "${KEYCLOAK_ADMIN}"
       KEYCLOAK_ADMIN_PASSWORD: "${KEYCLOAK_ADMIN_PASSWORD}"
     volumes:
@@ -87,7 +92,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'",
+          "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /auth/health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'",
         ]
       interval: 10s
       timeout: 5s
