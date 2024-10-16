@@ -134,25 +134,26 @@ fi
 sudo cat > /etc/nginx/sites-available/acme-app <<EOL
 limit_req_zone \$binary_remote_addr zone=mylimit:10m rate=10r/s;
 
+# server {
+#     listen 80;
+#     server_name $DOMAIN_NAME;
+
+#     # Redirect all HTTP requests to HTTPS
+#     return 301 https://\$host\$request_uri;
+# }
+
 server {
     listen 80;
+    # listen 443 ssl;
     server_name $DOMAIN_NAME;
 
-    # Redirect all HTTP requests to HTTPS
-    return 301 https://\$host\$request_uri;
-}
+    # ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
+    # ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;
+    # include /etc/letsencrypt/options-ssl-nginx.conf;
+    # ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
-server {
-    listen 443 ssl;
-    server_name $DOMAIN_NAME;
-
-    ssl_certificate /etc/letsencrypt/live/$DOMAIN_NAME/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN_NAME/privkey.pem;
-    include /etc/letsencrypt/options-ssl-nginx.conf;
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
-
-    # Enable rate limiting
-    limit_req zone=mylimit burst=20 nodelay;
+    # # Enable rate limiting
+    # limit_req zone=mylimit burst=20 nodelay;
 
     # Serve Next.js app at the root (default location '/')
     location / {
