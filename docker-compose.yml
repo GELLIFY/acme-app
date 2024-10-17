@@ -28,9 +28,9 @@ services:
   postgres:
     image: "postgres:16.3-alpine"
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -39,7 +39,7 @@ services:
         target: /docker-entrypoint-initdb.d/init.sql
         read_only: true
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -70,8 +70,8 @@ services:
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://postgres:5432/${DB_NAME}
-      KC_DB_PASSWORD: "${DB_PASSWORD}"
-      KC_DB_USERNAME: "${DB_USERNAME}"
+      KC_DB_PASSWORD: "${POSTGRES_PASSWORD}"
+      KC_DB_USERNAME: "${POSTGRES_USER}"
       KC_DB_SCHEMA: "keycloak"
       KC_HEALTH_ENABLED: "true"
       KC_HTTP_ENABLED: "true" # Abilita HTTP
