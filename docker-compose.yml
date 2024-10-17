@@ -77,11 +77,11 @@ services:
       KC_DB_USERNAME: "${POSTGRES_USER}"
       KC_DB_SCHEMA: "keycloak"
       KC_HEALTH_ENABLED: "true"
-      KC_HTTP_RELATIVE_PATH: "/auth" # Specifica il percorso
+      KC_HTTP_ENABLED: "true" # Abilita HTTP
+      KC_HTTP_RELATIVE_PATH: "/auth"
       KC_HTTP_MANAGEMENT_RELATIVE_PATH: "/auth"
       KC_PROXY_PROTOCOL_ENABLED: "true"
       KC_PROXY_HEADERS: "xforwarded"
-      KC_HTTP_ENABLED: "true" # Abilita HTTP
       KEYCLOAK_ADMIN: "${KEYCLOAK_ADMIN}"
       KEYCLOAK_ADMIN_PASSWORD: "${KEYCLOAK_ADMIN_PASSWORD}"
     volumes:

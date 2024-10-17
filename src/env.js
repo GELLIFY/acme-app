@@ -7,8 +7,8 @@ export const env = createEnv({
    * isn't built with invalid env vars.
    */
   server: {
-    DATABASE_URL: z.string(),
-    DATABASE_URL_EXTERNAL: z.string(),
+    DATABASE_URL: z.string().url("not a valid db url"),
+    DATABASE_URL_EXTERNAL: z.string().url("not a valid db url"),
     POSTGRES_DB: z.string(),
     POSTGRES_PASSWORD: z.string(),
     POSTGRES_USER: z.string(),

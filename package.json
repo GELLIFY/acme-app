@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": "20.16.0"
+    "node": "18.19.1"
   },
-  "packageManager": "pnpm@9.12.1",
+  "packageManager": "pnpm@9.4.0",
   "scripts": {
     "build": "next build",
     "clean": "git clean -xdf node_modules .next",
@@ -23,10 +23,10 @@
     "start": "node .next/standalone/server.js"
   },
   "dependencies": {
-    "@auth/core": "^0.37.0",
-    "@auth/drizzle-adapter": "^1.7.0",
+    "@auth/core": "^0.34.2",
+    "@auth/drizzle-adapter": "^1.4.2",
     "@hookform/resolvers": "^3.9.0",
-    "@neondatabase/serverless": "^0.10.1",
+    "@neondatabase/serverless": "^0.9.5",
     "@paralleldrive/cuid2": "^2.2.2",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-separator": "^1.1.0",
@@ -34,11 +34,11 @@
     "@t3-oss/env-nextjs": "^0.11.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
-    "drizzle-orm": "^0.35.1",
+    "drizzle-orm": "^0.33.0",
     "drizzle-zod": "^0.5.1",
     "lucide-react": "^0.446.0",
+    "next-auth": "5.0.0-beta.20",
     "next": "^14.2.15",
-    "next-auth": "5.0.0-beta.22",
     "next-safe-action": "^7.9.3",
     "next-themes": "^0.3.0",
     "postgres": "^3.4.4",
@@ -59,7 +59,7 @@
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "dotenv-cli": "^7.4.2",
-    "drizzle-kit": "^0.26.2",
+    "drizzle-kit": "^0.24.2",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.15",
     "eslint-plugin-drizzle": "^0.2.3",
