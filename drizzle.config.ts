@@ -5,15 +5,12 @@ import { env } from "~/env";
 
 // TODO: remove when next-auth postgres edge problems resolves
 // #ref: https://github.com/vercel/next.js/discussions/50177
-if (!process.env.VERCEL_ENV) {
-  // Set the WebSocket proxy to work with the local instance
-  neonConfig.wsProxy = (host) => `${host}:5433/v1`;
-
-  // Disable all authentication and encryption
-  neonConfig.useSecureWebSocket = false;
-  neonConfig.pipelineTLS = false;
-  neonConfig.pipelineConnect = false;
-}
+// Set the WebSocket proxy to work with the local instance
+neonConfig.wsProxy = (host) => `${host}:5433/v1`;
+// Disable all authentication and encryption
+neonConfig.useSecureWebSocket = false;
+neonConfig.pipelineTLS = false;
+neonConfig.pipelineConnect = false;
 
 export default {
   dialect: "postgresql", // "postgresql" | "mysql"
