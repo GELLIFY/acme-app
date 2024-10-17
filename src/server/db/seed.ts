@@ -1,12 +1,12 @@
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
+import { connectionStr } from "drizzle.config";
 import postgres from "postgres";
 
-import { env } from "~/env";
 import { schema } from ".";
 import { postsMock } from "./data/posts-mock";
 
-const queryClient = postgres(env.DATABASE_URL_EXTERNAL);
+const queryClient = postgres(connectionStr.toString());
 const db = drizzle(queryClient);
 
 console.log("Seed start");

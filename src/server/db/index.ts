@@ -1,5 +1,6 @@
 import { Pool } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-serverless";
+import { connectionStr } from "drizzle.config";
 
 import { env } from "~/env";
 import * as auth from "./schema/auth";
@@ -14,7 +15,7 @@ const globalForDb = globalThis as unknown as {
 };
 
 const conn =
-  globalForDb.conn ?? new Pool({ connectionString: env.DATABASE_URL_EXTERNAL });
+  globalForDb.conn ?? new Pool({ connectionString: connectionStr.toString() });
 if (env.NODE_ENV !== "production") globalForDb.conn = conn;
 
 export const schema = { ...auth, ...post };
