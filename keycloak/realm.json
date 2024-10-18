@@ -26,9 +26,7 @@
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "secret": "secret",
-      "redirectUris": [
-        "http://localhost:3000/api/auth/callback/keycloak"
-      ],
+      "redirectUris": ["http://localhost:3000/api/auth/callback/keycloak"],
       "webOrigins": [],
       "notBefore": 0,
       "bearerOnly": false,
