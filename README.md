@@ -28,7 +28,7 @@ Below you can find a diagram representing an high level overview of architecture
 
 ### Architecture - App Layer
 
-The application is build following all of the latest Next.js 14 best practices and guidelines. Plese refer to [Next.js](https://nextjs.org) official docs to get a better understanding of the available features.
+The application is build following all of the latest Next.js 14 best practices and guidelines. Please refer to [Next.js](https://nextjs.org) official docs to get a better understanding of the available features.
 
 The standard Next.js application layer features:
 
@@ -91,18 +91,107 @@ cp .env.example .env
 pnpm run dev
 ```
 
+### Supported Features
+
+This demo tries to showcase many different Next.js features.
+
+- Image Optimization
+- Streaming
+- Talking to a Postgres database
+- Caching
+- Incremental Static Regeneration
+- Reading environment variables
+- Using Middleware
+- Running code on server startup
+- A cron that hits a Route Handler
+
+View the demo at https://acme-app.gellify.dev to see further explanations.
+
 ## How do I deploy this?
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+#### Prerequisites
+
+- Purchase a domain name
+- Purchase a Linux Ubuntu server (e.g. droplet)
+- Create an A DNS record pointing to your server IPv4 address
+
+#### Quickstart
+
+1. SSH into your server:
+
+```sh
+ssh root@your_server_ip
+```
+
+2. Create a SSH key pair:
+
+```sh
+ssh-keygen -t ed25519 -C "name.surname@gellify.com"
+# Enter a file in which to save the key (/home/YOU/.ssh/id_ALGORITHM):[Press enter]
+# Enter passphrase (empty for no passphrase): [Type a passphrase]
+# Enter same passphrase again: [Type passphrase again]
+
+eval "$(ssh-agent -s)"
+
+ssh-add ~/.ssh/id_ed25519
+```
+
+3. Copy the SSH public key to clipboard and add it to your GitHub or BitBucket account:
+
+```sh
+$ cat ~/.ssh/id_ed25519.pub
+# Then select and copy the contents of the id_ed25519.pub file
+# displayed in the terminal to your clipboard
+```
+
+4. From your shell upload the deployment script via SSH:
+
+```sh
+scp -i ~/.ssh/id_ed25519 deploy.sh root@your_server_ip:~
+```
+
+5. From inside the server run the deployment script:
+
+> You can modify the email and domain name variables inside of the script to use your own.
+
+```sh
+chmod +x ~/deploy.sh
+./deploy.sh
+```
+
+#### Deploy script
+
+I've included a Bash script which does the following:
+
+- Installs all the necessary packages for your server
+- Installs Docker, Docker Compose, and Nginx
+- Clones this repository
+- Generates an SSL certificate
+- Builds your Next.js application from the Dockerfile
+- Sets up Nginx and configures HTTPS and rate limting
+- Sets up a cron which clears the database every 10m
+- Creates a .env file with your Postgres database creds
+- Once the deployment completes, your Next.js app will be available at:
+
+http://your-provided-domain.com
+
+Both the Next.js app and PostgreSQL database will be up and running in Docker containers. To set up your database, you could install npm inside your Postgres container and use the Drizzle scripts.
+
+For pushing subsequent updates, I also provided an update.sh script as an example.
+
+#### Helpful Commands
+
+- `docker-compose ps` – check status of Docker containers
+- `docker-compose logs app` – view Next.js output logs
+- `docker-compose logs cron` – view cron logs
+- `docker-compose down` - shut down the Docker containers
+- `docker-compose up -d` - start containers in the background
+- `sudo systemctl restart nginx` - restart nginx
+- `docker exec -it myapp-app-1 sh` - enter Next.js Docker container
+- `docker exec -it myapp-db-1 psql -U myuser -d mydatabase` - enter Postgres db
 
 ## Must read and watch
 
 - [From 0 to Production - The Modern React Tutorial (RSCs, Next.js, Shadui, Drizzle, TS and more)](https://www.youtube.com/watch?v=d5x0JCZbAJs)
 - [React Hook Form & React 19 Form Actions, The Right Way](https://www.youtube.com/watch?v=VLk45JBe8L8)
-
-## TODO
-
-- [x] update create form with safe action
-- [x] install server-only and move fetch there
-- [x] example of caching and revalidation
-- [ ] remove ws-proxy
+- [Self-Hosting Next.js](https://www.youtube.com/watch?v=sIVL4JMqRfc)

@@ -1,18 +1,19 @@
-export { auth as middleware } from "./server/auth";
+import { NextResponse } from "next/server";
 
-// Or like this if you need to do something here.
-// export default auth((req) => {
-//   console.log(req.auth) //  { session: { user: { ... } } }
-// })
+import { auth } from "./server/auth";
+
+export default auth((request) => {
+  const session = request.auth;
+
+  if (!session) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  return NextResponse.next();
+});
 
 // Read more: https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
 export const config = {
-  /*
-   * Match all request paths except for the ones starting with:
-   * - api (API routes)
-   * - _next/static (static files)
-   * - _next/image (image optimization files)
-   * - favicon.ico (favicon file)
-   */
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  // If you only want to secure certain pages
+  matcher: ["/protected"],
 };
