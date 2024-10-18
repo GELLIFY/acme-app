@@ -19,39 +19,38 @@ concurrency:
 #   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
 
 jobs:
-  lint:
+  build-lint:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - name: Setup
-        uses: ./.github/setup
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.4.0
 
-      - name: Copy env
-        shell: bash
-        run: cp .env.example .env
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-      - name: Lint
-        run: pnpm lint
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: |
+          echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-  format:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
-      - name: Setup
-        uses: ../.github/setup
+      - name: Install deps (with cache)
+        run: pnpm install
 
-      - name: Format
-        run: pnpm format
+      - run: cp .env.example .env
 
-  typecheck:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup
-        uses: ./../.github/setup
-
-      - name: Typecheck
-        run: pnpm typecheck
+      - name: Build, lint and type-check
+        run: pnpm turbo lint typecheck format
