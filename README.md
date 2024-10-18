@@ -18,13 +18,14 @@ If you are not familiar with the different technologies used in this project, pl
 
 In this stack we tried to follow all of the best practices of the different components that are used to enable the various features. In order to offer some default we pre-configured the following layers:
 
-- App Layer, a standard [Next.js](https://nextjs.org) app
-- Auth Layer, a Keycloak instance wrapped with [NextAuth.js](https://next-auth.js.org)
-- Data Layer, a Postgres instance managed by [Drizzle](https://orm.drizzle.team)
+- ✅ App Layer, a standard [Next.js](https://nextjs.org) app
+- ✅ Auth Layer, a Keycloak instance wrapped with [NextAuth.js](https://next-auth.js.org)
+- ✅ Data Layer, a Postgres instance managed by [Drizzle](https://orm.drizzle.team)
+- 😌 That's it!
 
 Below you can find a diagram representing an high level overview of architecture we strived to implement. This fullstack template aims to reduce complexity, increase DX and reduce dependencies overhead.
 
-![alt text](./docs/acme_app-architecture.png)
+![alt text](./docs/acme_app-charmender-architecture.png)
 
 ### Architecture - App Layer
 
@@ -109,11 +110,14 @@ View the demo at https://acme-app.gellify.dev to see further explanations.
 
 ## How do I deploy this?
 
+![alt text](./docs/acme_app-charmender-infra.png)
+
 #### Prerequisites
 
-- Purchase a domain name
-- Purchase a Linux Ubuntu server (e.g. droplet)
-- Create an A DNS record pointing to your server IPv4 address
+1. ✅ Purchase a domain name
+2. ✅ Purchase a Linux Ubuntu server (e.g. droplet)
+3. ✅ Docker
+4. 😌 That's it!
 
 #### Quickstart
 
@@ -175,20 +179,9 @@ I've included a Bash script which does the following:
 
 http://your-provided-domain.com
 
-Both the Next.js app and PostgreSQL database will be up and running in Docker containers. To set up your database, you could install npm inside your Postgres container and use the Drizzle scripts.
+Next.js app, PostgreSQL database and Keycloak instance will be up and running in Docker containers. To set up your database, you could install npm inside your Postgres container and use the Drizzle scripts.
 
 For pushing subsequent updates, I also provided an update.sh script as an example.
-
-#### Helpful Commands
-
-- `docker-compose ps` – check status of Docker containers
-- `docker-compose logs app` – view Next.js output logs
-- `docker-compose logs cron` – view cron logs
-- `docker-compose down` - shut down the Docker containers
-- `docker-compose up -d` - start containers in the background
-- `sudo systemctl restart nginx` - restart nginx
-- `docker exec -it myapp-app-1 sh` - enter Next.js Docker container
-- `docker exec -it myapp-db-1 psql -U myuser -d mydatabase` - enter Postgres db
 
 ## Must read and watch
 
