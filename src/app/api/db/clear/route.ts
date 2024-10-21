@@ -8,7 +8,7 @@ export async function POST() {
   // Because you can't trust an open <input> on the internet
   // eslint-disable-next-line drizzle/enforce-delete-with-where
   await db.delete(schema.post);
-  revalidatePath("/db");
+  revalidatePath("/todo");
 
   return NextResponse.json({ message: "All todos deleted successfully" });
 }

@@ -17,7 +17,7 @@ if (!process.env.VERCEL_ENV) {
 
 // Push requires SSL so use URL instead of username/password
 export const connectionStr = new URL(
-  `postgresql://${env.DATABASE_URL_EXTERNAL.split("@")[1]}`,
+  `postgresql://${env.DATABASE_URL_EXTERNAL?.split("@")[1]}`,
 );
 connectionStr.username = env.POSTGRES_USER;
 connectionStr.password = env.POSTGRES_PASSWORD;
