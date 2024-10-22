@@ -10,18 +10,9 @@ importers:
       "@auth/core":
         specifier: ^0.37.0
         version: 0.37.0
-      "@auth/drizzle-adapter":
-        specifier: ^1.7.0
-        version: 1.7.0
       "@hookform/resolvers":
         specifier: ^3.9.0
         version: 3.9.0(react-hook-form@7.53.0(react@18.3.1))
-      "@neondatabase/serverless":
-        specifier: ^0.9.5
-        version: 0.9.5
-      "@paralleldrive/cuid2":
-        specifier: ^2.2.2
-        version: 2.2.2
       "@radix-ui/react-label":
         specifier: ^2.1.0
         version: 2.1.0(@types/react-dom@18.3.0)(@types/react@18.3.9)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -42,10 +33,10 @@ importers:
         version: 2.1.1
       drizzle-orm:
         specifier: ^0.35.2
-        version: 0.35.2(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(@types/react@18.3.9)(pg@8.12.0)(postgres@3.4.4)(react@18.3.1)
+        version: 0.35.2(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(@types/react@18.3.9)(pg@8.13.0)(postgres@3.4.4)(react@18.3.1)
       drizzle-zod:
         specifier: ^0.5.1
-        version: 0.5.1(drizzle-orm@0.35.2(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(@types/react@18.3.9)(pg@8.12.0)(postgres@3.4.4)(react@18.3.1))(zod@3.23.8)
+        version: 0.5.1(drizzle-orm@0.35.2(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(@types/react@18.3.9)(pg@8.13.0)(postgres@3.4.4)(react@18.3.1))(zod@3.23.8)
       lucide-react:
         specifier: ^0.446.0
         version: 0.446.0(react@18.3.1)
@@ -61,9 +52,6 @@ importers:
       next-themes:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      postgres:
-        specifier: ^3.4.4
-        version: 3.4.4
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -123,8 +111,8 @@ importers:
         specifier: ^0.2.3
         version: 0.2.3(eslint@8.57.1)
       pg:
-        specifier: ^8.12.0
-        version: 8.12.0
+        specifier: ^8.13.0
+        version: 8.13.0
       postcss:
         specifier: ^8.4.47
         version: 8.4.47
@@ -192,12 +180,6 @@ packages:
         optional: true
       nodemailer:
         optional: true
-
-  "@auth/drizzle-adapter@1.7.0":
-    resolution:
-      {
-        integrity: sha512-hijoZnkCf9UxiTiNgm0rw3t2JhzFyJSFRGugv9kT9zgdlUtVy7TzyW8/6Me3TPNuLXCzXW1PkPIc3zqZ/1JLdA==,
-      }
 
   "@babel/code-frame@7.24.7":
     resolution:
@@ -1208,13 +1190,6 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  "@noble/hashes@1.4.0":
-    resolution:
-      {
-        integrity: sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==,
-      }
-    engines: { node: ">= 16" }
-
   "@nodelib/fs.scandir@2.1.5":
     resolution:
       {
@@ -1240,12 +1215,6 @@ packages:
     resolution:
       {
         integrity: sha512-6oclG6Y3PiDFcoyk8srjLfVKyMfVCKJ27JwNPViuXziFpmdz+MZnZN/aKY0JGXgYuO/VghU0jcOAZgWXZ1Dmrw==,
-      }
-
-  "@paralleldrive/cuid2@2.2.2":
-    resolution:
-      {
-        integrity: sha512-ZOBkgDwEdoYVlSeRbYYXs0S9MejQofiVYoTbKzy/6GQa39/q5tQU2IX46+shYnUkpEl3wc+J6wRlar7r2EK2xA==,
       }
 
   "@pkgjs/parseargs@0.11.0":
@@ -3292,10 +3261,10 @@ packages:
       }
     engines: { node: ">=0.10.0" }
 
-  oauth4webapi@2.11.1:
+  oauth4webapi@2.17.0:
     resolution:
       {
-        integrity: sha512-aNzOnL98bL6izG97zgnZs1PFEyO4WDVRhz2Pd066NPak44w5ESLRCYmJIyey8avSBPOMtBjhF3ZDDm7bIb7UOg==,
+        integrity: sha512-lbC0Z7uzAFNFyzEYRIC+pkSVvDHJTbEW+dYlSBAlCYDe6RxUkJ26bClhk8ocBZip1wfI9uKTe0fm4Ib4RHn6uQ==,
       }
 
   oauth4webapi@3.1.1:
@@ -3460,10 +3429,10 @@ packages:
         integrity: sha512-xWPagP/4B6BgFO+EKz3JONXv3YDgvkbVrGw2mTo3D6tVDQRh1e7cqVGvyR3BE+eQgAvx1XhW/iEASj4/jCWl3Q==,
       }
 
-  pg-connection-string@2.6.4:
+  pg-connection-string@2.7.0:
     resolution:
       {
-        integrity: sha512-v+Z7W/0EO707aNMaAEfiGnGL9sxxumwLl2fJvCQtMn9Fxsg+lPpPkdcyBSv/KFgpGdYkMfn+EI1Or2EHjpgLCA==,
+        integrity: sha512-PI2W9mv53rXJQEOb8xNR8lH7Hr+EKa6oJa38zsK0S/ky2er16ios1wLKhZyxzD7jUReiWokc9WK5nxSnC7W1TA==,
       }
 
   pg-int8@1.0.1:
@@ -3480,18 +3449,18 @@ packages:
       }
     engines: { node: ">=4" }
 
-  pg-pool@3.6.2:
+  pg-pool@3.7.0:
     resolution:
       {
-        integrity: sha512-Htjbg8BlwXqSBQ9V8Vjtc+vzf/6fVUuak/3/XXKA9oxZprwW3IMDQTGHP+KDmVL7rtd+R1QjbnCFPuTHm3G4hg==,
+        integrity: sha512-ZOBQForurqh4zZWjrgSwwAtzJ7QiRX0ovFkZr2klsen3Nm0aoh33Ls0fzfv3imeH/nw/O27cjdz5kzYJfeGp/g==,
       }
     peerDependencies:
       pg: ">=8.0"
 
-  pg-protocol@1.6.1:
+  pg-protocol@1.7.0:
     resolution:
       {
-        integrity: sha512-jPIlvgoD63hrEuihvIg+tJhoGjUsLPn6poJY9N5CnlPd91c2T18T/9zBtLxZSb1EhYxBRoZJtzScCaWlYLtktg==,
+        integrity: sha512-hTK/mE36i8fDDhgDFjy6xNOG+LCorxLG3WO17tku+ij6sVHXh1jQUJ8hYAnRhNla4QVD2H8er/FOjc/+EgC6yQ==,
       }
 
   pg-types@2.2.0:
@@ -3508,10 +3477,10 @@ packages:
       }
     engines: { node: ">=10" }
 
-  pg@8.12.0:
+  pg@8.13.0:
     resolution:
       {
-        integrity: sha512-A+LHUSnwnxrnL/tZ+OLfqR1SxLN3c/pgDztZ47Rpbsd4jUytsTtwQo/TLPRzPJMp/1pbhYVhH9cuSZLAajNfjQ==,
+        integrity: sha512-34wkUTh3SxTClfoHB3pQ7bIMvw9dpFU1audQQeZG837fmHfHpr14n/AELVDoOYVDW2h5RDWU78tFjkD+erSBsw==,
       }
     engines: { node: ">= 8.0.0" }
     peerDependencies:
@@ -4458,7 +4427,7 @@ snapshots:
       "@types/cookie": 0.6.0
       cookie: 0.6.0
       jose: 5.9.4
-      oauth4webapi: 2.11.1
+      oauth4webapi: 2.17.0
       preact: 10.11.3
       preact-render-to-string: 5.2.3(preact@10.11.3)
 
@@ -4471,14 +4440,6 @@ snapshots:
       oauth4webapi: 3.1.1
       preact: 10.11.3
       preact-render-to-string: 5.2.3(preact@10.11.3)
-
-  "@auth/drizzle-adapter@1.7.0":
-    dependencies:
-      "@auth/core": 0.37.0
-    transitivePeerDependencies:
-      - "@simplewebauthn/browser"
-      - "@simplewebauthn/server"
-      - nodemailer
 
   "@babel/code-frame@7.24.7":
     dependencies:
@@ -4916,6 +4877,7 @@ snapshots:
   "@neondatabase/serverless@0.9.5":
     dependencies:
       "@types/pg": 8.11.6
+    optional: true
 
   "@next/env@14.2.15": {}
 
@@ -4950,8 +4912,6 @@ snapshots:
   "@next/swc-win32-x64-msvc@14.2.15":
     optional: true
 
-  "@noble/hashes@1.4.0": {}
-
   "@nodelib/fs.scandir@2.1.5":
     dependencies:
       "@nodelib/fs.stat": 2.0.5
@@ -4965,10 +4925,6 @@ snapshots:
       fastq: 1.17.1
 
   "@panva/hkdf@1.2.1": {}
-
-  "@paralleldrive/cuid2@2.2.2":
-    dependencies:
-      "@noble/hashes": 1.4.0
 
   "@pkgjs/parseargs@0.11.0":
     optional: true
@@ -5055,8 +5011,9 @@ snapshots:
   "@types/pg@8.11.6":
     dependencies:
       "@types/node": 20.12.11
-      pg-protocol: 1.6.1
+      pg-protocol: 1.7.0
       pg-types: 4.0.2
+    optional: true
 
   "@types/prop-types@15.7.12": {}
 
@@ -5469,18 +5426,18 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.35.2(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(@types/react@18.3.9)(pg@8.12.0)(postgres@3.4.4)(react@18.3.1):
+  drizzle-orm@0.35.2(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(@types/react@18.3.9)(pg@8.13.0)(postgres@3.4.4)(react@18.3.1):
     optionalDependencies:
       "@neondatabase/serverless": 0.9.5
       "@types/pg": 8.11.6
       "@types/react": 18.3.9
-      pg: 8.12.0
+      pg: 8.13.0
       postgres: 3.4.4
       react: 18.3.1
 
-  drizzle-zod@0.5.1(drizzle-orm@0.35.2(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(@types/react@18.3.9)(pg@8.12.0)(postgres@3.4.4)(react@18.3.1))(zod@3.23.8):
+  drizzle-zod@0.5.1(drizzle-orm@0.35.2(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(@types/react@18.3.9)(pg@8.13.0)(postgres@3.4.4)(react@18.3.1))(zod@3.23.8):
     dependencies:
-      drizzle-orm: 0.35.2(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(@types/react@18.3.9)(pg@8.12.0)(postgres@3.4.4)(react@18.3.1)
+      drizzle-orm: 0.35.2(@neondatabase/serverless@0.9.5)(@types/pg@8.11.6)(@types/react@18.3.9)(pg@8.13.0)(postgres@3.4.4)(react@18.3.1)
       zod: 3.23.8
 
   eastasianwidth@0.2.0: {}
@@ -6337,7 +6294,7 @@ snapshots:
 
   normalize-path@3.0.0: {}
 
-  oauth4webapi@2.11.1: {}
+  oauth4webapi@2.17.0: {}
 
   oauth4webapi@3.1.1: {}
 
@@ -6387,7 +6344,8 @@ snapshots:
       define-properties: 1.2.1
       es-object-atoms: 1.0.0
 
-  obuf@1.1.2: {}
+  obuf@1.1.2:
+    optional: true
 
   once@1.4.0:
     dependencies:
@@ -6432,17 +6390,18 @@ snapshots:
   pg-cloudflare@1.1.1:
     optional: true
 
-  pg-connection-string@2.6.4: {}
+  pg-connection-string@2.7.0: {}
 
   pg-int8@1.0.1: {}
 
-  pg-numeric@1.0.2: {}
+  pg-numeric@1.0.2:
+    optional: true
 
-  pg-pool@3.6.2(pg@8.12.0):
+  pg-pool@3.7.0(pg@8.13.0):
     dependencies:
-      pg: 8.12.0
+      pg: 8.13.0
 
-  pg-protocol@1.6.1: {}
+  pg-protocol@1.7.0: {}
 
   pg-types@2.2.0:
     dependencies:
@@ -6461,12 +6420,13 @@ snapshots:
       postgres-date: 2.1.0
       postgres-interval: 3.0.0
       postgres-range: 1.1.4
+    optional: true
 
-  pg@8.12.0:
+  pg@8.13.0:
     dependencies:
-      pg-connection-string: 2.6.4
-      pg-pool: 3.6.2(pg@8.12.0)
-      pg-protocol: 1.6.1
+      pg-connection-string: 2.7.0
+      pg-pool: 3.7.0(pg@8.13.0)
+      pg-protocol: 1.7.0
       pg-types: 2.2.0
       pgpass: 1.0.5
     optionalDependencies:
@@ -6533,27 +6493,33 @@ snapshots:
 
   postgres-array@2.0.0: {}
 
-  postgres-array@3.0.2: {}
+  postgres-array@3.0.2:
+    optional: true
 
   postgres-bytea@1.0.0: {}
 
   postgres-bytea@3.0.0:
     dependencies:
       obuf: 1.1.2
+    optional: true
 
   postgres-date@1.0.7: {}
 
-  postgres-date@2.1.0: {}
+  postgres-date@2.1.0:
+    optional: true
 
   postgres-interval@1.2.0:
     dependencies:
       xtend: 4.0.2
 
-  postgres-interval@3.0.0: {}
+  postgres-interval@3.0.0:
+    optional: true
 
-  postgres-range@1.1.4: {}
+  postgres-range@1.1.4:
+    optional: true
 
-  postgres@3.4.4: {}
+  postgres@3.4.4:
+    optional: true
 
   preact-render-to-string@5.2.3(preact@10.11.3):
     dependencies:

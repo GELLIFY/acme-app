@@ -14,7 +14,7 @@ WORKDIR /app
 RUN npm i -g pnpm
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED 1
 RUN SKIP_ENV_VALIDATION=1 pnpm run build
 
 # Stage 3: Production server

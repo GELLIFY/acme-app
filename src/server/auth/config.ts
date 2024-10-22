@@ -1,11 +1,9 @@
 import type { TokenSet } from "@auth/core/types";
 import type { DefaultSession, NextAuthConfig } from "next-auth";
 import type { JWT } from "next-auth/jwt";
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import KeycloakProvider from "next-auth/providers/keycloak";
 
 import { env } from "~/env";
-import { db, schema } from "../db";
 
 declare module "next-auth" {
   interface Session {
@@ -32,12 +30,6 @@ declare module "next-auth/jwt" {
 }
 
 export const authConfig = {
-  adapter: DrizzleAdapter(db, {
-    usersTable: schema.users,
-    accountsTable: schema.accounts,
-    sessionsTable: schema.sessions,
-    verificationTokensTable: schema.verificationTokens,
-  }),
   pages: {
     signIn: "/auth/signin",
     signOut: "/auth/signout",

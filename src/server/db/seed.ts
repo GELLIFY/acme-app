@@ -1,13 +1,11 @@
 import { sql } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/postgres-js";
+import { drizzle } from "drizzle-orm/node-postgres";
 import { connectionStr } from "drizzle.config";
-import postgres from "postgres";
 
 import { schema } from ".";
 import { postsMock } from "./data/posts-mock";
 
-const queryClient = postgres(connectionStr.toString());
-const db = drizzle(queryClient);
+const db = drizzle(connectionStr.toString());
 
 console.log("Seed start");
 await db
@@ -21,6 +19,3 @@ await db
     },
   });
 console.log("Seed done");
-
-// closing connection
-await queryClient.end();

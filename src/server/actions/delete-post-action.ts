@@ -14,7 +14,7 @@ export const deletePostAction = authActionClient
     await deletePostMutation(parsedInput);
 
     // Invalidate cache
-    revalidatePath("/");
+    revalidatePath("/todo");
 
     // Return response
     return { message: "Post deleted" };
