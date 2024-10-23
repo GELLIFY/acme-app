@@ -1,4 +1,3 @@
-import type { TokenSet } from "@auth/core/types";
 import type { DefaultSession, NextAuthConfig } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import KeycloakProvider from "next-auth/providers/keycloak";
@@ -30,10 +29,6 @@ declare module "next-auth/jwt" {
 }
 
 export const authConfig = {
-  pages: {
-    signIn: "/auth/signin",
-    signOut: "/auth/signout",
-  },
   providers: [
     KeycloakProvider({
       clientId: env.KEYCLOAK_CLIENT_ID,
@@ -42,7 +37,6 @@ export const authConfig = {
     }),
   ],
   session: {
-    maxAge: 60 * 30,
     strategy: "jwt",
   },
   callbacks: {
@@ -77,8 +71,12 @@ export const authConfig = {
             },
           );
 
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const tokens: TokenSet = await response.json();
+          const tokens = (await response.json()) as {
+            id_token: string;
+            access_token: string;
+            refresh_token: string;
+            expires_in?: number;
+          };
 
           if (!response.ok) throw tokens;
 
@@ -86,7 +84,6 @@ export const authConfig = {
             ...token, // Keep the previous token properties
             idToken: tokens.id_token,
             accessToken: tokens.access_token,
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             expiresAt: Math.floor(Date.now() / 1000 + tokens.expires_in!),
             refreshToken: tokens.refresh_token ?? token.refreshToken,
           };
