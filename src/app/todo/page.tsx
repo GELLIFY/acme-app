@@ -7,6 +7,8 @@ import { CreatePostForm } from "./_components/create-post-form";
 import { PostListLoading } from "./_components/post-list.loading";
 import { PostListServer } from "./_components/post-list.server";
 
+export const dynamic = "force-dynamic";
+
 export default function HomePage() {
   return (
     <main className="container h-screen space-y-6 py-16">
