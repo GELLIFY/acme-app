@@ -8,16 +8,18 @@ const signinErrors: Record<string, string> = {
 };
 
 interface SignInPageProp {
-  params: object;
-  searchParams: {
+  params: Promise<object>;
+  searchParams: Promise<{
     callbackUrl: string;
     error: string;
-  };
+  }>;
 }
 
-export default async function Signin({
-  searchParams: { callbackUrl, error },
-}: SignInPageProp) {
+export default async function Signin(props: SignInPageProp) {
+  const searchParams = await props.searchParams;
+
+  const { callbackUrl, error } = searchParams;
+
   const session = await auth();
 
   if (session) {
