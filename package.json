@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": "20.16.0"
+    "node": "20.18.0"
   },
-  "packageManager": "pnpm@9.12.1",
+  "packageManager": "pnpm@9.12.2",
   "scripts": {
     "build": "next build",
     "clean": "git clean -xdf node_modules .next",
@@ -32,16 +32,16 @@
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.35.3",
     "drizzle-zod": "^0.5.1",
-    "lucide-react": "^0.446.0",
-    "next-auth": "5.0.0-beta.25",
+    "lucide-react": "^0.453.0",
     "next": "15.0.1",
-    "next-safe-action": "^7.9.3",
+    "next-auth": "5.0.0-beta.25",
+    "next-safe-action": "^7.9.6",
     "next-themes": "^0.3.0",
     "react": "19.0.0-rc-69d4b800-20241021",
     "react-dom": "19.0.0-rc-69d4b800-20241021",
-    "react-hook-form": "^7.53.0",
+    "react-hook-form": "^7.53.1",
     "sonner": "^1.5.0",
-    "tailwind-merge": "^2.5.2",
+    "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8"
   },
@@ -62,12 +62,9 @@
     "postcss": "^8.4.47",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.8",
-    "tailwindcss": "^3.4.13",
+    "tailwindcss": "^3.4.14",
     "tsx": "^4.19.1",
-    "typescript": "^5.6.2"
-  },
-  "ct3aMetadata": {
-    "initVersion": "7.32.1"
+    "typescript": "^5.6.3"
   },
   "pnpm": {
     "overrides": {
