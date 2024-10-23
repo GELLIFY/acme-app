@@ -23,7 +23,6 @@
     "start": "node .next/standalone/server.js"
   },
   "dependencies": {
-    "@auth/core": "^0.37.0",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-separator": "^1.1.0",
@@ -34,8 +33,8 @@
     "drizzle-orm": "^0.35.2",
     "drizzle-zod": "^0.5.1",
     "lucide-react": "^0.446.0",
-    "next-auth": "5.0.0-beta.22",
     "next": "^14.2.15",
+    "next-auth": "5.0.0-beta.25",
     "next-safe-action": "^7.9.3",
     "next-themes": "^0.3.0",
     "react": "18.3.1",
