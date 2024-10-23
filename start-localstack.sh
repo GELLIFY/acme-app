@@ -4,7 +4,7 @@ set -a
 set +a
 
 # setup
-docker-compose up -d --wait postgres pg_proxy keycloak
+docker-compose up -d --wait postgres keycloak
 
 # db
 pnpm db:push
