@@ -78,7 +78,7 @@ export const authConfig = {
             expires_in?: number;
           };
 
-          if (!response.ok) throw tokens;
+          if (!response.ok) throw new Error(response.statusText);
 
           const updatedToken: JWT = {
             ...token, // Keep the previous token properties

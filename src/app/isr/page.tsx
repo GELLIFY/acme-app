@@ -12,15 +12,15 @@ async function getPokemon() {
   const res = await fetch(`https://api.vercel.app/pokemon/${randomId}`, {
     next: { revalidate: 10 },
   });
-  return res.json();
-}
-
-export default async function ISRDemo() {
-  const pokemon = (await getPokemon()) as {
+  return res.json() as Promise<{
     id: string;
     name: string;
     type: string[];
-  };
+  }>;
+}
+
+export default async function ISRDemo() {
+  const pokemon = await getPokemon();
   const generatedAt = Date.now();
 
   return (
