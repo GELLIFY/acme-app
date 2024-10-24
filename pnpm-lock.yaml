@@ -94,7 +94,7 @@ importers:
         specifier: ^8.1.0
         version: 8.11.0(@typescript-eslint/parser@8.11.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1)(typescript@5.6.3)
       "@typescript-eslint/parser":
-        specifier: ^8.8.0
+        specifier: ^8.1.0
         version: 8.11.0(eslint@8.57.1)(typescript@5.6.3)
       dotenv-cli:
         specifier: ^7.4.2
