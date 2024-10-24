@@ -4,11 +4,11 @@ set -a
 set +a
 
 # setup
-docker-compose up -d --wait postgres keycloak
+docker-compose up -d --wait db db-migration keycloak
 
 # db
-pnpm db:push
-pnpm db:seed
+#pnpm db:push
+#pnpm db:seed
 
 # run
 #pnpm run dev

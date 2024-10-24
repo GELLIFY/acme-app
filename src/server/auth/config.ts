@@ -38,6 +38,7 @@ export const authConfig = {
   ],
   session: {
     strategy: "jwt",
+    maxAge: 5 * 60, // 5 min to sync with keycloak
   },
   callbacks: {
     async jwt({ token, account }) {

@@ -1,21 +1,23 @@
 import { sql } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/node-postgres";
-import { connectionStr } from "drizzle.config";
 
-import { schema } from ".";
+import { client, db, schema } from ".";
 import { postsMock } from "./data/posts-mock";
 
-const db = drizzle(connectionStr.toString());
+async function main() {
+  console.log("Seed start");
+  await db
+    .insert(schema.post)
+    .values(postsMock)
+    .onConflictDoUpdate({
+      target: schema.post.id,
+      set: {
+        title: sql`excluded.name`,
+        content: sql`excluded.content`,
+      },
+    });
 
-console.log("Seed start");
-await db
-  .insert(schema.post)
-  .values(postsMock)
-  .onConflictDoUpdate({
-    target: schema.post.id,
-    set: {
-      title: sql`excluded.name`,
-      content: sql`excluded.content`,
-    },
-  });
-console.log("Seed done");
+  await client.end();
+  console.log("Seed done");
+}
+
+await main();
