@@ -5,7 +5,7 @@ import { env } from "~/env";
 export default {
   dialect: "postgresql", // "postgresql" | "mysql"
   dbCredentials: {
-    url: env.DATABASE_URL_EXTERNAL,
+    url: env.DATABASE_URL,
   },
   schema: "./src/server/db/schema",
   out: "./src/server/db/migrations",

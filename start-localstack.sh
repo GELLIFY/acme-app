@@ -4,7 +4,7 @@ set -a
 set +a
 
 # setup
-docker-compose up -d --wait db db-migration keycloak
+docker-compose up -d --wait db db-migration db-seed keycloak
 
 # db
 #pnpm db:push
