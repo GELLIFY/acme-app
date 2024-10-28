@@ -29,7 +29,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - type: volume
-        source: tk80k8ssg8wcckkkoo8g404w_postgres-data
+        source: z044c88sk44kcwk8k44kccgw_postgres-data
         target: /var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
@@ -72,7 +72,9 @@ services:
         condition: service_completed_successfully
 
   keycloak:
-    image: "quay.io/keycloak/keycloak:26.0"
+    build:
+      context: .
+      dockerfile: ./docker/keycloak.Dockerfile
     depends_on:
       db:
         condition: service_healthy
@@ -112,6 +114,3 @@ services:
   #     "
   #   depends_on:
   #     - app
-
-volumes:
-  postgres_data:
