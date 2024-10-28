@@ -3,8 +3,6 @@ services:
     build:
       context: .
       dockerfile: ./docker/app.Dockerfile
-    ports:
-      - "3000:3000"
     environment:
       NODE_ENV: "production"
       DATABASE_URL: ${DATABASE_URL}
@@ -29,11 +27,9 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    ports:
-      - "5432:5432"
     volumes:
       - type: volume
-        source: postgres_data
+        source: tk80k8ssg8wcckkkoo8g404w_postgres-data
         target: /var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
@@ -57,21 +53,16 @@ services:
         condition: service_healthy
 
   keycloak:
-    build:
-      context: .
-      dockerfile: ./docker/keycloak.Dockerfile
+    image: "quay.io/keycloak/keycloak:26.0"
     depends_on:
       db:
         condition: service_healthy
     command:
       - "start-dev"
       - --import-realm
-    ports:
-      - "8080:8080"
-      - "9000:9000"
     environment:
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      KC_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
       KC_DB_PASSWORD: "${POSTGRES_PASSWORD}"
       KC_DB_USERNAME: "${POSTGRES_USER}"
       KC_DB_SCHEMA: "keycloak"
@@ -84,26 +75,24 @@ services:
       KC_PROXY_HEADERS: "xforwarded"
       KEYCLOAK_ADMIN: "${KEYCLOAK_ADMIN}"
       KEYCLOAK_ADMIN_PASSWORD: "${KEYCLOAK_ADMIN_PASSWORD}"
-      TZ: Europe/Rome
+      TZ: ${TIMEZONE:-UTC}
     healthcheck:
       test:
-        [
-          "CMD-SHELL",
-          "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'",
-        ]
+        - CMD-SHELL
+        - "exec 3<>/dev/tcp/127.0.0.1/9000;echo -e 'GET /health/ready HTTP/1.1\r\nhost: http://localhost\r\nConnection: close\r\n\r\n' >&3;if [ $? -eq 0 ]; then echo 'Healthcheck Successful';exit 0;else echo 'Healthcheck Failed';exit 1;fi;"
       interval: 10s
       timeout: 5s
       retries: 5
 
-  cron:
-    image: alpine/curl
-    command: >
-      sh -c "
-        echo '*/10 * * * * curl -X POST http://app:3000/api/db/clear' > /etc/crontabs/root && \
-        crond -f -l 2
-      "
-    depends_on:
-      - app
+  # cron:
+  #   image: alpine/curl
+  #   command: >
+  #     sh -c "
+  #       echo '*/10 * * * * curl -X POST http://app:3000/api/db/clear' > /etc/crontabs/root && \
+  #       crond -f -l 2
+  #     "
+  #   depends_on:
+  #     - app
 
 volumes:
   postgres_data:
