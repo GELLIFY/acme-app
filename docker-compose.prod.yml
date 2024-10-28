@@ -104,6 +104,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    exclude_from_hc: true
 
   # cron:
   #   image: alpine/curl
