@@ -29,7 +29,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - type: volume
-        source: z044c88sk44kcwk8k44kccgw_postgres-data
+        source: postgres-data
         target: /var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
@@ -83,7 +83,7 @@ services:
       - --import-realm
     environment:
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      KC_DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
       KC_DB_PASSWORD: "${POSTGRES_PASSWORD}"
       KC_DB_USERNAME: "${POSTGRES_USER}"
       KC_DB_SCHEMA: "keycloak"
