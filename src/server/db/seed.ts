@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 
-import { client, db, schema } from ".";
+import { db, schema } from ".";
 import { postsMock } from "./data/posts-mock";
 
 async function main() {
@@ -11,12 +11,14 @@ async function main() {
     .onConflictDoUpdate({
       target: schema.post.id,
       set: {
-        title: sql`excluded.name`,
+        title: sql`excluded.title`,
         content: sql`excluded.content`,
       },
     });
 
-  await client.end();
+  // @ts-expect-error wrong typings
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  await db.$client.end();
   console.log("Seed done");
 }
 
