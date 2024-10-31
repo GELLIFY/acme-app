@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install dependencies & tooling
-        uses: ./.github/setup.yml
+        uses: ./.github/workflows/setup
 
       - run: cp .env.example .env
 
@@ -52,7 +52,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install dependencies & tooling
-        uses: ./.github/setup.yml
+        uses: ./.github/workflows/setup
 
       - name: Apply migrations
         run: pnpm run db:migrate
