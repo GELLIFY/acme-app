@@ -35,6 +35,8 @@ jobs:
   setup_keycloak:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
       - name: Keycloak Admin CLI
         uses: carlosthe19916/keycloak-action@0.6
         with:
