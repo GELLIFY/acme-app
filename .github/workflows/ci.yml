@@ -1,8 +1,8 @@
 name: CI
 
 on:
-  pull_request:
-    branches: ["*"]
+  # pull_request:
+  #   branches: ["*"]
   push:
     branches: ["main"]
   merge_group:
@@ -11,44 +11,15 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
-# You can leverage Vercel Remote Caching with Turbo to speed up your builds
-# @link https://turborepo.org/docs/core-concepts/remote-caching#remote-caching-on-vercel-builds
-# env:
-#   FORCE_COLOR: 3
-#   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
-#   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-
 jobs:
-  build-lint:
+  check_quality:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.4.1
-
-      - name: Setup Node 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: |
-          echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install deps (with cache)
-        run: pnpm install
+      - name: Install dependencies & tooling
+        uses: ./.github/setup.yml
 
       - run: cp .env.example .env
 
@@ -60,3 +31,38 @@ jobs:
 
       - name: Format
         run: pnpm run format
+
+  setup_keycloak:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Keycloak Admin CLI
+        uses: carlosthe19916/keycloak-action@0.6
+        with:
+          version: latest
+          server: https://keycloak.gellify.dev
+          username: ${{ secrets.KEYCLOAK_ADMIN }}
+          password: ${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}
+          kcadm: |
+            create realms -f ./docker/realm.json
+
+  apply_migrations:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install dependencies & tooling
+        uses: ./.github/setup.yml
+
+      - name: Apply migrations
+        run: pnpm run db:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SKIP_ENV_VALIDATION: true
+
+  trigger_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Coolify
+        run: |
+          curl --request GET '${{ secrets.COOLIFY_WEBHOOK }}' --header 'Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}'
