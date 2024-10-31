@@ -38,7 +38,7 @@ jobs:
       - name: Keycloak Admin CLI
         uses: carlosthe19916/keycloak-action@0.6
         with:
-          version: latest
+          version: "25.0.2"
           server: https://keycloak.gellify.dev
           username: ${{ secrets.KEYCLOAK_ADMIN }}
           password: ${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}
