@@ -45,7 +45,7 @@ All of the above are just the basic features of a modern Next.js application. Yo
 
 For authentication and authorization we choose Keycloak provider. In this template Auth is configured out-of-the-box with some defaults that can be modified.
 
-- Keycloak configuration, `/keycloak/realm.json`
+- Keycloak configuration, `/docker/realm.json`
 - Keycloak Admin, `.env`
 
 Comunication with Keycloak is handled via [NextAuth.js](https://next-auth.js.org). This choice enbles you the Developer to change Idendity Provider is needed, without much effort. See the relative [documentation](https://next-auth.js.org/providers/) to find out more.
@@ -108,7 +108,7 @@ This demo tries to showcase many different Next.js features.
 
 View the demo at https://acme-app.gellify.dev to see further explanations.
 
-## How do I deploy this?
+## How do I deploy this? (WIP)
 
 ![alt text](./docs/acme_app-charmender-infra.png)
 
@@ -165,7 +165,7 @@ chmod +x ~/deploy.sh
 
 #### Deploy script
 
-I've included a Bash script which does the following:
+I've included a Bash script **THAT NEEDS ADJUSTMENTS** which does the following:
 
 - Installs all the necessary packages for your server
 - Installs Docker, Docker Compose, and Nginx

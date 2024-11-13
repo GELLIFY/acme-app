@@ -8,7 +8,6 @@ export const env = createEnv({
    */
   server: {
     DATABASE_URL: z.string().url("not a valid db url"),
-    DATABASE_URL_EXTERNAL: z.string().url("not a valid db url"),
     POSTGRES_DB: z.string(),
     POSTGRES_PASSWORD: z.string(),
     POSTGRES_USER: z.string(),
@@ -42,7 +41,6 @@ export const env = createEnv({
    */
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
-    DATABASE_URL_EXTERNAL: process.env.DATABASE_URL_EXTERNAL,
     POSTGRES_DB: process.env.POSTGRES_DB,
     POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD,
     POSTGRES_USER: process.env.POSTGRES_USER,
