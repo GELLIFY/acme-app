@@ -80,8 +80,8 @@ else
   cd $APP_DIR
 fi
 
-# For Docker internal communication ("postgres" is the name of Postgres container)
-DATABASE_URL="postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB"
+# For Docker internal communication ("db" is the name of Postgres container)
+DATABASE_URL="postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@db:5432/$POSTGRES_DB"
 
 # For external tools (like Drizzle Studio)
 DATABASE_URL_EXTERNAL="postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:5432/$POSTGRES_DB"
@@ -205,7 +205,6 @@ The .env file has been created with the following values:
 - POSTGRES_USER
 - POSTGRES_PASSWORD (randomly generated)
 - DATABASE_URL
-- DATABASE_URL_EXTERNAL
 - AUTH_SECRET
 - AUTH_URL
 - KEYCLOAK_ADMIN

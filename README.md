@@ -50,6 +50,8 @@ For authentication and authorization we choose Keycloak provider. In this templa
 
 Comunication with Keycloak is handled via [NextAuth.js](https://next-auth.js.org). This choice enbles you the Developer to change Idendity Provider is needed, without much effort. See the relative [documentation](https://next-auth.js.org/providers/) to find out more.
 
+If you want to go faster and don't want to worry about hosting and configurations use [Clerk](https://clerk.com). Here a quick [migration guide](https://clerk.com/docs/guides/authjs-migration)
+
 ### Architecture - Data Layer
 
 A standard Postrges Database is the default. Both the App and Keycloak will use the same DB (but different schemas) to handle their respective business logic.
