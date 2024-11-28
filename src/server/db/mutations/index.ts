@@ -7,11 +7,11 @@ import { db, schema } from "..";
 export async function deletePostMutation(
   params: z.infer<typeof deletePostSchema>,
 ) {
-  await db.delete(schema.post).where(eq(schema.post.id, params.id));
+  await db.delete(schema.posts).where(eq(schema.posts.id, params.id));
 }
 
 export async function createPostMutation(
   params: z.infer<typeof createPostSchema>,
 ) {
-  await db.insert(schema.post).values(params);
+  await db.insert(schema.posts).values(params);
 }

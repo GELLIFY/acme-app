@@ -15,15 +15,8 @@ export const env = createEnv({
       .enum(["development", "test", "production"])
       .default("development"),
 
-    AUTH_URL: z.string().url(),
-    AUTH_SECRET:
-      process.env.NODE_ENV === "production"
-        ? z.string().min(1)
-        : z.string().min(1).optional(),
-
-    KEYCLOAK_CLIENT_ID: z.string().min(1),
-    KEYCLOAK_CLIENT_SECRET: z.string().min(1),
-    KEYCLOAK_ISSUER: z.string().min(1),
+    SERVERVAR: z.string().min(1),
+    CLERK_SECRET_KEY: z.string().min(1),
   },
 
   /**
@@ -33,6 +26,7 @@ export const env = createEnv({
    */
   client: {
     NEXT_PUBLIC_CLIENTVAR: z.string(),
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),
   },
 
   /**
@@ -45,12 +39,11 @@ export const env = createEnv({
     POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD,
     POSTGRES_USER: process.env.POSTGRES_USER,
     NODE_ENV: process.env.NODE_ENV,
-    AUTH_URL: process.env.AUTH_URL,
-    AUTH_SECRET: process.env.AUTH_SECRET,
-    KEYCLOAK_CLIENT_ID: process.env.KEYCLOAK_CLIENT_ID,
-    KEYCLOAK_CLIENT_SECRET: process.env.KEYCLOAK_CLIENT_SECRET,
-    KEYCLOAK_ISSUER: process.env.KEYCLOAK_ISSUER,
+    CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
+    SERVERVAR: process.env.SERVERVAR,
     NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
+      process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

@@ -1,10 +1,9 @@
+import { auth } from "@clerk/nextjs/server";
 import {
   createSafeActionClient,
   DEFAULT_SERVER_ERROR_MESSAGE,
 } from "next-safe-action";
 import { z } from "zod";
-
-import { auth } from "~/server/auth";
 
 // This is our base client.
 // Here we define a middleware that logs the result of the action execution.
@@ -53,7 +52,7 @@ export const authActionClient = actionClient
     const session = await auth();
 
     // If the session is not valid, we throw an error and stop execution here.
-    if (!session?.access_token) {
+    if (!session.userId) {
       throw new Error("Session is not valid!");
     }
 

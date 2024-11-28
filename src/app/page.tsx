@@ -18,7 +18,7 @@ async function getPokemon() {
 }
 
 export default async function Home() {
-  const secretKey = env.AUTH_SECRET;
+  const secretKey = env.SERVERVAR;
   const response = await getPokemon();
   const pokemon = (await response.json()) as {
     id: string;

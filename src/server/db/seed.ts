@@ -1,25 +1,21 @@
-import { sql } from "drizzle-orm";
+import "dotenv/config";
+
+import { reset, seed } from "drizzle-seed";
 
 import { db, schema } from ".";
-import { postsMock } from "./data/posts-mock";
+import { posts } from "./schema/posts";
 
 async function main() {
-  console.log("Seed start");
-  await db
-    .insert(schema.post)
-    .values(postsMock)
-    .onConflictDoUpdate({
-      target: schema.post.id,
-      set: {
-        title: sql`excluded.title`,
-        content: sql`excluded.content`,
+  await reset(db, schema);
+  await seed(db, { posts }).refine((f) => ({
+    posts: {
+      columns: {
+        title: f.loremIpsum(),
+        content: f.loremIpsum(),
       },
-    });
-
-  // @ts-expect-error wrong typings
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  await db.$client.end();
-  console.log("Seed done");
+      count: 5,
+    },
+  }));
 }
 
 await main();

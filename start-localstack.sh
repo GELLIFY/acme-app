@@ -4,7 +4,7 @@ set -a
 set +a
 
 # setup
-docker-compose up -d --wait db keycloak
+docker-compose up -d --wait db neon-proxy
 
 # db
 pnpm db:push

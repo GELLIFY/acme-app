@@ -6,9 +6,9 @@ import { toast } from "sonner";
 
 import { Button } from "~/components/ui/button";
 import { deletePostAction } from "~/server/actions/delete-post-action";
-import { type schema } from "~/server/db";
+import { type SelectPost } from "~/server/db/schema/posts";
 
-export function DeletePosts(props: { post: typeof schema.post.$inferSelect }) {
+export function DeletePosts(props: { post: SelectPost }) {
   const { execute, result } = useAction(deletePostAction);
 
   useEffect(() => {
