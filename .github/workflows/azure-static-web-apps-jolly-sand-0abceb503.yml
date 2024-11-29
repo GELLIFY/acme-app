@@ -9,6 +9,12 @@ on:
     branches:
       - main
 
+env:
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+  SKIP_ENV_VALIDATION: 1
+
 jobs:
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
@@ -25,6 +31,11 @@ jobs:
         env:
           PRE_BUILD_COMMAND: npm install -g pnpm
           CUSTOM_BUILD_COMMAND: pnpm install && pnpm run build
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          SERVERVAR: "server_var"
+          NEXT_PUBLIC_CLIENTVAR: "client_var"
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY: ${{ env.CLERK_SECRET_KEY }}
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_JOLLY_SAND_0ABCEB503 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
