@@ -3,9 +3,9 @@ name: Deploy Preview
 on: [pull_request]
 
 env:
-  NEON_DATABASE_USERNAME: ${{ secrets.NEON_DATABASE_USERNAME }} # change this to your database username
   NEON_API_KEY: ${{ secrets.NEON_API_KEY }} # You can generate a an API key in your account settings
-  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  NEON_DATABASE_NAME: neondb # Change this to your db name
+  NEON_DATABASE_USERNAME: neondb_owner # Change this to your db user
 
 jobs:
   deploy-preview:
@@ -28,39 +28,9 @@ jobs:
           project_id: ${{ vars.NEON_PROJECT_ID }}
           # parent: dev # optional (defaults to your primary branch)
           branch_name: preview/pr-${{ github.event.number }}-${{ steps.branch-name.outputs.current_branch }}
-          database: aplomb
+          database: ${{ env.NEON_DATABASE_NAME }}
           username: ${{ env.NEON_DATABASE_USERNAME }}
           api_key: ${{ env.NEON_API_KEY }}
 
-      - name: Run Migrations
-        run: |
-          touch .env
-
-          echo DATABASE_URL=${{ steps.create-branch.outputs.db_url_with_pooler }} >> .env
-          echo DATABASE_URL_UNPOOLED=${{ steps.create-branch.outputs.db_url }} >> .env
-          echo SKIP_ENV_VALIDATION=1 >> .env
-
-          pnpm run db:generate
-          pnpm run db:migrate
-          pnpm run db:csv
-
-      - name: Install Vercel CLI
-        run: npm install --global vercel@latest
-
-      - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=preview --token=${{ env.VERCEL_TOKEN }}
-
-      - name: Build Project Artifacts
-        run: vercel build --token=${{ env.VERCEL_TOKEN }}
-
-      - name: Deploy Preview to Vercel
-        id: deploy
-        run: echo preview_url=$(vercel deploy --prebuilt --token=${{ env.VERCEL_TOKEN }}) >> $GITHUB_OUTPUT
-
-      - name: Comment on Pull Request
-        uses: thollander/actions-comment-pull-request@v3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          message: |
-            Vercel Preview URL :rocket: : ${{ steps.deploy.outputs.preview_url }}
-            Neon branch :elephant: : https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ steps.create-branch.outputs.branch_id }}
+      - name: Deploy to Preview
+        uses: ./.github/workflows/cd/vercel/preview
