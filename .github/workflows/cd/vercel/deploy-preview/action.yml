@@ -2,6 +2,14 @@ name: Deploy Preview
 
 on: [pull_request]
 
+inputs:
+  DATABASE_URL:
+    description: database url with pooler
+    required: true
+  DATABASE_URL_UNPOOLED:
+    description: database url
+    required: true
+
 env:
   NEON_DATABASE_USERNAME: ${{ secrets.NEON_DATABASE_USERNAME }} # change this to your database username
   NEON_API_KEY: ${{ secrets.NEON_API_KEY }} # You can generate a an API key in your account settings
@@ -15,8 +23,8 @@ runs:
       run: |
         touch .env
 
-        echo DATABASE_URL=${{ steps.create-branch.outputs.db_url_with_pooler }} >> .env
-        echo DATABASE_URL_UNPOOLED=${{ steps.create-branch.outputs.db_url }} >> .env
+        echo DATABASE_URL=${{ inputs.DATABASE_URL }} >> .env
+        echo DATABASE_URL_UNPOOLED=${{ inputs.DATABASE_URL_UNPOOLED }} >> .env
 
         pnpm run db:generate
         pnpm run db:migrate

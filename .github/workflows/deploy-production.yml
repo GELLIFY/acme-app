@@ -5,6 +5,9 @@ on:
     branches:
       - "main"
 
+env:
+  CLOUD_PROVIDER: "vercel" # "azure" | "aws" | "vercel"
+
 jobs:
   deploy-production:
     permissions: write-all
@@ -16,4 +19,9 @@ jobs:
         uses: ./.github/workflows/setup
 
       - name: Deploy to Production
+        if: env.CLOUD_PROVIDER == 'vercel'
         uses: ./.github/workflows/cd/vercel/production
+
+      - name: Deploy to Production
+        if: env.CLOUD_PROVIDER == 'azure'
+        uses: ./.github/workflows/cd/azure/production

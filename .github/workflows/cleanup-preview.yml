@@ -5,6 +5,7 @@ on:
     types: [closed]
 
 env:
+  CLOUD_PROVIDER: "vercel" # "azure" | "aws" | "vercel"
   NEON_API_KEY: ${{ secrets.NEON_API_KEY }} # You can generate a an API key in your account settings
   NEON_PROJECT_ID: ${{ vars.NEON_PROJECT_ID }} # You can generate a an API key in your account settings
 
