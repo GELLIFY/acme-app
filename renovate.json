@@ -1,7 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:base"],
-  "enabled": false,
+  "enabled": true,
   "branchConcurrentLimit": 1,
   "updateInternalDeps": true,
   "rangeStrategy": "bump",
