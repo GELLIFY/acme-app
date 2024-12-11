@@ -1,5 +1,5 @@
 # Stage 1: Install dependencies
-FROM node:20-alpine AS deps
+FROM node:20.18.1-alpine AS deps
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 RUN npm i -g pnpm
@@ -7,7 +7,7 @@ COPY package.json pnpm-lock.yaml\* ./
 RUN pnpm i
 
 # Stage 2: Build the application
-FROM node:20-alpine AS builder
+FROM node:20.18.1-alpine AS builder
 ARG DATABASE_URL
 ARG NEXT_PUBLIC_CLIENTVAR
 WORKDIR /app
