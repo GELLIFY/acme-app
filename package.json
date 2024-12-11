@@ -19,7 +19,7 @@
     "db:seedd": "tsx src/server/db/index.ts",
     "ui-add": "pnpm dlx shadcn add && prettier src --write --list-different",
     "dev": "next dev --turbopack",
-    "format": "prettier --check . !pnpm-lock.yaml",
+    "format": "prettier --check . !pnpm-lock.yaml !package.json",
     "format:fix": "prettier --write .",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
