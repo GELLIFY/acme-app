@@ -5,5 +5,20 @@
   "branchConcurrentLimit": 1,
   "updateInternalDeps": true,
   "rangeStrategy": "bump",
-  "automerge": false
+  "automerge": false,
+  "packageRules": [
+    {
+      "description": "Ignore nodejs",
+      "matchPackageNames": ["node"],
+      "matchManagers": ["pnpm"],
+      "matchDepTypes": ["engines"],
+      "dependencyDashboardApproval": true
+    }
+  ],
+  "docker-compose": {
+    "enabled": false
+  },
+  "dockerfile": {
+    "enabled": false
+  }
 }
