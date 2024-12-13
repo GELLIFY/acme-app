@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@clerk/elements": "^0.22.0",
-    "@clerk/nextjs": "^6.9.0",
+    "@clerk/nextjs": "^6.9.1",
     "@hookform/resolvers": "^3.9.1",
     "@neondatabase/serverless": "^0.10.4",
     "@paralleldrive/cuid2": "^2.2.2",
