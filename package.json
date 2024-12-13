@@ -27,7 +27,7 @@
     "start": "node .next/standalone/server.js"
   },
   "dependencies": {
-    "@clerk/elements": "^0.22.0",
+    "@clerk/elements": "^0.22.2",
     "@clerk/nextjs": "^6.9.1",
     "@hookform/resolvers": "^3.9.1",
     "@neondatabase/serverless": "^0.10.4",
