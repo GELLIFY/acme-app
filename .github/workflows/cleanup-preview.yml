@@ -5,7 +5,7 @@ on:
     types: [closed]
 
 env:
-  CLOUD_PROVIDER: "vercel" # "azure" | "aws" | "vercel"
+  CLOUD_PROVIDER: "" # "azure" | "aws" | "vercel"
   NEON_API_KEY: ${{ secrets.NEON_API_KEY }} # You can generate a an API key in your account settings
   NEON_PROJECT_ID: ${{ vars.NEON_PROJECT_ID }} # You can generate a an API key in your account settings
 
@@ -21,9 +21,9 @@ jobs:
           api_key: ${{ env.NEON_API_KEY }}
 
       - name: Clean up Vercel deployment
-        if: env.CLOUD_PROVIDER == 'vercel'
+        if: ${{ env.CLOUD_PROVIDER == '' || env.CLOUD_PROVIDER == 'vercel' }}
         uses: ./.github/workflows/cd/vercel/cleanup-preview
 
       - name: Clean up Azure deployment
-        if: env.CLOUD_PROVIDER == 'azure'
+        if: ${{ env.CLOUD_PROVIDER == '' || env.CLOUD_PROVIDER == 'azure' }}
         uses: ./.github/workflows/cd/azure/cleanup-preview

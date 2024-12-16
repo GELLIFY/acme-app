@@ -6,7 +6,7 @@ on:
       - "main"
 
 env:
-  CLOUD_PROVIDER: "vercel" # "azure" | "aws" | "vercel"
+  CLOUD_PROVIDER: "" # "azure" | "aws" | "vercel"
   SKIP_ENV_VALIDATION: 1
 
 jobs:
@@ -27,9 +27,9 @@ jobs:
           pnpm run db:migrate
 
       - name: Deploy to Production
-        if: env.CLOUD_PROVIDER == 'vercel'
+        if: ${{ env.CLOUD_PROVIDER == '' || env.CLOUD_PROVIDER == 'vercel' }}
         uses: ./.github/workflows/cd/vercel/deploy-production
 
       - name: Deploy to Production
-        if: env.CLOUD_PROVIDER == 'azure'
+        if: ${{ env.CLOUD_PROVIDER == '' || env.CLOUD_PROVIDER == 'azure' }}
         uses: ./.github/workflows/cd/azure/deploy-production

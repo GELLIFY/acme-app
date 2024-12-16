@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, reopened]
 
 env:
-  CLOUD_PROVIDER: "vercel" # "azure" | "aws" | "vercel"
+  CLOUD_PROVIDER: "" # "azure" | "aws" | "vercel"
   NEON_API_KEY: ${{ secrets.NEON_API_KEY }} # You can generate a an API key in your account settings
   NEON_DATABASE_NAME: neondb # Change this to your db name
   NEON_DATABASE_USERNAME: neondb_owner # Change this to your db user
@@ -54,14 +54,14 @@ jobs:
           api_key: ${{ env.NEON_API_KEY }}
 
       - name: Deploy to Preview (Vercel)
-        if: env.CLOUD_PROVIDER == 'vercel'
+        if: ${{ env.CLOUD_PROVIDER == '' || env.CLOUD_PROVIDER == 'vercel' }}
         uses: ./.github/workflows/cd/vercel/deploy-preview
         with:
           DATABASE_URL: ${{ steps.create-branch.outputs.db_url_with_pooler }}
           DATABASE_URL_UNPOOLED: ${{ steps.create-branch.outputs.db_url }}
 
       - name: Deploy to Preview (Azure)
-        if: env.CLOUD_PROVIDER == 'azure'
+        if: ${{ env.CLOUD_PROVIDER == '' || env.CLOUD_PROVIDER == 'azure' }}
         uses: ./.github/workflows/cd/azure/deploy-preview
         with:
           DATABASE_URL: ${{ steps.create-branch.outputs.db_url_with_pooler }}
