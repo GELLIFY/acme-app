@@ -7,6 +7,7 @@ on:
 
 env:
   CLOUD_PROVIDER: "vercel" # "azure" | "aws" | "vercel"
+  SKIP_ENV_VALIDATION: 1
 
 jobs:
   deploy-production:
@@ -18,10 +19,17 @@ jobs:
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
 
+      - name: Apply Migrations
+        run: |
+          touch .env
+
+          echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env
+          pnpm run db:migrate
+
       - name: Deploy to Production
         if: env.CLOUD_PROVIDER == 'vercel'
-        uses: ./.github/workflows/cd/vercel/production
+        uses: ./.github/workflows/cd/vercel/deploy-production
 
       - name: Deploy to Production
         if: env.CLOUD_PROVIDER == 'azure'
-        uses: ./.github/workflows/cd/azure/production
+        uses: ./.github/workflows/cd/azure/deploy-production

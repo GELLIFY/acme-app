@@ -1,12 +1,15 @@
 name: Deploy Preview
 
-on: [pull_request]
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 env:
   CLOUD_PROVIDER: "vercel" # "azure" | "aws" | "vercel"
   NEON_API_KEY: ${{ secrets.NEON_API_KEY }} # You can generate a an API key in your account settings
   NEON_DATABASE_NAME: neondb # Change this to your db name
   NEON_DATABASE_USERNAME: neondb_owner # Change this to your db user
+  SKIP_ENV_VALIDATION: 1
 
 jobs:
   deploy-preview:
@@ -18,29 +21,46 @@ jobs:
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
 
-      - name: Get branch name
-        id: branch-name
-        uses: tj-actions/branch-names@v8
-
       - name: Create Neon Branch
         id: create-branch
         uses: neondatabase/create-branch-action@v5
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
-          # parent: dev # optional (defaults to your primary branch)
-          branch_name: preview/pr-${{ github.event.number }}-${{ steps.branch-name.outputs.current_branch }}
+          # parent: main # optional (defaults to your primary branch)
+          branch_name: preview/pr-${{ github.event.number }}
           database: ${{ env.NEON_DATABASE_NAME }}
           username: ${{ env.NEON_DATABASE_USERNAME }}
           api_key: ${{ env.NEON_API_KEY }}
 
-      - name: Deploy to Preview
+      - name: Apply Migrations
+        run: |
+          touch .env
+
+          echo DATABASE_URL=${{ steps.create-branch.outputs.db_url_with_pooler }} >> .env
+          echo DATABASE_URL_UNPOOLED=${{ steps.create-branch.outputs.db_url }} >> .env
+
+          pnpm run db:generate
+          pnpm run db:migrate
+
+      - name: Comment with schema diff
+        uses: neondatabase/schema-diff-action@v1
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          compare_branch: preview/pr-${{ github.event.number }}
+          database: ${{ env.NEON_DATABASE_NAME }}
+          username: ${{ env.NEON_DATABASE_USERNAME }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          base_branch: main
+          api_key: ${{ env.NEON_API_KEY }}
+
+      - name: Deploy to Preview (Vercel)
         if: env.CLOUD_PROVIDER == 'vercel'
-        uses: ./.github/workflows/cd/vercel/preview
+        uses: ./.github/workflows/cd/vercel/deploy-preview
         with:
           DATABASE_URL: ${{ steps.create-branch.outputs.db_url_with_pooler }}
           DATABASE_URL_UNPOOLED: ${{ steps.create-branch.outputs.db_url }}
 
-      - name: Deploy to Preview
+      - name: Deploy to Preview (Azure)
         if: env.CLOUD_PROVIDER == 'azure'
         uses: ./.github/workflows/cd/azure/deploy-preview
         with:

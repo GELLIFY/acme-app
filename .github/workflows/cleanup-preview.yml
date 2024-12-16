@@ -17,5 +17,13 @@ jobs:
         uses: neondatabase/delete-branch-action@v3.2.0
         with:
           project_id: ${{ env.NEON_PROJECT_ID }}
-          branch: preview/pr-${{ github.event.number }}-${{ github.event.pull_request.head.ref }}
+          branch: preview/pr-${{ github.event.number }}
           api_key: ${{ env.NEON_API_KEY }}
+
+      - name: Clean up Vercel deployment
+        if: env.CLOUD_PROVIDER == 'vercel'
+        uses: ./.github/workflows/cd/vercel/cleanup-preview
+
+      - name: Clean up Azure deployment
+        if: env.CLOUD_PROVIDER == 'azure'
+        uses: ./.github/workflows/cd/azure/cleanup-preview

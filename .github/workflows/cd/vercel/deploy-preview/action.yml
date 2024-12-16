@@ -1,6 +1,4 @@
-name: Deploy Preview
-
-on: [pull_request]
+name: Deploy Preview on Vercel
 
 inputs:
   DATABASE_URL:
@@ -10,37 +8,21 @@ inputs:
     description: database url
     required: true
 
-env:
-  NEON_DATABASE_USERNAME: ${{ secrets.NEON_DATABASE_USERNAME }} # change this to your database username
-  NEON_API_KEY: ${{ secrets.NEON_API_KEY }} # You can generate a an API key in your account settings
-  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-  SKIP_ENV_VALIDATION: 1
-
 runs:
   using: composite
   steps:
-    - name: Run Migrations
-      run: |
-        touch .env
-
-        echo DATABASE_URL=${{ inputs.DATABASE_URL }} >> .env
-        echo DATABASE_URL_UNPOOLED=${{ inputs.DATABASE_URL_UNPOOLED }} >> .env
-
-        pnpm run db:generate
-        pnpm run db:migrate
-
     - name: Install Vercel CLI
       run: npm install --global vercel@latest
 
     - name: Pull Vercel Environment Information
-      run: vercel pull --yes --environment=preview --token=${{ env.VERCEL_TOKEN }}
+      run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
     - name: Build Project Artifacts
-      run: vercel build --token=${{ env.VERCEL_TOKEN }}
+      run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
     - name: Deploy Preview to Vercel
       id: deploy
-      run: echo preview_url=$(vercel deploy --prebuilt --token=${{ env.VERCEL_TOKEN }}) >> $GITHUB_OUTPUT
+      run: echo preview_url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}) >> $GITHUB_OUTPUT
 
     - name: Comment on Pull Request
       uses: thollander/actions-comment-pull-request@v3

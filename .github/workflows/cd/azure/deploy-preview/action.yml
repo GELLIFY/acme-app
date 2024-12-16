@@ -1,10 +1,4 @@
-name: Azure Static Web Apps CI/CD
-
-on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-    branches:
-      - main
+name: Deploy Preview on Azure
 
 inputs:
   DATABASE_URL:
@@ -27,17 +21,12 @@ runs:
         CUSTOM_BUILD_COMMAND: pnpm install && pnpm run build:az
         SKIP_ENV_VALIDATION: 1 # disable env validation on build step
         DATABASE_URL: ${{ inputs.DATABASE_URL }} # usefull to build static content that depends on DB
-        # List all of your client side env in order to build them into the output
         NEXT_PUBLIC_CLIENTVAR: "client_var"
         NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-        ###### End of client side environment ######
       with:
         azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_JOLLY_SAND_0ABCEB503 }}
         repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
         action: "upload"
-        ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-        # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
         app_location: "/" # App source code path
         api_location: "" # Api source code path - optional
         output_location: "" # Built app content directory - optional
-        ###### End of Repository/Build Configurations ######

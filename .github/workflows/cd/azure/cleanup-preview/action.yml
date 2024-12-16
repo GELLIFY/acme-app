@@ -1,10 +1,4 @@
-name: Azure Static Web Apps CI/CD
-
-on:
-  pull_request:
-    types: [closed]
-    branches:
-      - main
+name: Cleanup Azure deployment
 
 runs:
   using: composite
