@@ -29,7 +29,13 @@ jobs:
       - name: Deploy to Production
         if: ${{ env.CLOUD_PROVIDER == '' || env.CLOUD_PROVIDER == 'vercel' }}
         uses: ./.github/workflows/cd/vercel/deploy-production
+        with:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy to Production
         if: ${{ env.CLOUD_PROVIDER == '' || env.CLOUD_PROVIDER == 'azure' }}
         uses: ./.github/workflows/cd/azure/deploy-production
+        with:
+          AZURE_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_JOLLY_SAND_0ABCEB503 }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}

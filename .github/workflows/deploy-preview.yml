@@ -54,9 +54,11 @@ jobs:
           api_key: ${{ env.NEON_API_KEY }}
 
       - name: Deploy to Preview (Vercel)
+        id: deploy-vercel
         if: ${{ env.CLOUD_PROVIDER == '' || env.CLOUD_PROVIDER == 'vercel' }}
         uses: ./.github/workflows/cd/vercel/deploy-preview
         with:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           DATABASE_URL: ${{ steps.create-branch.outputs.db_url_with_pooler }}
           DATABASE_URL_UNPOOLED: ${{ steps.create-branch.outputs.db_url }}
 
@@ -64,5 +66,15 @@ jobs:
         if: ${{ env.CLOUD_PROVIDER == '' || env.CLOUD_PROVIDER == 'azure' }}
         uses: ./.github/workflows/cd/azure/deploy-preview
         with:
+          AZURE_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_JOLLY_SAND_0ABCEB503 }}
           DATABASE_URL: ${{ steps.create-branch.outputs.db_url_with_pooler }}
           DATABASE_URL_UNPOOLED: ${{ steps.create-branch.outputs.db_url }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+
+      - name: Comment on Pull Request
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          message: |
+            Preview URL :rocket: : ${{ steps.deploy-vercel.outputs.preview_url }}
+            Neon branch :elephant: : https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ steps.create-branch.outputs.branch_id }}

@@ -7,6 +7,13 @@ inputs:
   DATABASE_URL_UNPOOLED:
     description: database url
     required: true
+  VERCEL_TOKEN:
+    description: vercel token
+    required: true
+outputs:
+  preview_url:
+    description: "Preview URL"
+    value: ${{ steps.deploy.outputs.preview_url }}
 
 runs:
   using: composite
@@ -15,19 +22,11 @@ runs:
       run: npm install --global vercel@latest
 
     - name: Pull Vercel Environment Information
-      run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      run: vercel pull --yes --environment=preview --token=${{ inputs.VERCEL_TOKEN }}
 
     - name: Build Project Artifacts
-      run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      run: vercel build --token=${{ inputs.VERCEL_TOKEN }}
 
     - name: Deploy Preview to Vercel
       id: deploy
-      run: echo preview_url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}) >> $GITHUB_OUTPUT
-
-    - name: Comment on Pull Request
-      uses: thollander/actions-comment-pull-request@v3
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        message: |
-          Vercel Preview URL :rocket: : ${{ steps.deploy.outputs.preview_url }}
-          Neon branch :elephant: : https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ steps.create-branch.outputs.branch_id }}
+      run: echo preview_url=$(vercel deploy --prebuilt --token=${{ inputs.VERCEL_TOKEN }}) >> $GITHUB_OUTPUT
