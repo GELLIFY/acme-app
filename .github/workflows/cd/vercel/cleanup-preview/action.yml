@@ -6,3 +6,4 @@ runs:
     - name: Cleanup preview deployment
       run: |
         echo TODO use Vercel CLI to cleanup preview deployment
+      shell: bash
