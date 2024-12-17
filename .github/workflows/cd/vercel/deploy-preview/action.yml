@@ -26,6 +26,8 @@ runs:
     - name: Build Project Artifacts
       run: vercel build --token=${{ inputs.VERCEL_TOKEN }}
       shell: bash
+      env:
+        DATABASE_URL: "${{ inputs.DATABASE_URL }}"
 
     - name: Deploy Preview to Vercel
       id: deploy
