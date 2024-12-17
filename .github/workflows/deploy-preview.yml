@@ -98,6 +98,10 @@ jobs:
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
 
+      - run: echo db_url ${{ needs.create_neon_branch.outputs.db_url }}
+      - run: echo db_url_with_pooler ${{ needs.create_neon_branch.outputs.db_url_with_pooler }}
+      - run: echo branch_id ${{ needs.create_neon_branch.outputs.branch_id }}
+
       - name: Deploy to Preview (Vercel)
         id: deploy-vercel
         uses: ./.github/workflows/cd/vercel/deploy-preview
