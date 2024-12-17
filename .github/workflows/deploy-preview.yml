@@ -2,7 +2,11 @@ name: Deploy Preview
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - closed
 
 env:
   CLOUD_PROVIDER: "" # "azure" | "aws" | "vercel"
@@ -11,9 +15,14 @@ env:
   NEON_DATABASE_USERNAME: neondb_owner # Change this to your db user
   SKIP_ENV_VALIDATION: 1
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
 jobs:
-  deploy-preview:
-    permissions: write-all
+  setup:
+    name: Setup
+    outputs:
+      branch: ${{ steps.branch_name.outputs.current_branch }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,38 +30,59 @@ jobs:
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
 
+      - name: Get branch name
+        id: branch_name
+        uses: tj-actions/branch-names@v8
+
+  create_neon_branch:
+    name: Create Neon Branch
+    outputs:
+      db_url: ${{ steps.create_neon_branch.outputs.db_url }}
+      db_url_with_pooler: ${{ steps.create_neon_branch.outputs.db_url_with_pooler }}
+      branch_id: ${{ steps.create_neon_branch.outputs.branch_id }}
+    needs: setup
+    if: github.event.action == 'synchronize' || github.event.action == 'opened' || github.event.action == 'reopened'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
       - name: Create Neon Branch
-        id: create-branch
+        id: create_neon_branch
         uses: neondatabase/create-branch-action@v5
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
           # parent: main # optional (defaults to your primary branch)
-          branch_name: preview/pr-${{ github.event.number }}
+          branch_name: preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }}
           database: ${{ env.NEON_DATABASE_NAME }}
           username: ${{ env.NEON_DATABASE_USERNAME }}
           api_key: ${{ env.NEON_API_KEY }}
 
-      - name: Apply Migrations
-        run: |
-          touch .env
+      - name: Run Migrations
+        run: pnpm run db:migrate
+        env:
+          # to use pooled connection
+          DATABASE_URL: "${{ steps.create_neon_branch.outputs.db_url_with_pooler }}"
+          # OR to use unpooled connection
+          # DATABASE_URL: "${{ steps.create_neon_branch.outputs.db_url }}"
 
-          echo DATABASE_URL=${{ steps.create-branch.outputs.db_url_with_pooler }} >> .env
-          echo DATABASE_URL_UNPOOLED=${{ steps.create-branch.outputs.db_url }} >> .env
-
-          pnpm run db:generate
-          pnpm run db:migrate
-
-      - name: Comment with schema diff
+      - name: Post Schema Diff Comment to PR
         uses: neondatabase/schema-diff-action@v1
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
-          compare_branch: preview/pr-${{ github.event.number }}
+          compare_branch: preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }}
           database: ${{ env.NEON_DATABASE_NAME }}
           username: ${{ env.NEON_DATABASE_USERNAME }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           base_branch: main
           api_key: ${{ env.NEON_API_KEY }}
 
+  deploy-preview:
+    name: Deploy Preview
+    needs: create_neon_branch
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
       - name: Deploy to Preview (Vercel)
         id: deploy-vercel
         if: ${{ env.CLOUD_PROVIDER == '' || env.CLOUD_PROVIDER == 'vercel' }}
@@ -77,4 +107,29 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           message: |
             Preview URL :rocket: : ${{ steps.deploy-vercel.outputs.preview_url }}
-            Neon branch :elephant: : https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ steps.create-branch.outputs.branch_id }}
+            Neon branch :elephant: : https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ needs.create_neon_branch.outputs.branch_id }}
+
+  delete_neon_branch:
+    name: Delete Neon Branch
+    needs: setup
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete Neon Branch
+        uses: neondatabase/delete-branch-action@v3
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch: preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+
+      - name: Clean up Vercel deployment
+        if: ${{ env.CLOUD_PROVIDER == '' || env.CLOUD_PROVIDER == 'vercel' }}
+        uses: ./.github/workflows/cd/vercel/cleanup-preview
+        with:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: Clean up Azure deployment
+        if: ${{ env.CLOUD_PROVIDER == '' || env.CLOUD_PROVIDER == 'azure' }}
+        uses: ./.github/workflows/cd/azure/cleanup-preview
+        with:
+          AZURE_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_JOLLY_SAND_0ABCEB503 }}
