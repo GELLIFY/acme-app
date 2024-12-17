@@ -88,6 +88,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies & tooling
+        uses: ./.github/workflows/setup
+
       - name: Deploy to Preview (Vercel)
         id: deploy-vercel
         if: ${{ env.CLOUD_PROVIDER == '' || env.CLOUD_PROVIDER == 'vercel' }}
