@@ -1,9 +1,6 @@
 name: Deploy Preview on Vercel
 
 inputs:
-  DATABASE_URL:
-    description: database url with pooler
-    required: true
   VERCEL_TOKEN:
     description: vercel token
     required: true
@@ -15,11 +12,6 @@ outputs:
 runs:
   using: composite
   steps:
-    - shell: bash
-      run: |
-        touch .env
-        echo DATABASE_URL=${{ inputs.DATABASE_URL }} >> .env
-
     - name: Install Vercel CLI
       run: npm install --global vercel@latest
       shell: bash
@@ -31,8 +23,6 @@ runs:
     - name: Build Project Artifacts
       run: vercel build --token=${{ inputs.VERCEL_TOKEN }}
       shell: bash
-      env:
-        DATABASE_URL: "${{ inputs.DATABASE_URL }}"
 
     - name: Deploy Preview to Vercel
       id: deploy

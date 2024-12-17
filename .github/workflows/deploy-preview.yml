@@ -86,6 +86,8 @@ jobs:
     needs: create_neon_branch
     runs-on: ubuntu-latest
     permissions: write-all
+    env:
+      DATABASE_URL: ${{ needs.create_neon_branch.outputs.db_url_with_pooler }}
     steps:
       - uses: actions/checkout@v4
 
