@@ -1,0 +1,58 @@
+name: Cleanup Preview
+
+on:
+  workflow_call:
+
+jobs:
+  delete_neon_branch:
+    name: Delete Neon Branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get branch name
+        id: branch_name
+        uses: tj-actions/branch-names@v8
+
+      - name: Delete Neon Branch
+        uses: neondatabase/delete-branch-action@v3
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch: preview/pr-${{ github.event.number }}-${{ steps.branch_name.outputs.current_branch }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+
+  cleanup_vercel_preview:
+    name: Cleanup Vercel Preview
+    needs: delete_neon_branch
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies & tooling
+        uses: ./.github/workflows/setup
+
+      - name: Cleanup Preview Deployment
+        id: cleanup-vercel
+        uses: ./.github/workflows/cd/vercel/cleanup-preview
+        with:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+  cleanup_azure_preview:
+    name: Cleanup Azure Preview
+    needs: delete_neon_branch
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies & tooling
+        uses: ./.github/workflows/setup
+
+      - name: Cleanup Preview Deployment
+        id: cleanup-azure
+        uses: ./.github/workflows/cd/azure/cleanup-preview
+        with:
+          AZURE_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_JOLLY_SAND_0ABCEB503 }}
