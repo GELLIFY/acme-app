@@ -15,7 +15,8 @@ outputs:
 runs:
   using: composite
   steps:
-    - run: |
+    - shell: bash
+      run: |
         touch .env
         echo DATABASE_URL=${{ inputs.DATABASE_URL }} >> .env
 
