@@ -15,6 +15,10 @@ outputs:
 runs:
   using: composite
   steps:
+    - run: |
+        touch .env
+        echo DATABASE_URL=${{ inputs.DATABASE_URL }} >> .env
+
     - name: Install Vercel CLI
       run: npm install --global vercel@latest
       shell: bash
