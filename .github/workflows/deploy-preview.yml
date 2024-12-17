@@ -99,7 +99,6 @@ jobs:
         uses: ./.github/workflows/cd/vercel/deploy-preview
         with:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          DATABASE_URL: ${{ needs.create_neon_branch.outputs.db_url_with_pooler }}
 
       - name: Comment on Pull Request
         uses: thollander/actions-comment-pull-request@v3
