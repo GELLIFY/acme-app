@@ -4,9 +4,6 @@ inputs:
   DATABASE_URL:
     description: database url with pooler
     required: true
-  DATABASE_URL_UNPOOLED:
-    description: database url
-    required: true
   VERCEL_TOKEN:
     description: vercel token
     required: true
