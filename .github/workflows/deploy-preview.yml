@@ -61,6 +61,10 @@ jobs:
           database: ${{ env.NEON_DATABASE_NAME }}
           username: ${{ env.NEON_DATABASE_USERNAME }}
           api_key: ${{ env.NEON_API_KEY }}
+      - run: echo db_url ${{ steps.create_branch.outputs.db_url }}
+      - run: echo db_url_with_pooler ${{ steps.create_branch.outputs.db_url_with_pooler }}
+      - run: echo host ${{ steps.create_branch.outputs.host }}
+      - run: echo branch_id ${{ steps.create_branch.outputs.branch_id }}
 
       - name: Run Migrations
         run: pnpm run db:migrate
