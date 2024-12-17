@@ -36,9 +36,9 @@ jobs:
   create_neon_branch:
     name: Create Neon Branch
     outputs:
-      db_url: ${{ steps.create_neon_branch.outputs.db_url }}
-      db_url_with_pooler: ${{ steps.create_neon_branch.outputs.db_url_with_pooler }}
-      branch_id: ${{ steps.create_neon_branch.outputs.branch_id }}
+      db_url: ${{ steps.create_branch.outputs.db_url }}
+      db_url_with_pooler: ${{ steps.create_branch.outputs.db_url_with_pooler }}
+      branch_id: ${{ steps.create_branch.outputs.branch_id }}
     needs: setup
     if: github.event.action == 'synchronize' || github.event.action == 'opened' || github.event.action == 'reopened'
     runs-on: ubuntu-latest
@@ -52,7 +52,7 @@ jobs:
         uses: ./.github/workflows/setup
 
       - name: Create Neon Branch
-        id: create_neon_branch
+        id: create_branch
         uses: neondatabase/create-branch-action@v5
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
@@ -65,10 +65,8 @@ jobs:
       - name: Run Migrations
         run: pnpm run db:migrate
         env:
-          # to use pooled connection
-          DATABASE_URL: "${{ steps.create_neon_branch.outputs.db_url_with_pooler }}"
-          # OR to use unpooled connection
-          # DATABASE_URL: "${{ steps.create_neon_branch.outputs.db_url }}"
+          DATABASE_URL: "${{ steps.create_branch.outputs.db_url_with_pooler }}" # to use pooled connection
+          # DATABASE_URL: "${{ steps.create_branch.outputs.db_url }}" # OR to use unpooled connection
 
       - name: Post Schema Diff Comment to PR
         uses: neondatabase/schema-diff-action@v1
@@ -85,7 +83,9 @@ jobs:
     name: Deploy Vercel Preview
     needs: create_neon_branch
     runs-on: ubuntu-latest
-    permissions: write-all
+    permissions:
+      contents: read
+      pull-requests: write
     env:
       DATABASE_URL: ${{ needs.create_neon_branch.outputs.db_url_with_pooler }}
     steps:
@@ -99,6 +99,7 @@ jobs:
         uses: ./.github/workflows/cd/vercel/deploy-preview
         with:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DATABASE_URL: ${{ needs.create_neon_branch.outputs.db_url_with_pooler }}
 
       - name: Comment on Pull Request
         uses: thollander/actions-comment-pull-request@v3
@@ -112,7 +113,9 @@ jobs:
     name: Deploy Azure Preview
     needs: create_neon_branch
     runs-on: ubuntu-latest
-    permissions: write-all
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
 
