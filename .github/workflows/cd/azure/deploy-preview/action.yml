@@ -19,7 +19,7 @@ outputs:
 runs:
   using: composite
   permissions:
-  id-token: write # Require write permission to Fetch an OIDC token.
+    id-token: write # Require write permission to Fetch an OIDC token.
   steps:
     - name: Build And Deploy
       id: builddeploy
