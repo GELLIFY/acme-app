@@ -31,6 +31,7 @@ jobs:
   deploy_vercel_production:
     name: Deploy Vercel Preview
     runs-on: ubuntu-latest
+    environment: production
     needs: run_migrations
     permissions:
       contents: read

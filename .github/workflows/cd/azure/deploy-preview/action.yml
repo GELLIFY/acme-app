@@ -12,7 +12,7 @@ inputs:
     required: true
     default: pk_test_
 outputs:
-  preview-url:
+  preview_url:
     description: "Preview URL"
     value: ${{ steps.builddeploy.outputs.static_web_app_url }}
 
