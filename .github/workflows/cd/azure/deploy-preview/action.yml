@@ -29,7 +29,7 @@ runs:
       uses: Azure/static-web-apps-deploy@v1
       env:
         PRE_BUILD_COMMAND: npm install -g pnpm
-        CUSTOM_BUILD_COMMAND: pnpm install && cat .env && pnpm run build:az
+        CUSTOM_BUILD_COMMAND: pnpm install && pnpm run build:az
         SKIP_ENV_VALIDATION: 1 # disable env validation on build step
         DATABASE_URL: ${{ inputs.DATABASE_URL }} # usefull to build static content that depends on DB
         NEXT_PUBLIC_CLIENTVAR: "client_var"
