@@ -1,7 +1,12 @@
 name: Cleanup Preview
 
 on:
-  workflow_call:
+  pull_request:
+    types:
+      - closed
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   delete_neon_branch:
@@ -19,7 +24,7 @@ jobs:
           branch: preview/pr-${{ github.event.number }}-${{ steps.branch_name.outputs.current_branch }}
           api_key: ${{ secrets.NEON_API_KEY }}
 
-  cleanup_vercel_preview:
+  cleanup_preview:
     name: Cleanup Vercel Preview
     needs: delete_neon_branch
     runs-on: ubuntu-latest
@@ -33,26 +38,13 @@ jobs:
         uses: ./.github/workflows/setup
 
       - name: Cleanup Preview Deployment
-        id: cleanup-vercel
+        id: cleanup_vercel
         uses: ./.github/workflows/cd/vercel/cleanup-preview
         with:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
-  cleanup_azure_preview:
-    name: Cleanup Azure Preview
-    needs: delete_neon_branch
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install dependencies & tooling
-        uses: ./.github/workflows/setup
-
       - name: Cleanup Preview Deployment
-        id: cleanup-azure
+        id: cleanup_azure
         uses: ./.github/workflows/cd/azure/cleanup-preview
         with:
           AZURE_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_JOLLY_SAND_0ABCEB503 }}

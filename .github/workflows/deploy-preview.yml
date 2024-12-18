@@ -1,18 +1,73 @@
 name: Deploy Preview
 
 on:
-  workflow_call:
-    inputs:
-      branch_id:
-        required: true
-        type: string
-    secrets:
-      database_url:
-        required: true
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  deploy_vercel_preview:
+  ci:
+    name: CI checks
+    uses: ./.github/workflows/ci.yml
+
+  create_neon_branch:
+    name: Create Neon Branch
+    outputs:
+      db_url: ${{ steps.create_branch.outputs.db_url }}
+      db_url_with_pooler: ${{ steps.create_branch.outputs.db_url_with_pooler }}
+      branch_id: ${{ steps.create_branch.outputs.branch_id }}
+    needs: ci
+    if: github.event.action == 'synchronize' || github.event.action == 'opened' || github.event.action == 'reopened'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies & tooling
+        uses: ./.github/workflows/setup
+
+      - name: Get branch name
+        id: branch_name
+        uses: tj-actions/branch-names@v8
+
+      - name: Create Neon Branch
+        id: create_branch
+        uses: neondatabase/create-branch-action@v5
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          # parent: main # optional (defaults to your primary branch)
+          branch_name: preview/pr-${{ github.event.number }}-${{ steps.branch_name.outputs.current_branch }}
+          database: neondb
+          username: neondb_owner
+          api_key: ${{ secrets.NEON_API_KEY }}
+
+      - name: Run Migrations
+        run: pnpm run db:migrate
+        env:
+          DATABASE_URL: "${{ steps.create_branch.outputs.db_url_with_pooler }}" # to use pooled connection
+          # DATABASE_URL: "${{ steps.create_branch.outputs.db_url }}" # OR to use unpooled connection
+
+      - name: Post Schema Diff Comment to PR
+        uses: neondatabase/schema-diff-action@v1
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          compare_branch: preview/pr-${{ github.event.number }}-${{ steps.branch_name.outputs.current_branch }}
+          database: neondb
+          username: neondb_owner
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          base_branch: main
+          api_key: ${{ secrets.NEON_API_KEY }}
+
+  deploy_preview:
     name: Deploy Vercel Preview
+    needs: create_neon_branch
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -24,34 +79,14 @@ jobs:
         uses: ./.github/workflows/setup
 
       - name: Deploy to Preview (Vercel)
-        id: deploy-vercel
+        id: deploy_vercel
         uses: ./.github/workflows/cd/vercel/deploy-preview
         with:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.vercel_token }}
           DATABASE_URL: ${{ secrets.database_url }}
 
-      - name: Comment on Pull Request
-        uses: thollander/actions-comment-pull-request@v3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          message: |
-            Preview URL :rocket: : ${{ steps.deploy-vercel.outputs.preview_url }}
-            Neon branch :elephant: : https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ inputs.branch_id }}
-
-  deploy_azure_preview:
-    name: Deploy Azure Preview
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install dependencies & tooling
-        uses: ./.github/workflows/setup
-
       - name: Deploy to Preview (Azure)
-        id: deploy_azure_preview
+        id: deploy_azure
         uses: ./.github/workflows/cd/azure/deploy-preview
         with:
           AZURE_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_JOLLY_SAND_0ABCEB503 }}
@@ -63,5 +98,6 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           message: |
-            Preview URL :rocket: : ${{ steps.deploy_azure_preview.outputs.preview_url }}
-            Neon branch :elephant: : https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ inputs.branch_id }}
+            Vercel Preview URL :rocket: : ${{ steps.deploy_vercel.outputs.preview_url }}
+            Azure Preview URL :rocket: : ${{ steps.deploy_azure.outputs.preview_url }}
+            Neon branch :elephant: : https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ needs.create_neon_branch.outputs.branch_id }}
