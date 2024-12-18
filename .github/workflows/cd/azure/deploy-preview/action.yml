@@ -18,12 +18,9 @@ outputs:
 
 runs:
   using: composite
+  permissions:
+  id-token: write # Require write permission to Fetch an OIDC token.
   steps:
-    - shell: bash
-      run: |
-        touch .env
-        echo DATABASE_URL=${{ inputs.DATABASE_URL }} >> .env
-
     - name: Build And Deploy
       id: builddeploy
       uses: Azure/static-web-apps-deploy@v1
@@ -40,3 +37,20 @@ runs:
         app_location: "/" # App source code path
         api_location: "" # Api source code path - optional
         output_location: "" # Built app content directory - optional
+
+    - name: Azure CLI Login
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Configure Environment Variables in Azure
+      uses: azure/cli@v2
+      with:
+        azcliversion: latest
+        inlineScript: |
+          az staticwebapp appsettings set \
+            -n acme-app \
+            --environment-name ${{ github.event.pull_request.number }} \
+            --setting-names DATABASE_URL=${{ inputs.DATABASE_URL }}
