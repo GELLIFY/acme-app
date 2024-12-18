@@ -17,6 +17,13 @@ jobs:
       branch: ${{ steps.branch_name.outputs.current_branch }}
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install dependencies & tooling
+        id: setup
+        uses: ./.github/workflows/setup
+
       - name: Get branch name
         id: branch_name
         uses: tj-actions/branch-names@v8
