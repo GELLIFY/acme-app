@@ -7,6 +7,15 @@ inputs:
   AZURE_TOKEN:
     description: azure token
     required: true
+  AZURE_CLIENT_ID:
+    description: azure token
+    required: true
+  AZURE_TENANT_ID:
+    description: azure token
+    required: true
+  AZURE_SUBSCRIPTION_ID:
+    description: azure token
+    required: true
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
     description: clerk publishable key
     required: true
@@ -18,15 +27,15 @@ outputs:
 
 runs:
   using: composite
-  permissions:
-    id-token: write # Require write permission to Fetch an OIDC token.
   steps:
     - name: Build And Deploy
       id: builddeploy
       uses: Azure/static-web-apps-deploy@v1
       env:
+        # custom to work with pnpm
         PRE_BUILD_COMMAND: npm install -g pnpm
         CUSTOM_BUILD_COMMAND: pnpm install && pnpm run build:az
+        # necessary build time envs
         SKIP_ENV_VALIDATION: 1 # disable env validation on build step
         DATABASE_URL: ${{ inputs.DATABASE_URL }} # usefull to build static content that depends on DB
         NEXT_PUBLIC_CLIENTVAR: "client_var"
@@ -41,15 +50,16 @@ runs:
     - name: Azure CLI Login
       uses: azure/login@v2
       with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        client-id: ${{ inputs.AZURE_CLIENT_ID }}
+        tenant-id: ${{ inputs.AZURE_TENANT_ID }}
+        subscription-id: ${{ inputs.AZURE_SUBSCRIPTION_ID }}
 
     - name: Configure Environment Variables in Azure
       uses: azure/cli@v2
       with:
         azcliversion: latest
         inlineScript: |
+          # Override all runtime env for preview env
           az staticwebapp appsettings set \
             -n acme-app \
             --environment-name ${{ github.event.pull_request.number }} \
