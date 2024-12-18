@@ -30,6 +30,7 @@ jobs:
 
   ci:
     name: CI checks
+    needs: setup
     uses: ./.github/workflows/ci.yml
 
   deploy_preview:
