@@ -51,6 +51,7 @@ jobs:
       - name: Run Migrations
         run: pnpm run db:migrate
         env:
+          SKIP_ENV_VALIDATION: 1
           DATABASE_URL: "${{ steps.create_branch.outputs.db_url_with_pooler }}" # to use pooled connection
           # DATABASE_URL: "${{ steps.create_branch.outputs.db_url }}" # OR to use unpooled connection
 
