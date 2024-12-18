@@ -53,7 +53,7 @@ jobs:
       - name: Run Migrations
         run: |
           touch .env
-          echo SKIP_ENV_VALIDATION=1
+          echo SKIP_ENV_VALIDATION=1 >> .env
           echo DATABASE_URL=${{ steps.create_branch.outputs.db_url_with_pooler }} >> .env
           echo DIRECT_URL=${{ steps.create_branch.outputs.db_url }} >> .env
           pnpm run db:migrate
