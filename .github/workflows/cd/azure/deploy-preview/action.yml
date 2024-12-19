@@ -34,7 +34,7 @@ runs:
       env:
         # custom to work with pnpm
         PRE_BUILD_COMMAND: npm install -g pnpm
-        CUSTOM_BUILD_COMMAND: pnpm install && pnpm run build:az
+        CUSTOM_BUILD_COMMAND: pnpm install && pnpm run build && cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/
         # necessary build time envs
         SKIP_ENV_VALIDATION: 1 # disable env validation on build step
         DATABASE_URL: ${{ inputs.DATABASE_URL }} # usefull to build static content that depends on DB

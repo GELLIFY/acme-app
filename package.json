@@ -9,7 +9,6 @@
   "packageManager": "pnpm@9.15.0",
   "scripts": {
     "build": "next build",
-    "build:az": "next build && cp -r .next/static .next/standalone/static/ && cp -r public .next/standalone/",
     "clean": "git clean -xdf node_modules .next",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
