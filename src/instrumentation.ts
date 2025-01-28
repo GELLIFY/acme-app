@@ -11,6 +11,8 @@ declare global {
 export async function register() {
   let traceExporter: SpanExporter | undefined;
 
+  if (process.env.VERCEL_URL) return;
+
   if (process.env.NEXT_RUNTIME === "nodejs") {
     const { AzureMonitorTraceExporter } = await import(
       "@azure/monitor-opentelemetry-exporter"
