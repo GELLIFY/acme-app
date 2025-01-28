@@ -10,6 +10,8 @@ async function getPokemon() {
   const apiKey = global.secrets?.apiKey ?? "None for demo";
   const randomNumber = Math.floor(Math.random() * 100) + 1;
 
+  console.log("apiKey", apiKey, randomNumber);
+
   return await fetch(`https://api.vercel.app/pokemon/${randomNumber}`, {
     headers: {
       Authorization: `Bearer ${apiKey}`,

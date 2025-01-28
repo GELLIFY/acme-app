@@ -1,3 +1,6 @@
+import type { SpanExporter } from "@opentelemetry/sdk-trace-base";
+import { registerOTel } from "@vercel/otel";
+
 declare global {
   // eslint-disable-next-line no-var
   var secrets: {
@@ -5,12 +8,17 @@ declare global {
   };
 }
 
-// TODO: document me
 export async function register() {
-  global.secrets = {};
+  let traceExporter: SpanExporter | undefined;
 
-  // you can fetch from secretmanager here if needed
-  global.secrets.apiKey = "None for demo";
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    const { AzureMonitorTraceExporter } = await import(
+      "@azure/monitor-opentelemetry-exporter"
+    );
+    traceExporter = new AzureMonitorTraceExporter({
+      connectionString: process.env.APPLICATIONINSIGHTS_CONNECTION_STRING,
+    });
+  }
 
-  console.log("Secrets loaded!");
+  registerOTel({ serviceName: "acme-app", traceExporter });
 }
