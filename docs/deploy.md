@@ -1,74 +1,154 @@
-## How do I deploy this? (DEPRECATED)
+# Workflows and Deployment
 
-![alt text](./docs/acme_app-charmender-infra.png)
+## Table of Contents
 
-#### Prerequisites
+1. [Overview](#overview)
+2. [Workflow Architecture](#workflow-architecture)
+3. [Actions and CI/CD Steps](#actions-and-cicd-steps)
+4. [Cloud Environments](#cloud-environments)
+5. [Code Repository Structure](#code-repository-structure)
 
-1. ✅ Purchase a domain name
-2. ✅ Purchase a Linux Ubuntu server (e.g. droplet)
-3. ✅ Docker
-4. 😌 That's it!
+---
 
-#### Quickstart
+## Overview
 
-1. SSH into your server:
+This documentation provides an in-depth explanation of the workflows, deployment strategies, and CI/CD pipeline used in the ACME App project. It leverages **GitHub Actions** for managing infrastructure and application code, and for deploying environments across multiple cloud providers (Vercel, Azure, AWS, and GCP).
 
-```sh
-ssh root@your_server_ip
+The diagram below illustrates the end-to-end process:
+
+![Workflow Diagram](/docs/ops-workflow.png)
+
+---
+
+## Workflow Architecture
+
+The architecture combines **GitOps** and **CloudOps** principles:
+
+- **GitOps** focuses on managing versioned application and infrastructure code in the repository.
+- **CloudOps** handles the cloud environments for different stages of development.
+
+### High-Level Workflow:
+
+1. **Code Changes** trigger GitHub Actions workflows.
+2. Actions execute formatting, linting, type-checking, and build tasks.
+3. Successful changes are deployed to cloud environments.
+4. Different branches (feature, develop, main) map to **Preview**, **Staging**, and **Production** environments, respectively.
+
+The diagram below summarizes the complete workflow:
+
+![Workflow Diagram](/docs/ops-full.png)
+
+---
+
+## Actions and CI/CD Steps
+
+GitHub Actions execute the following steps as part of the CI/CD pipeline:
+
+1. **CI**:
+   - Ensures code adheres to the project's formatting rules.
+   - Static analysis for code quality and catching errors
+   - Ensures correctness of TypeScript and other typed files
+2. **Deploy Preview**:
+   - Creates or update a DB branch
+   - Apply migrations and seed the DB
+   - Builds, and deploys the project to an ephemeral environment
+3. **Deploy Staging**:
+   - Creates or update a DB branch
+   - Apply migrations and seed the DB
+   - Builds, and deploys the project to the environment
+4. **Deploy Production**:
+   - Apply migrations to the DB
+   - Builds and deployes the project to production
+5. **Cleanup Preview**:
+   - Close DB branch
+   - Cleanup resources of the deployment environment
+
+### Branch to Environment Mapping
+
+| Branch      | Environment | Pipeline Trigger  |
+| ----------- | ----------- | ----------------- |
+| `feature/*` | Preview     | Pull Request      |
+| `develop`   | Staging     | Push to `develop` |
+| `main`      | Production  | Push to `main`    |
+
+> **Note:** The specific provider is configurable, and the workflow pipeline can target any desired environment.
+
+---
+
+## Cloud Environments
+
+The **CloudOps** section defines three environments for the ACME App:
+
+| Environment    | Trigger Source | Cloud Provider Support  |
+| -------------- | -------------- | ----------------------- |
+| **Preview**    | Pull Requests  | Vercel, Azure, AWS, GCP |
+| **Staging**    | Develop Branch | Vercel, Azure, AWS, GCP |
+| **Production** | Main Branch    | Vercel, Azure, AWS, GCP |
+
+### Environment Stages
+
+- **Preview**: Deployments for PRs and short-term branches.
+- **Staging**: Integration testing environment for `develop`.
+- **Production**: Deployment to `main` for release-ready applications.
+
+### Deployment Options
+
+ACME App supports deployment to the following cloud providers:
+
+1. **Vercel**: Ideal for front-end applications (Next.js).
+2. **Azure**: Robust deployments for enterprise applications.
+3. **AWS**: Scalable deployments using AWS infrastructure.
+4. **GCP**: Google Cloud for custom cloud environments.
+
+Deployment selection depends on pipeline configuration within GitHub Actions.
+
+### Customizable Cloud Provider Pipeline
+
+The cloud provider can be chosen explicitly to trigger the desired CI/CD pipeline:
+
+```yaml
+# Example Workflow Snippet
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to AWS
+        if: ${{ inputs.provider == 'aws' }}
+        run: |
+          aws deploy ...
+      - name: Deploy to Azure
+        if: ${{ inputs.provider == 'azure' }}
+        run: |
+          az webapp deploy ...
 ```
 
-2. Create a SSH key pair:
+---
 
-```sh
-ssh-keygen -t ed25519 -C "name.surname@gellify.com"
-# Enter a file in which to save the key (/home/YOU/.ssh/id_ALGORITHM):[Press enter]
-# Enter passphrase (empty for no passphrase): [Type a passphrase]
-# Enter same passphrase again: [Type passphrase again]
+## Code Repository Structure
 
-eval "$(ssh-agent -s)"
+The repository follows a clean structure for code and infrastructure:
 
-ssh-add ~/.ssh/id_ed25519
+```
+acme-app/
+├── src/                 # Application source code
+│   ├── components/     # Reusable UI components
+│   ├── pages/          # Application pages (Next.js)
+│   ├── services/       # API and service integrations
+│   └── utils/          # Utility functions
+│
+├── infra/              # Infrastructure-as-Code (IaC) scripts
+│   ├── pulumi/         # Pulumi configurations
+│   └── terraform/      # Optional Terraform scripts
+│
+├── .github/            # GitHub Actions workflows
+│   └── workflows/      # CI/CD pipeline definitions
+│
+├── package.json        # Project dependencies and scripts
+└── README.md           # Documentation
 ```
 
-3. Copy the SSH public key to clipboard and add it to your GitHub or BitBucket account:
+---
 
-```sh
-$ cat ~/.ssh/id_ed25519.pub
-# Then select and copy the contents of the id_ed25519.pub file
-# displayed in the terminal to your clipboard
-```
+## Conclusion
 
-4. From your shell upload the deployment script via SSH:
-
-```sh
-scp -i ~/.ssh/id_ed25519 deploy.sh root@your_server_ip:~
-```
-
-5. From inside the server run the deployment script:
-
-> You can modify the email and domain name variables inside of the script to use your own.
-
-```sh
-chmod +x ~/deploy.sh
-./deploy.sh
-```
-
-#### Deploy script
-
-I've included a Bash script **THAT NEEDS ADJUSTMENTS** which does the following:
-
-- Installs all the necessary packages for your server
-- Installs Docker, Docker Compose, and Nginx
-- Clones this repository
-- Generates an SSL certificate
-- Builds your Next.js application from the Dockerfile
-- Sets up Nginx and configures HTTPS and rate limting
-- Sets up a cron which clears the database every 10m
-- Creates a .env file with your Postgres database creds
-- Once the deployment completes, your Next.js app will be available at:
-
-http://your-provided-domain.com
-
-Next.js app, PostgreSQL database and Keycloak instance will be up and running in Docker containers. To set up your database, you could install npm inside your Postgres container and use the Drizzle scripts.
-
-For pushing subsequent updates, I also provided an update.sh script as an example.
+This documentation outlines the workflows, deployment options, and environment configurations for ACME App. The CI/CD pipeline uses GitHub Actions to deploy seamlessly to multiple cloud providers. For further customization, specific configurations can be adjusted in the repository's `.github/workflows/` directory.

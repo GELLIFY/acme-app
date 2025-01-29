@@ -5,7 +5,6 @@ declare global {
   };
 }
 
-// TODO: document me
 export async function register() {
   global.secrets = {};
 

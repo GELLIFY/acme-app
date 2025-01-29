@@ -1,0 +1,30 @@
+name: Deploy Preview on Vercel
+
+inputs:
+  VERCEL_TOKEN:
+    description: vercel token
+    required: true
+outputs:
+  preview_url:
+    description: "Preview URL"
+    value: ${{ steps.deploy.outputs.preview_url }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install Vercel CLI
+      run: npm install --global vercel@latest
+      shell: bash
+
+    - name: Pull Vercel Environment Information
+      run: vercel pull --yes --environment=preview --token=${{ inputs.VERCEL_TOKEN }}
+      shell: bash
+
+    - name: Build Project Artifacts
+      run: vercel build --token=${{ inputs.VERCEL_TOKEN }}
+      shell: bash
+
+    - name: Deploy Preview to Vercel
+      id: deploy
+      run: echo preview_url=$(vercel deploy --prebuilt --token=${{ inputs.VERCEL_TOKEN }}) >> $GITHUB_OUTPUT
+      shell: bash

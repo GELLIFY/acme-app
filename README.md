@@ -105,21 +105,10 @@ View the demo at https://acme-hfnya4lj9-gellify.vercel.app/ to see further expla
 
 ## How do I deploy this? (WIP)
 
-### VPS (self-host)
-
-TBD
-
-### Vercel (internal products)
-
-Go to the Vercel dashboard add a project, connect your repository and deploy!
-
-### Azure
-
-Azure static web apps + GitHub Actions or Azure pipelines
-
-### AWS
-
-TBD
+- [Vercel](./docs/vercel.md)
+- [Azure](./docs/azure.md)
+- [AWS](./docs/aws.md)
+- [VPS](.docs/self-host.md)
 
 ## Must read and watch
 
