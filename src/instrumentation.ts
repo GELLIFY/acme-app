@@ -3,6 +3,7 @@ import type {
   LogRecordProcessor,
 } from "@opentelemetry/sdk-logs";
 import type { SpanExporter } from "@opentelemetry/sdk-trace-base";
+import { logs } from "@opentelemetry/api-logs";
 import {
   BatchLogRecordProcessor,
   LoggerProvider,
@@ -28,13 +29,16 @@ export async function register() {
       "@azure/monitor-opentelemetry-exporter"
     );
 
+    // Add the Log exporter into the logRecordProcessor and register it with the LoggerProvider
     logExporter = new AzureMonitorLogExporter({
       connectionString: process.env.APPLICATIONINSIGHTS_CONNECTION_STRING,
     });
-
     logRecordProcessor = new BatchLogRecordProcessor(logExporter);
     const loggerProvider = new LoggerProvider();
     loggerProvider.addLogRecordProcessor(logRecordProcessor);
+
+    // Register logger Provider as global
+    logs.setGlobalLoggerProvider(loggerProvider);
 
     traceExporter = new AzureMonitorTraceExporter({
       connectionString: process.env.APPLICATIONINSIGHTS_CONNECTION_STRING,
