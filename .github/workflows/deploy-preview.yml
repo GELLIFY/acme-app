@@ -73,7 +73,6 @@ jobs:
           project_id: ${{ vars.NEON_PROJECT_ID }}
           compare_branch: preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }}
           database: neondb
-          username: neondb_owner
           github-token: ${{ secrets.GITHUB_TOKEN }}
           base_branch: main
           api_key: ${{ secrets.NEON_API_KEY }}
