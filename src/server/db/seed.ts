@@ -16,6 +16,8 @@ async function main() {
       count: 5,
     },
   }));
+
+  await db.$client.end();
 }
 
 await main();
