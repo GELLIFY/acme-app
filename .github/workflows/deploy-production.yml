@@ -24,7 +24,7 @@ jobs:
       - name: Apply Migrations
         run: |
           touch .env
-
+          echo SKIP_ENV_VALIDATION=1 >> .env
           echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env
           pnpm run db:migrate
 
