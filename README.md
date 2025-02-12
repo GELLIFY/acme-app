@@ -1,117 +1,83 @@
 # Acme App
 
-This is template for GELLIFY fullstack app. A [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app` and configured to use the best integrations for our standard projects.
+The GELLIFY Stack is a modern web development stack designed for simplicity, modularity, and full-stack TypeScript safety. Created and refined by [Matteo Badini↗](https://x.com/badini_matteo) and the GELLIFY team, it brings together battle-tested technologies to help developers build scalable, maintainable, and performant applications with minimal friction. Plese refer to the [official documentation↗](https://gellify.dev)
 
-## What's next? How do I make an app with this?
-
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
-
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please refer to the [Documentation](https://create.t3.gg/) and the [T3 Stack Tutorial](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available).
-
-- [Next.js](https://nextjs.org)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [Shadcn/ui](https://ui.shadcn.com)
-
-## What's the architecture of this app?
-
-In this stack we tried to follow all of the best practices of the different components that are used to enable the various features. In order to offer some default we pre-configured the following layers:
-
-- ✅ App Layer, a standard [Next.js](https://nextjs.org) app
-- ✅ Auth Layer, a [Clerk](https://clerk.com/) instance
-- ✅ Data Layer, a Postgres instance managed by [Neon](https://neon.tech/) with [Drizzle](https://orm.drizzle.team)
-- 😌 That's it!
-
-Below you can find a diagram representing an high level overview of architecture we strived to implement. This fullstack template aims to reduce complexity, increase DX and reduce dependencies overhead.
-
-![alt text](./docs/acme_app-charmender-architecture.png)
-
-### Architecture - App Layer
-
-The application is build following all of the latest Next.js 15 best practices and guidelines. Please refer to [Next.js](https://nextjs.org) official docs to get a better understanding of the available features.
-
-The standard Next.js application layer features:
-
-- [Middleware](https://nextjs.org/docs/app/building-your-application/routing/middleware) -> `middleware.ts` single point of ingress into the app
-- [API Routes](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) -> `/app/api/**/route.ts` REST APIs
-- [Server Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations) -> `/app/actions.ts` new way to handle data querying and mutation
-- [RSC](https://nextjs.org/docs/app/building-your-application/rendering/server-components) (React Server Component) -> `/app/**/*.tsx` default or annotated with `use server`
-- [RCC](https://nextjs.org/docs/app/building-your-application/rendering/client-components) (React Client Component) -> `/app/**/*.tsx` annotated with `use client`
-
-All of the above are just the basic features of a modern Next.js application. You can and should make a deeper deep dive into the official docs to learn about other usefull features and guidelines on how to build with this stack.
-
-### Architecture - Auth Layer
-
-For authentication and authorization we choose Clerk for rapid development and easy of use. In this template Auth is configured out-of-the-box with some defaults that can be modified.
-
-Documentation can be found [here](https://clerk.com/docs).
-
-### Architecture - Data Layer
-
-A [Neon](https://neon.tech/) Postrges Database is required, but local development can be done via a local instance through Docker.
-
-[Drizzle](https://orm.drizzle.team) is the ORM used to manage the the DB and this is the case for several reasons:
-
-- Can handle almost every relational databases, so switching can be done pretty easily.
-- Easy way to handle schema push, migrations and seeding of the DB
-
-**Why not Prisma?**
-
-1. Prisma needs a generation step to be typesafe where Drizzle is 100% typescript
-2. Prisma handle query under the hood, making impossible for the Developer to optimize or take control of a given query.
-
-## How do I start developing with this?
-
-### Requirements
+## Requirements
 
 - Docker or Podman
-- Node Version Manager ([fnm](https://github.com/Schniz/fnm) **reccomended** to switch version automagically)
+- Node Version Manager (fnm reccomended to switch version automagically)
 
-### Getting started
+## Getting started
 
-1. First you have to create a copy of the environment variables.
+First you have to create a copy of the environment variables.
 
 ```sh
 cp .env.example .env
 ```
 
-2. Then start the localstack needed for development. We need a Postgres instace, and we should also push DB schema + seed. All of the above can be done with a pre-configured script
+Then follow the instruction below to fill the `.env` with the required pieces to get you started.
+
+### Database
+
+GELLIFY app will come with a `start-localstack.sh` bash script that can create a docker container with a database for local development.
+If you already have a database, feel free to delete this file and put your database credentials in `.env`.
 
 ```sh
 ./start-localstack.sh
 ```
 
-3. Run the actual Next.js development server
+The `.env` file in your project directory already contains a valid DB url for local development via Docker.
+Your app is already configured to talk to Neon and has a local Postgres via Docker for local development, we get you started. No initial setup on your part is needed.
 
-```sh
-pnpm run dev
+Sooner or later you will have to create a remote instance to deploy to. Here the basic steps:
+
+1. If you're already signed up or coming to Neon from Azure, you can skip ahead to Step 2.<br />
+   If you haven't signed up yet, you can sign up for free here: [Create a Neon Account↗](https://console.neon.tech/signup)
+
+2. Create a Neon project and get the necessary `DATABASE_URL`
+
+Once everything is completed you can update the `.env` with Clerk variables to point to your remote DB instance.
+
+```
+DATABASE_URL=***
 ```
 
-### Supported Features
+### Authentication
 
-This demo tries to showcase many different Next.js features.
+Your app includes Clerk, we get you started. This is one of the simplest providers, but it still requires a bit of initial setup on your part.
+Of course, if you prefer to use a different auth provider, you can also opt-out of Clerk and use something link [NextAuth.js](https://next-auth.js.org/) instead.
 
-- Image Optimization
-- Streaming
-- Talking to a Postgres database
-- Caching
-- Incremental Static Regeneration
-- Reading environment variables
-- Using Middleware
-- Running code on server startup
-- A cron that hits a Route Handler
+You will need to:
 
-View the demo at https://acme-hfnya4lj9-gellify.vercel.app/ to see further explanations.
+1. Sign into Clerk
+   [Create a Clerk account↗](https://dashboard.clerk.com/sign-up) or [sign into the Clerk Dashboard↗](https://dashboard.clerk.com/).
 
-## How do I deploy this? (WIP)
+2. Create a Clerk application
+   If you've just created an account for the first time, you'll be taken directly to the interactive authentication setup form.
+   Otherwise, you'll be redirected to the [Clerk Dashboard↗](https://dashboard.clerk.com/). To create a new app, select the **Create application** card.
+   You'll be redirected to the interactive authentication setup form.
 
-- [Vercel](./docs/vercel.md)
-- [Azure](./docs/azure.md)
-- [AWS](./docs/aws.md)
-- [VPS](.docs/self-host.md)
+3. Select identifiers and social providers
+   Once you are in the interactive authentication setup form, you will be asked to build your authentication flow.
+   Here, Clerk provides various options for setting up your sign-up and sign-in flows. You can choose to use email, phone, or username as [identifiers](https://clerk.com/docs/authentication/configuration/sign-up-sign-in-options#identifiers), and you can enable [social authentication providers](https://clerk.com/docs/authentication/social-connections/overview).
+   Once the application is created, you can also customize your authentication flow by selecting different authentication strategies, verification methods, and more. [Learn more about sign-up and sign-in options](https://clerk.com/docs/authentication/configuration/sign-up-sign-in-options).
 
-## Must read and watch
+Once everything is completed update the `.env` with Clerk variables
 
-- [From 0 to Production - The Modern React Tutorial (RSCs, Next.js, Shadui, Drizzle, TS and more)](https://www.youtube.com/watch?v=d5x0JCZbAJs)
-- [React Hook Form & React 19 Form Actions, The Right Way](https://www.youtube.com/watch?v=VLk45JBe8L8)
-- [Self-Hosting Next.js](https://www.youtube.com/watch?v=sIVL4JMqRfc)
+```
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_***
+CLERK_SECRET_KEY=sk_test_***
+```
+
+## Editor Setup
+
+We recommended using [Cursor↗](https://www.cursor.com/) a fork of VSCode with a deeper integration with different AI models. We also provide a `.cursorrules` file to give the AI the necessary context on technologies, patterns, conventions...
+The following extensions are recommended for an optimal developer experience. The links below provide editor specific plugin support.
+
+- [Tailwind CSS IntelliSense Extension↗](https://tailwindcss.com/docs/editor-setup)
+- [Prettier Extension↗](https://prettier.io/docs/en/editors.html)
+- [Pretty TypeScript Errors↗](https://marketplace.visualstudio.com/items?itemName=yoavbls.pretty-ts-errors)
+
+## Next Steps
+
+Have a look around the [docs↗](https://gellify.dev), as well as the docs of the packages that your app includes.
