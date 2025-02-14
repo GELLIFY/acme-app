@@ -17,8 +17,6 @@ inputs:
 
 runs:
   using: composite
-  runs-on: ubuntu-latest
-  name: Build and Deploy Job
   steps:
     - name: Build And Deploy
       id: builddeploy
