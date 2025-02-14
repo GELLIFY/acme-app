@@ -84,6 +84,5 @@ Have a look around the [docs↗](https://gellify.dev), as well as the docs of th
 
 ## Notes 2025-02-12
 
-- [ ] upgrade to tailwind v4
 - [ ] move ci/cd part outside in a `acme-infra` repo
 - [ ] consider single QUERIES object pattern
