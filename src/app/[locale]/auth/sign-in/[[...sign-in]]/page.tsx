@@ -247,12 +247,12 @@ export default function Page() {
                               <Clerk.Input
                                 type="otp"
                                 autoSubmit
-                                className="flex justify-center has-[:disabled]:opacity-50"
+                                className="flex justify-center has-disabled:opacity-50"
                                 render={({ value, status }) => {
                                   return (
                                     <div
                                       data-status={status}
-                                      className="relative flex h-9 w-9 items-center justify-center border-y border-r border-input text-sm shadow-sm transition-all first:rounded-l-md first:border-l last:rounded-r-md data-[status=cursor]:ring-1 data-[status=selected]:ring-1 data-[status=cursor]:ring-ring data-[status=selected]:ring-ring"
+                                      className="relative flex h-9 w-9 items-center justify-center border-y border-r border-input text-sm shadow-xs transition-all first:rounded-l-md first:border-l last:rounded-r-md data-[status=cursor]:ring-1 data-[status=cursor]:ring-ring data-[status=selected]:ring-1 data-[status=selected]:ring-ring"
                                     >
                                       {value}
                                     </div>

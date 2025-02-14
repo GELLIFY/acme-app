@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 export default function HomePage() {
   return (
-    <main className="container h-screen space-y-6 py-16">
+    <main className="mx-auto h-screen space-y-6 py-16">
       <header className="flex flex-col items-center justify-center gap-4">
         <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
           Create <span className="text-primary">GELLIFY</span> App

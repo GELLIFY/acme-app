@@ -81,3 +81,8 @@ The following extensions are recommended for an optimal developer experience. Th
 ## Next Steps
 
 Have a look around the [docs↗](https://gellify.dev), as well as the docs of the packages that your app includes.
+
+## Notes 2025-02-12
+
+- [ ] move ci/cd part outside in a `acme-infra` repo
+- [ ] consider single QUERIES object pattern
