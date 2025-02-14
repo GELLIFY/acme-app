@@ -17,8 +17,8 @@ export async function PostListServer() {
       {posts.map((post) => {
         return (
           <div className="flex flex-row rounded-lg" key={post.id}>
-            <div className="flex-grow">
-              <h2 className="text-2xl font-bold text-primary">{post.title}</h2>
+            <div className="grow">
+              <h2 className="text-primary text-2xl font-bold">{post.title}</h2>
               <p className="mt-2 text-sm">{post.content}</p>
             </div>
             <DeletePosts post={post} />

@@ -70,7 +70,7 @@ export default function Page() {
                           </Button>
                         </Clerk.Connection>
                       </div>
-                      <p className="flex items-center gap-x-3 text-sm text-muted-foreground before:h-px before:flex-1 before:bg-border after:h-px after:flex-1 after:bg-border">
+                      <p className="text-muted-foreground before:bg-border after:bg-border flex items-center gap-x-3 text-sm before:h-px before:flex-1 after:h-px after:flex-1">
                         or
                       </p>
                       <Clerk.Field name="emailAddress" className="space-y-2">
@@ -80,7 +80,7 @@ export default function Page() {
                         <Clerk.Input type="email" required asChild>
                           <Input />
                         </Clerk.Input>
-                        <Clerk.FieldError className="block text-sm text-destructive" />
+                        <Clerk.FieldError className="text-destructive block text-sm" />
                       </Clerk.Field>
                       <Clerk.Field name="password" className="space-y-2">
                         <Clerk.Label asChild>
@@ -89,7 +89,7 @@ export default function Page() {
                         <Clerk.Input type="password" required asChild>
                           <Input />
                         </Clerk.Input>
-                        <Clerk.FieldError className="block text-sm text-destructive" />
+                        <Clerk.FieldError className="text-destructive block text-sm" />
                       </Clerk.Field>
                     </CardContent>
                     <CardFooter>
@@ -131,7 +131,7 @@ export default function Page() {
                         <Clerk.Input type="text" required asChild>
                           <Input />
                         </Clerk.Input>
-                        <Clerk.FieldError className="block text-sm text-destructive" />
+                        <Clerk.FieldError className="text-destructive block text-sm" />
                       </Clerk.Field>
                     </CardContent>
                     <CardFooter>
@@ -172,16 +172,16 @@ export default function Page() {
                             <div className="flex justify-center text-center">
                               <Clerk.Input
                                 type="otp"
-                                className="flex justify-center has-[:disabled]:opacity-50"
+                                className="flex justify-center has-disabled:opacity-50"
                                 autoSubmit
                                 render={({ value, status }) => {
                                   return (
                                     <div
                                       data-status={status}
                                       className={cn(
-                                        "relative flex size-10 items-center justify-center border-y border-r border-input text-sm transition-all first:rounded-l-md first:border-l last:rounded-r-md",
+                                        "border-input relative flex size-10 items-center justify-center border-y border-r text-sm transition-all first:rounded-l-md first:border-l last:rounded-r-md",
                                         {
-                                          "z-10 ring-2 ring-ring ring-offset-background":
+                                          "ring-ring ring-offset-background z-10 ring-2":
                                             status === "cursor" ||
                                             status === "selected",
                                         },
@@ -190,7 +190,7 @@ export default function Page() {
                                       {value}
                                       {status === "cursor" && (
                                         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                                          <div className="animate-caret-blink h-4 w-px bg-foreground duration-1000" />
+                                          <div className="animate-caret-blink bg-foreground h-4 w-px duration-1000" />
                                         </div>
                                       )}
                                     </div>
@@ -198,7 +198,7 @@ export default function Page() {
                                 }}
                               />
                             </div>
-                            <Clerk.FieldError className="block text-center text-sm text-destructive" />
+                            <Clerk.FieldError className="text-destructive block text-center text-sm" />
                           </Clerk.Field>
                           <SignUp.Action
                             asChild
@@ -245,7 +245,7 @@ export default function Page() {
           </Clerk.Loading>
         </SignUp.Root>
       </div>
-      <div className="hidden bg-muted lg:block">
+      <div className="bg-muted hidden lg:block">
         <Image
           src="/placeholder.svg"
           alt="Image"

@@ -19,7 +19,7 @@ export function DeletePosts(props: { post: SelectPost }) {
   return (
     <Button
       variant="ghost"
-      className="cursor-pointer text-sm font-bold uppercase text-primary"
+      className="text-primary cursor-pointer text-sm font-bold uppercase"
       onClick={() => execute({ id: props.post.id })}
     >
       Delete
