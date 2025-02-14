@@ -10,12 +10,16 @@ runs:
   steps:
     - name: Install Vercel CLI
       run: npm install --global vercel@latest
+      shell: bash
 
     - name: Pull Vercel Environment Information
       run: vercel pull --yes --environment=production --token=${{ inputs.VERCEL_TOKEN }}
+      shell: bash
 
     - name: Build Project Artifacts
       run: vercel build --prod --token=${{ inputs.VERCEL_TOKEN }}
+      shell: bash
 
     - name: Deploy Project Artifacts to Vercel
       run: vercel deploy --prebuilt --prod --token=${{ inputs.VERCEL_TOKEN }}
+      shell: bash

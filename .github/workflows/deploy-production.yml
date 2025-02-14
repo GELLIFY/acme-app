@@ -55,7 +55,7 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
   deploy_azure_production:
-    name: Deploy Vercel Production
+    name: Deploy Azure Production
     runs-on: ubuntu-latest
     needs: run_migrations
     permissions:
