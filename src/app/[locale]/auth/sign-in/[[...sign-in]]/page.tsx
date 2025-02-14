@@ -90,7 +90,7 @@ export default function Page() {
                           </Button>
                         </Clerk.Connection>
                       </div>
-                      <p className="text-muted-foreground before:bg-border after:bg-border flex items-center gap-x-3 text-sm before:h-px before:flex-1 after:h-px after:flex-1">
+                      <p className="flex items-center gap-x-3 text-sm text-muted-foreground before:h-px before:flex-1 before:bg-border after:h-px after:flex-1 after:bg-border">
                         or
                       </p>
                       <Clerk.Field name="identifier" className="space-y-2">
@@ -100,7 +100,7 @@ export default function Page() {
                         <Clerk.Input type="email" required asChild>
                           <Input />
                         </Clerk.Input>
-                        <Clerk.FieldError className="text-destructive block text-sm" />
+                        <Clerk.FieldError className="block text-sm text-destructive" />
                       </Clerk.Field>
                     </CardContent>
                     <CardFooter>
@@ -186,7 +186,7 @@ export default function Page() {
                         <CardDescription>
                           Enter the verification code sent to your email
                         </CardDescription>
-                        <p className="text-muted-foreground text-sm">
+                        <p className="text-sm text-muted-foreground">
                           Welcome back <SignIn.SafeIdentifier />
                         </p>
                       </CardHeader>
@@ -198,7 +198,7 @@ export default function Page() {
                           <Clerk.Input type="password" asChild>
                             <Input />
                           </Clerk.Input>
-                          <Clerk.FieldError className="text-destructive block text-sm" />
+                          <Clerk.FieldError className="block text-sm text-destructive" />
                         </Clerk.Field>
                       </CardContent>
                       <CardFooter>
@@ -233,7 +233,7 @@ export default function Page() {
                         <CardDescription>
                           Enter the verification code sent to your email
                         </CardDescription>
-                        <p className="text-muted-foreground text-sm">
+                        <p className="text-sm text-muted-foreground">
                           Welcome back <SignIn.SafeIdentifier />
                         </p>
                       </CardHeader>
@@ -252,7 +252,7 @@ export default function Page() {
                                   return (
                                     <div
                                       data-status={status}
-                                      className="border-input data-[status=cursor]:ring-ring data-[status=selected]:ring-ring relative flex h-9 w-9 items-center justify-center border-y border-r text-sm shadow-xs transition-all first:rounded-l-md first:border-l last:rounded-r-md data-[status=cursor]:ring-1 data-[status=selected]:ring-1"
+                                      className="relative flex h-9 w-9 items-center justify-center border-y border-r border-input text-sm shadow-xs transition-all first:rounded-l-md first:border-l last:rounded-r-md data-[status=cursor]:ring-1 data-[status=cursor]:ring-ring data-[status=selected]:ring-1 data-[status=selected]:ring-ring"
                                     >
                                       {value}
                                     </div>
@@ -260,7 +260,7 @@ export default function Page() {
                                 }}
                               />
                             </div>
-                            <Clerk.FieldError className="text-destructive block text-center text-sm" />
+                            <Clerk.FieldError className="block text-center text-sm text-destructive" />
                             <SignIn.Action
                               asChild
                               resend
@@ -312,7 +312,7 @@ export default function Page() {
           </Clerk.Loading>
         </SignIn.Root>
       </div>
-      <div className="bg-muted hidden lg:block">
+      <div className="hidden bg-muted lg:block">
         <Image
           src="/placeholder.svg"
           alt="Image"
