@@ -15,5 +15,5 @@ export const posts = pgTable("posts", {
   ...timestamps,
 });
 
-export type SelectPost = typeof posts.$inferSelect;
-export type InsertPost = typeof posts.$inferInsert;
+export type DB_PostType = typeof posts.$inferSelect;
+export type DB_PostInsertType = typeof posts.$inferInsert;
