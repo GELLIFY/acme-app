@@ -6,7 +6,7 @@
   "engines": {
     "node": "20.x"
   },
-  "packageManager": "pnpm@9.15.0",
+  "packageManager": "pnpm@9.15.6",
   "scripts": {
     "build": "next build",
     "clean": "git clean -xdf node_modules .next",
