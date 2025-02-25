@@ -31,8 +31,8 @@ export default async function Home() {
       <header className="flex flex-col gap-2">
         <h1 className="text-4xl font-bold">GELLIFY Acme App Demo</h1>
         <p>
-          This is a demo of a Next.js application hosted on Ubuntu Linux. It
-          also includes a Postgres database and an Nginx proxy.{" "}
+          This is a demo of a Next.js application. It also includes a Postgres
+          database.{" "}
           <Link href="https://github.com/leerob/next-self-host">
             View the code
           </Link>
@@ -108,129 +108,14 @@ export default async function Home() {
       </section>
 
       <section className="flex flex-col gap-2">
-        <h3 className="text-2xl font-semibold">Streaming</h3>
-        <p>
-          The Next.js App router supports streaming responses. This demo uses
-          <code className="rounded border border-slate-200 bg-slate-100 p-0.5 px-1">
-            Suspense
-          </code>{" "}
-          with an{" "}
-          <code className="rounded border border-slate-200 bg-slate-100 p-0.5 px-1">
-            async
-          </code>{" "}
-          component to stream in different components with a delay. We let Nginx
-          handle compression for our application, and then disable proxy
-          buffering to enable streamed responses.
-        </p>
-        <p>
-          <Link className="underline" href="/streaming">
-            View the demo
-          </Link>
-        </p>
-        <p>
-          <Link
-            className="underline"
-            href="https://nextjs.org/docs/app/building-your-application/routing/loading-ui-and-streaming"
-          >
-            Read the docs
-          </Link>
-        </p>
-      </section>
-
-      <section className="flex flex-col gap-2">
         <h3 className="text-2xl font-semibold">Postgres Database</h3>
         <p>
           This route reads and writes to our Postgres database, which is in its
-          own Docker container. It uses Drizzle for the ORM. There is also a
-          cron job that resets the demo data every 10 minutes. You can manually
-          hit the endpoint the cron uses by sending a{" "}
-          <code className="rounded border border-slate-200 bg-slate-100 p-0.5 px-1">
-            POST
-          </code>{" "}
-          to{" "}
-          <code className="rounded border border-slate-200 bg-slate-100 p-0.5 px-1">
-            /api/db/clear
-          </code>
+          own Docker container. It uses Drizzle for the ORM.
         </p>
         <p>
           <Link className="underline" href="/todo">
             View the demo
-          </Link>
-        </p>
-      </section>
-
-      <section className="flex flex-col gap-2">
-        <h3 className="text-2xl font-semibold">
-          Caching / Incremental Static Regeneration
-        </h3>
-        <p>
-          By default, Next.js ISR uses an{" "}
-          <code className="rounded border border-slate-200 bg-slate-100 p-0.5 px-1">
-            lru-cache
-          </code>{" "}
-          and stores cached entries in memory. This works without configuration,
-          for both caching data as well as ISR, in both the Pages and App
-          Router.
-        </p>
-        <p>
-          If you prefer to override the cache location, you can store entries in
-          something like Redis. For multi-container applications, this is
-          strongly recommended, but for this single container app it’s not
-          necessary.
-        </p>
-        <p>
-          For this demo, we have a route that retrieves data with{" "}
-          <code className="rounded border border-slate-200 bg-slate-100 p-0.5 px-1">
-            fetch
-          </code>{" "}
-          from an API, then adds a time-based{" "}
-          <code className="rounded border border-slate-200 bg-slate-100 p-0.5 px-1">
-            revalidate
-          </code>{" "}
-          time of 10 seconds. This indicates it will be &quot;fresh&quot; for a
-          maximum of that time. You can view the{" "}
-          <code className="rounded border border-slate-200 bg-slate-100 p-0.5 px-1">
-            s-maxage=10, stale-while-revalidate=31536000
-          </code>{" "}
-          response header for the page.
-        </p>
-        <p>
-          The default{" "}
-          <code className="rounded border border-slate-200 bg-slate-100 p-0.5 px-1">
-            stale-while-revalidate
-          </code>{" "}
-          time for static pages that do not specify a{" "}
-          <code className="rounded border border-slate-200 bg-slate-100 p-0.5 px-1">
-            revalidate
-          </code>{" "}
-          time is 1 year, however, this can also be{" "}
-          <Link
-            className="underline"
-            href="https://nextjs.org/docs/canary/app/api-reference/next-config-js/swrDelta"
-          >
-            configured
-          </Link>{" "}
-          with{" "}
-          <code className="rounded border border-slate-200 bg-slate-100 p-0.5 px-1">
-            swrDelta
-          </code>{" "}
-          in{" "}
-          <code className="rounded border border-slate-200 bg-slate-100 p-0.5 px-1">
-            next.config.ts
-          </code>
-          .
-        </p>
-        <p>
-          <Link className="underline" href="/isr">
-            View the demo
-          </Link>
-        </p>
-        <p>
-          <Link
-            className="underline"
-            href="https://nextjs.org/docs/app/building-your-application/deploying#caching-and-isr"
-          >
-            Read the docs
           </Link>
         </p>
       </section>
