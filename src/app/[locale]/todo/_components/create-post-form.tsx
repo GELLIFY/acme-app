@@ -15,29 +15,18 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import { createPostSchema } from "~/lib/validators";
+import { CreatePostSchema } from "~/lib/validators";
 import { createPostAction } from "~/server/actions/create-post-action";
 
 export function CreatePostForm() {
   const { execute, isExecuting } = useAction(createPostAction, {
-    onError: ({ error }) => {
-      toast.error(error.serverError, {
-        duration: 3500,
-      });
-    },
-    onSuccess: () => {
-      toast.success("Post creato!", {
-        duration: 3500,
-      });
-    },
+    onError: ({ error }) => toast.error(error.serverError),
+    onSuccess: ({ data }) => toast.success(data?.message),
   });
 
-  const form = useForm<z.output<typeof createPostSchema>>({
-    resolver: zodResolver(createPostSchema),
-    defaultValues: {
-      title: "",
-      content: "",
-    },
+  const form = useForm<z.output<typeof CreatePostSchema>>({
+    resolver: zodResolver(CreatePostSchema),
+    defaultValues: { title: "", content: "" },
   });
 
   return (

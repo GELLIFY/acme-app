@@ -3,11 +3,11 @@
 import { revalidateTag } from "next/cache";
 
 import { authActionClient } from "~/lib/safe-action";
-import { createPostSchema } from "~/lib/validators";
+import { CreatePostSchema } from "~/lib/validators";
 import { createPostMutation } from "~/server/db/mutations";
 
 export const createPostAction = authActionClient
-  .schema(createPostSchema)
+  .schema(CreatePostSchema)
   .metadata({ actionName: "create-post" })
   .action(async ({ parsedInput }) => {
     // Mutate data
