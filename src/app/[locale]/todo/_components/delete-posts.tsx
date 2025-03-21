@@ -4,9 +4,9 @@ import { useEffect } from "react";
 import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 
-import { Button } from "~/components/ui/button";
-import { deletePostAction } from "~/server/actions/delete-post-action";
-import { type DB_PostType } from "~/server/db/schema/posts";
+import { Button } from "@/components/ui/button";
+import { deletePostAction } from "@/server/actions/delete-post-action";
+import { type DB_PostType } from "@/server/db/schema/posts";
 
 export function DeletePosts(props: { post: DB_PostType }) {
   const { execute, result } = useAction(deletePostAction);

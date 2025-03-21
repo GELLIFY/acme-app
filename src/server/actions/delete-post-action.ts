@@ -2,9 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 
-import { authActionClient } from "~/lib/safe-action";
-import { DeletePostSchema } from "~/lib/validators";
-import { deletePostMutation } from "~/server/db/mutations";
+import { authActionClient } from "@/lib/safe-action";
+import { DeletePostSchema } from "@/lib/validators";
+import { deletePostMutation } from "@/server/db/mutations";
 
 export const deletePostAction = authActionClient
   .schema(DeletePostSchema)
