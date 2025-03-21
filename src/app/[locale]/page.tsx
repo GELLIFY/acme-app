@@ -17,7 +17,9 @@ export default function Home() {
           </p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <Button asChild>
-              <Link href="https://gellify.dev/">Read Documentation</Link>
+              <Link href="https://www.gellify.dev/docs/usage/first-steps">
+                Read Documentation
+              </Link>
             </Button>
             <Button variant="outline" asChild>
               <Link

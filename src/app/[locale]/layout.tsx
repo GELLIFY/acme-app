@@ -3,6 +3,7 @@ import "@/globals.css";
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 
+import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { I18nProviderClient } from "@/locales/client";
 
@@ -31,8 +32,15 @@ export default async function RootLayout({
       <html lang="en" suppressHydrationWarning>
         <body className={`font-sans ${inter.variable}`}>
           <I18nProviderClient locale={locale}>
-            {children}
-            <Toaster />
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+              <Toaster />
+            </ThemeProvider>
           </I18nProviderClient>
         </body>
       </html>
