@@ -1,10 +1,10 @@
-import "~/globals.css";
+import "@/globals.css";
 
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 
-import { Toaster } from "~/components/ui/sonner";
-import { I18nProviderClient } from "~/locales/client";
+import { Toaster } from "@/components/ui/sonner";
+import { I18nProviderClient } from "@/locales/client";
 
 const inter = Inter({
   subsets: ["latin"],

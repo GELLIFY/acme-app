@@ -1,6 +1,6 @@
 "use client";
 
-import { env } from "~/env";
+import { env } from "@/env";
 
 export default function ProtectedPage() {
   const safeKey = env.NEXT_PUBLIC_CLIENTVAR;

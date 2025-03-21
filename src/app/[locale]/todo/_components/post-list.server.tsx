@@ -1,4 +1,4 @@
-import { getPosts } from "~/server/db/queries/cached-query";
+import { getPosts } from "@/server/db/queries/cached-query";
 import { DeletePosts } from "./delete-posts";
 
 export async function PostListServer() {
@@ -18,7 +18,7 @@ export async function PostListServer() {
         return (
           <div className="flex flex-row rounded-lg" key={post.id}>
             <div className="grow">
-              <h2 className="text-2xl font-bold text-primary">{post.title}</h2>
+              <h2 className="text-xl font-bold text-primary">{post.title}</h2>
               <p className="mt-2 text-sm">{post.content}</p>
             </div>
             <DeletePosts post={post} />

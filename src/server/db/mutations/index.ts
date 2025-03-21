@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { type z } from "zod";
 
-import { type CreatePostSchema, type DeletePostSchema } from "~/lib/validators";
+import { type CreatePostSchema, type DeletePostSchema } from "@/lib/validators";
 import { db, schema } from "..";
 
 export async function deletePostMutation(

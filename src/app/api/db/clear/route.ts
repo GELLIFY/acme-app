@@ -1,7 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
-import { db, schema } from "~/server/db";
+import { db, schema } from "@/server/db";
 
 export async function POST() {
   // Clear out the todos for the (public) demo
