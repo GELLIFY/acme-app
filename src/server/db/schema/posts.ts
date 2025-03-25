@@ -1,19 +1,24 @@
 import { createId } from "@paralleldrive/cuid2";
-import { varchar } from "drizzle-orm/pg-core";
+import { index } from "drizzle-orm/pg-core";
 
 import { timestamps } from "../utils";
-import { pgTable } from "./_table";
+import { createTable } from "./_table";
 
-export const posts = pgTable("posts", {
-  id: varchar({ length: 128 })
-    .$defaultFn(() => createId())
-    .notNull(),
+export const posts = createTable(
+  "posts",
+  (d) => ({
+    id: d
+      .varchar({ length: 128 })
+      .primaryKey()
+      .$defaultFn(() => createId()),
 
-  title: varchar({ length: 256 }).notNull(),
-  content: varchar({ length: 256 }).notNull(),
+    title: d.varchar({ length: 256 }).notNull(),
+    content: d.varchar({ length: 256 }).notNull(),
 
-  ...timestamps,
-});
+    ...timestamps,
+  }),
+  (t) => [index("title_idx").on(t.title)],
+);
 
 export type DB_PostType = typeof posts.$inferSelect;
 export type DB_PostInsertType = typeof posts.$inferInsert;

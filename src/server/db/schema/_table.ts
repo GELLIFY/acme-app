@@ -6,4 +6,4 @@ import { pgTableCreator } from "drizzle-orm/pg-core";
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const pgTable = pgTableCreator((name) => `acme_${name}`);
+export const createTable = pgTableCreator((name) => `acme_${name}`);
