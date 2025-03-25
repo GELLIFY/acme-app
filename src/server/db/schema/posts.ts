@@ -9,8 +9,8 @@ export const posts = createTable(
   (d) => ({
     id: d
       .varchar({ length: 128 })
-      .$defaultFn(() => createId())
-      .notNull(),
+      .primaryKey()
+      .$defaultFn(() => createId()),
 
     title: d.varchar({ length: 256 }).notNull(),
     content: d.varchar({ length: 256 }).notNull(),
