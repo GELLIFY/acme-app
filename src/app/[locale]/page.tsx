@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-[calc(100vh-65px)] flex-col">
       <main className="flex flex-1 flex-col items-center justify-center p-4 md:p-8 lg:p-12">
         <div className="mx-auto max-w-3xl space-y-8 text-center">
           <h1 className="text-4xl font-bold tracking-tighter">

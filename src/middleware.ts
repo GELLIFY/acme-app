@@ -16,5 +16,10 @@ export default clerkMiddleware(async (auth, req) => {
 });
 
 export const config = {
-  matcher: ["/((?!api|static|.*\\..*|_next|favicon.ico|robots.txt).*)"],
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    "/((?!api|static|.*\\..*|_next|favicon.ico|robots.txt).*)",
+    // Always run for API routes
+    "/(api|trpc)(.*)",
+  ],
 };

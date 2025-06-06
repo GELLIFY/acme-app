@@ -1,30 +1,45 @@
 import { Suspense } from "react";
 import { ErrorBoundary } from "next/dist/client/components/error-boundary";
 
-import { AuthShowcase } from "@/components/auth-showcase";
 import { ErrorFallback } from "@/components/error-fallback";
-import { CreatePostForm } from "./_components/create-post-form";
-import { PostListLoading } from "./_components/post-list.loading";
-import { PostListServer } from "./_components/post-list.server";
+import { CreatePostForm } from "@/components/todo/create-todo-form";
+import { TodoList } from "@/components/todo/todo-list";
+import { TodoListLoading } from "@/components/todo/todo-list.loading";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { HydrateClient, trpc } from "@/shared/helpers/trpc/server";
 
 export const dynamic = "force-dynamic";
 
-export default function HomePage() {
+export default async function TodoPage() {
+  void trpc.todo.getAll.prefetch();
+
+  // Or use the caller directly without using `.prefetch()`
+  // const todos = await trpc.todo.getAll();
+
   return (
-    <main className="mx-auto h-screen space-y-6 py-16">
-      <header className="flex flex-col items-center justify-center gap-4">
-        <AuthShowcase />
-      </header>
-      <div className="flex flex-col items-center justify-center gap-4">
-        <CreatePostForm />
-        <div className="w-full max-w-2xl overflow-y-scroll">
-          <ErrorBoundary errorComponent={ErrorFallback}>
-            <Suspense fallback={<PostListLoading />}>
-              <PostListServer />
-            </Suspense>
-          </ErrorBoundary>
-        </div>
+    <HydrateClient>
+      <div className="mx-auto w-full max-w-md py-10">
+        <Card>
+          <CardHeader>
+            <CardTitle>Todo List</CardTitle>
+            <CardDescription>Manage your tasks efficiently</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <CreatePostForm />
+            <ErrorBoundary errorComponent={ErrorFallback}>
+              <Suspense fallback={<TodoListLoading />}>
+                <TodoList />
+              </Suspense>
+            </ErrorBoundary>
+          </CardContent>
+        </Card>
       </div>
-    </main>
+    </HydrateClient>
   );
 }

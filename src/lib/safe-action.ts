@@ -3,7 +3,7 @@ import {
   createSafeActionClient,
   DEFAULT_SERVER_ERROR_MESSAGE,
 } from "next-safe-action";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 // This is our base client.
 // Here we define a middleware that logs the result of the action execution.

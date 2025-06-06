@@ -3,9 +3,11 @@ import "@/globals.css";
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 
+import Navbar from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { I18nProviderClient } from "@/locales/client";
+import { TRPCProvider } from "@/shared/helpers/trpc/client";
+import { I18nProviderClient } from "@/shared/locales/client";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -31,17 +33,20 @@ export default async function RootLayout({
     <ClerkProvider dynamic>
       <html lang="en" suppressHydrationWarning>
         <body className={`font-sans ${inter.variable}`}>
-          <I18nProviderClient locale={locale}>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              {children}
-              <Toaster />
-            </ThemeProvider>
-          </I18nProviderClient>
+          <TRPCProvider>
+            <I18nProviderClient locale={locale}>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+              >
+                <Navbar />
+                {children}
+                <Toaster />
+              </ThemeProvider>
+            </I18nProviderClient>
+          </TRPCProvider>
         </body>
       </html>
     </ClerkProvider>
