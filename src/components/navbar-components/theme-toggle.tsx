@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import { MoonIcon, SunIcon } from "lucide-react";
+import { useTheme } from "next-themes";
 
 import { Toggle } from "@/components/ui/toggle";
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<string>("light");
+  const { theme, setTheme } = useTheme();
 
   return (
     <div>
