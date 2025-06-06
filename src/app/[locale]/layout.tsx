@@ -6,7 +6,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import Navbar from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { TRPCProvider } from "@/shared/helpers/trpc/client";
+import { TRPCReactProvider } from "@/shared/helpers/trpc/client";
 import { I18nProviderClient } from "@/shared/locales/client";
 
 const inter = Inter({
@@ -33,7 +33,7 @@ export default async function RootLayout({
     <ClerkProvider dynamic>
       <html lang="en" suppressHydrationWarning>
         <body className={`font-sans ${inter.variable}`}>
-          <TRPCProvider>
+          <TRPCReactProvider>
             <I18nProviderClient locale={locale}>
               <ThemeProvider
                 attribute="class"
@@ -46,7 +46,7 @@ export default async function RootLayout({
                 <Toaster />
               </ThemeProvider>
             </I18nProviderClient>
-          </TRPCProvider>
+          </TRPCReactProvider>
         </body>
       </html>
     </ClerkProvider>

@@ -12,15 +12,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { HydrateClient, trpc } from "@/shared/helpers/trpc/server";
-
-export const dynamic = "force-dynamic";
+import {
+  getQueryClient,
+  HydrateClient,
+  trpc,
+} from "@/shared/helpers/trpc/server";
 
 export default async function TodoPage() {
-  void trpc.todo.getAll.prefetch();
+  const queryClient = getQueryClient();
+
+  // Change this to prefetch once this is fixed: https://github.com/trpc/trpc/issues/6632
+  // prefetch(trpc.todo.getAll.queryOptions());
+  await queryClient.fetchQuery(trpc.todo.getAll.queryOptions());
 
   // Or use the caller directly without using `.prefetch()`
-  // const todos = await trpc.todo.getAll();
+  // const todos = await caller.todo.getAll();
 
   return (
     <HydrateClient>

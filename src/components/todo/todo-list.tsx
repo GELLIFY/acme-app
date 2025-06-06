@@ -1,27 +1,38 @@
 "use client";
 
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { Trash2Icon } from "lucide-react";
+import { toast } from "sonner";
 
-import { trpc } from "@/shared/helpers/trpc/client";
+import { useTRPC } from "@/shared/helpers/trpc/client";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 
 export function TodoList() {
-  const { data, refetch } = trpc.todo.getAll.useQuery();
+  const trpc = useTRPC();
+  const { data, refetch } = useSuspenseQuery(trpc.todo.getAll.queryOptions());
 
-  // const [data] = trpc.useSuspenseQueries((t) => [t.todo.getAll()]);
+  const toggleMutation = useMutation(
+    trpc.todo.update.mutationOptions({
+      onSuccess: () => {
+        void refetch();
+      },
+      onError: ({ message }) => {
+        void toast.error(message);
+      },
+    }),
+  );
 
-  const toggleMutation = trpc.todo.update.useMutation({
-    onSuccess: () => {
-      refetch();
-    },
-  });
-
-  const deleteMutation = trpc.todo.delete.useMutation({
-    onSuccess: () => {
-      refetch();
-    },
-  });
+  const deleteMutation = useMutation(
+    trpc.todo.delete.mutationOptions({
+      onSuccess: () => {
+        void refetch();
+      },
+      onError: ({ message }) => {
+        void toast.error(message);
+      },
+    }),
+  );
 
   return (
     <ul className="space-y-2">

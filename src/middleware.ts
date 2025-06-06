@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { createI18nMiddleware } from "next-international/middleware";
 
@@ -11,6 +12,9 @@ const isProtectedRoute = createRouteMatcher(["/protected(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) await auth.protect();
+
+  // avoid i18n middleware in /api routes
+  if (req.nextUrl.pathname.startsWith("/api")) return NextResponse.next();
 
   return I18nMiddleware(req);
 });

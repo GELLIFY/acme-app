@@ -1,5 +1,4 @@
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
-import { UserIcon } from "lucide-react";
 
 import { Button } from "../ui/button";
 

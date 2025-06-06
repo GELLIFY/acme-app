@@ -2,6 +2,7 @@
 
 import type z from "zod/v4";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2Icon } from "lucide-react";
 import { useForm } from "react-hook-form";
 
@@ -14,14 +15,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { trpc } from "@/shared/helpers/trpc/client";
+import { useTRPC } from "@/shared/helpers/trpc/client";
 import { createTodoSchema } from "@/shared/validators/post.schema";
 
 export function CreatePostForm() {
   // 1. Define your form.
   const form = useForm<z.infer<typeof createTodoSchema>>({
     resolver: standardSchemaResolver(createTodoSchema),
-    defaultValues: { text: "" },
+    defaultValues: { text: "", completed: false },
   });
 
   // 2. Define a submit handler.
@@ -32,14 +33,17 @@ export function CreatePostForm() {
     createMutation.mutate(values);
   }
 
-  const utils = trpc.useUtils();
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
 
-  const createMutation = trpc.todo.create.useMutation({
-    onSuccess: () => {
-      utils.todo.invalidate();
-      form.reset();
-    },
-  });
+  const createMutation = useMutation(
+    trpc.todo.create.mutationOptions({
+      onSuccess: () => {
+        void queryClient.invalidateQueries(trpc.todo.getAll.queryFilter());
+        form.reset();
+      },
+    }),
+  );
 
   return (
     <Form {...form}>
@@ -51,7 +55,7 @@ export function CreatePostForm() {
           control={form.control}
           name="text"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="w-full">
               <FormControl>
                 <Input
                   {...field}
@@ -63,10 +67,7 @@ export function CreatePostForm() {
             </FormItem>
           )}
         />
-        <Button
-          type="submit"
-          disabled={createMutation.isPending || !form.formState.isValid}
-        >
+        <Button type="submit" disabled={createMutation.isPending}>
           {createMutation.isPending ? (
             <Loader2Icon className="h-4 w-4 animate-spin" />
           ) : (
