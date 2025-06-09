@@ -46,15 +46,15 @@ This project is a [Next.js](https://nextjs.com/) app. The code for the docs is i
 
 Here are some useful scripts for when you are developing:
 
-| Command           | Description                         |
-| ----------------- | ----------------------------------- |
-| `pnpm dev`        | Builds and starts the dev server    |
-| `pnpm build`      | Builds the web app                  |
-| `pnpm format`     | Check formatting                    |
-| `pnpm format:fix` | Formats the code                    |
-| `pnpm lint`       | Lints the code                      |
-| `pnpm lint:fix`   | Lints the code and fixes any errors |
-| `pnpm typecheck`  | Checks your code for typeerrors     |
+| Command             | Description                         |
+| ------------------- | ----------------------------------- |
+| `pnpm dev`          | Builds and starts the dev server    |
+| `pnpm build`        | Builds the web app                  |
+| `pnpm format:check` | Check formatting                    |
+| `pnpm format:write` | Formats the code                    |
+| `pnpm lint`         | Lints the code                      |
+| `pnpm lint:fix`     | Lints the code and fixes any errors |
+| `pnpm typecheck`    | Checks your code for typeerrors     |
 
 When making commits, make sure to follow the [conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) guidelines, i.e. prepending the message with `feat:`, `fix:`, `chore:`, `docs:`, etc... You can use `git status` to double check which files have not yet been staged for commit:
 

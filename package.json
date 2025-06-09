@@ -18,11 +18,12 @@
     "db:seedd": "tsx src/server/db/index.ts",
     "ui-add": "pnpm dlx shadcn add && prettier src --write --list-different",
     "dev": "next dev",
-    "format": "prettier --check . !pnpm-lock.yaml !package.json",
-    "format:fix": "prettier --write .",
+    "format:check": "prettier --check . !pnpm-lock.yaml !package.json",
+    "format:write": "prettier --write .",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "typecheck": "tsc --noEmit",
+    "test": "bun test",
     "start": "node .next/standalone/server.js"
   },
   "dependencies": {

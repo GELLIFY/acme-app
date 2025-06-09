@@ -3,13 +3,13 @@ import {
   deleteTodoSchema,
   updateTodoSchema,
 } from "@/shared/validators/post.schema";
-import { createTodo, deleteTodo, updateTodo } from "../domain/todo/commands";
-import { getTodosQuery } from "../domain/todo/queries";
+import { createTodo, deleteTodo, updateTodo } from "../domain/todo/mutations";
 import { createTRPCRouter, publicProcedure } from "../lib/trpc";
+import { getTodos } from "../services/todo-service";
 
 export const todoRouter = createTRPCRouter({
   getAll: publicProcedure.query(async () => {
-    return await getTodosQuery();
+    return await getTodos();
   }),
 
   create: publicProcedure
