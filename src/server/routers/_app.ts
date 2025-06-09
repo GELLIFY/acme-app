@@ -1,5 +1,6 @@
 import z from "zod/v4";
 
+import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import {
   createCallerFactory,
   createTRPCRouter,
@@ -29,6 +30,10 @@ export const appRouter = createTRPCRouter({
 
 // export type definition of API
 export type AppRouter = typeof appRouter;
+
+// export type infer of procedures
+export type RouterInput = inferRouterInputs<AppRouter>;
+export type RouterOutput = inferRouterOutputs<AppRouter>;
 
 /**
  * Create a server-side caller for the tRPC API.

@@ -1,3 +1,5 @@
+"server-only";
+
 import type z from "zod/v4";
 import { eq } from "drizzle-orm";
 
