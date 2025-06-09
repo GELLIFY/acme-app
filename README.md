@@ -87,3 +87,5 @@ Have a look around the [docs↗](https://gellify.dev), as well as the docs of th
 - [ ] fix clerk element login
 - [ ] replace post with todos everywhere
 - [ ] document trpc patterns + clean up setup
+- [ ] fix scalar API doc
+- [ ] fix rest api auth middleware

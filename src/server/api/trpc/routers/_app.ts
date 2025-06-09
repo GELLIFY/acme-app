@@ -5,7 +5,7 @@ import {
   createCallerFactory,
   createTRPCRouter,
   publicProcedure,
-} from "../lib/trpc";
+} from "../init";
 import { todoRouter } from "./todo";
 
 /**

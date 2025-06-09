@@ -1,11 +1,15 @@
 import {
+  createTodo,
+  deleteTodo,
+  updateTodo,
+} from "@/server/domain/todo/mutations";
+import { getTodos } from "@/server/services/todo-service";
+import {
   createTodoSchema,
   deleteTodoSchema,
   updateTodoSchema,
 } from "@/shared/validators/post.schema";
-import { createTodo, deleteTodo, updateTodo } from "../domain/todo/mutations";
-import { createTRPCRouter, publicProcedure } from "../lib/trpc";
-import { getTodos } from "../services/todo-service";
+import { createTRPCRouter, publicProcedure } from "../init";
 
 export const todoRouter = createTRPCRouter({
   getAll: publicProcedure.query(async () => {

@@ -2,8 +2,8 @@ import type { NextRequest } from "next/server";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 
 import { env } from "@/env";
-import { createTRPCContext } from "@/server/lib/trpc";
-import { appRouter } from "@/server/routers/_app";
+import { createTRPCContext } from "@/server/api/trpc/init";
+import { appRouter } from "@/server/api/trpc/routers/_app";
 
 /**
  * This wraps the `createTRPCContext` helper and provides the required context for the tRPC API when
@@ -30,4 +30,5 @@ const handler = (req: NextRequest) =>
           }
         : undefined,
   });
+
 export { handler as GET, handler as POST };
