@@ -2,17 +2,20 @@ import Link from "next/link";
 import { Github } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { getScopedI18n } from "@/shared/locales/server";
 
-export default function Home() {
+export default async function Home() {
+  const t = await getScopedI18n("home");
+
   return (
     <div className="flex min-h-[calc(100vh-65px)] flex-col">
       <main className="flex flex-1 flex-col items-center justify-center p-4 md:p-8 lg:p-12">
         <div className="mx-auto max-w-3xl space-y-8 text-center">
           <h1 className="text-4xl font-bold tracking-tighter">
-            Welcome to gellify-app
+            {t("welcome", { name: "to gellify-app" })}
           </h1>
           <p className="text-muted-foreground">
-            Get started by editing{" "}
+            {t("get_started")}{" "}
             <code className="font-mono font-bold">app/[locale]/page.tsx</code>
           </p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">

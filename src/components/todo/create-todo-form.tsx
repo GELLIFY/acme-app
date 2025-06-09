@@ -16,9 +16,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useTRPC } from "@/shared/helpers/trpc/client";
+import { useScopedI18n } from "@/shared/locales/client";
 import { createTodoSchema } from "@/shared/validators/post.schema";
 
 export function CreatePostForm() {
+  const t = useScopedI18n("todo");
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof createTodoSchema>>({
     resolver: standardSchemaResolver(createTodoSchema),
@@ -59,7 +62,7 @@ export function CreatePostForm() {
               <FormControl>
                 <Input
                   {...field}
-                  placeholder="Add a new task..."
+                  placeholder={t("placeholder")}
                   disabled={createMutation.isPending}
                 />
               </FormControl>
@@ -71,7 +74,7 @@ export function CreatePostForm() {
           {createMutation.isPending ? (
             <Loader2Icon className="h-4 w-4 animate-spin" />
           ) : (
-            "Add"
+            t("add")
           )}
         </Button>
       </form>

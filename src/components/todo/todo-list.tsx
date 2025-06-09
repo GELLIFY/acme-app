@@ -5,10 +5,13 @@ import { Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 
 import { useTRPC } from "@/shared/helpers/trpc/client";
+import { useScopedI18n } from "@/shared/locales/client";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 
 export function TodoList() {
+  const t = useScopedI18n("todo");
+
   const trpc = useTRPC();
   const { data, refetch } = useSuspenseQuery(trpc.todo.getAll.queryOptions());
 
@@ -35,40 +38,45 @@ export function TodoList() {
   );
 
   return (
-    <ul className="space-y-2">
-      {data?.map((todo) => (
-        <li
-          key={todo.id}
-          className="flex items-center justify-between rounded-md border p-2"
-        >
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              checked={todo.completed}
-              onCheckedChange={() =>
-                toggleMutation.mutate({
-                  id: todo.id,
-                  completed: !todo.completed,
-                })
-              }
-              id={`todo-${todo.id}`}
-            />
-            <label
-              htmlFor={`todo-${todo.id}`}
-              className={`${todo.completed ? "text-muted-foreground line-through" : ""}`}
-            >
-              {todo.text}
-            </label>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => deleteMutation.mutate({ id: todo.id })}
-            aria-label="Delete todo"
+    <div className="flex flex-col gap-4">
+      <ul className="space-y-2">
+        {data?.map((todo) => (
+          <li
+            key={todo.id}
+            className="flex items-center justify-between rounded-md border p-2"
           >
-            <Trash2Icon className="h-4 w-4" />
-          </Button>
-        </li>
-      ))}
-    </ul>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                checked={todo.completed}
+                onCheckedChange={() =>
+                  toggleMutation.mutate({
+                    id: todo.id,
+                    completed: !todo.completed,
+                  })
+                }
+                id={`todo-${todo.id}`}
+              />
+              <label
+                htmlFor={`todo-${todo.id}`}
+                className={`${todo.completed ? "text-muted-foreground line-through" : ""}`}
+              >
+                {todo.text}
+              </label>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => deleteMutation.mutate({ id: todo.id })}
+              aria-label="Delete todo"
+            >
+              <Trash2Icon className="h-4 w-4" />
+            </Button>
+          </li>
+        ))}
+      </ul>
+      <span className="text-right text-muted-foreground">
+        {t("items", { count: data.length })}
+      </span>
+    </div>
   );
 }

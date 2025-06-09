@@ -17,8 +17,11 @@ import {
   HydrateClient,
   trpc,
 } from "@/shared/helpers/trpc/server";
+import { getScopedI18n } from "@/shared/locales/server";
 
 export default async function TodoPage() {
+  const t = await getScopedI18n("todo");
+
   const queryClient = getQueryClient();
 
   // Change this to prefetch once this is fixed: https://github.com/trpc/trpc/issues/6632
@@ -33,8 +36,8 @@ export default async function TodoPage() {
       <div className="mx-auto w-full max-w-md py-10">
         <Card>
           <CardHeader>
-            <CardTitle>Todo List</CardTitle>
-            <CardDescription>Manage your tasks efficiently</CardDescription>
+            <CardTitle>{t("title")}</CardTitle>
+            <CardDescription>{t("subtitle")}</CardDescription>
           </CardHeader>
           <CardContent>
             <CreatePostForm />
