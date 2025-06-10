@@ -40,7 +40,10 @@ routers.doc("/openapi", {
   ],
 });
 
-routers.get("/scalar", Scalar({ url: "/openapi", pageTitle: "GELLIFY API" }));
+routers.get(
+  "/scalar",
+  Scalar({ url: "/api/rest/openapi", pageTitle: "GELLIFY API" }),
+);
 
 // routers.get("/health", async (c) => {
 //   try {

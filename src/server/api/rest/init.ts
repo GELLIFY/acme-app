@@ -2,7 +2,7 @@ import type { MiddlewareHandler } from "hono";
 import { type auth } from "@clerk/nextjs/server";
 
 import type { db } from "@/server/db";
-import { withAuth } from "./middleware/auth";
+// import { withAuth } from "./middleware/auth";
 import { withDatabase } from "./middleware/db";
 
 export type Context = {

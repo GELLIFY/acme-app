@@ -17,9 +17,6 @@ importers:
       '@clerk/nextjs':
         specifier: ^6.21.0
         version: 6.21.0(next@15.3.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@hono/trpc-server':
-        specifier: ^0.3.4
-        version: 0.3.4(@trpc/server@11.3.1(typescript@5.8.3))(hono@4.7.11)
       '@hono/zod-openapi':
         specifier: ^0.19.8
         version: 0.19.8(hono@4.7.11)(zod@3.25.55)
@@ -657,13 +654,6 @@ packages:
 
   '@floating-ui/utils@0.2.9':
     resolution: {integrity: sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==}
-
-  '@hono/trpc-server@0.3.4':
-    resolution: {integrity: sha512-xFOPjUPnII70FgicDzOJy1ufIoBTu8eF578zGiDOrYOrYN8CJe140s9buzuPkX+SwJRYK8LjEBHywqZtxdm8aA==}
-    engines: {node: '>=16.0.0'}
-    peerDependencies:
-      '@trpc/server': ^10.10.0 || >11.0.0-rc
-      hono: '>=4.*'
 
   '@hono/zod-openapi@0.19.8':
     resolution: {integrity: sha512-CHUSW0K+bDGUYXovxQSbVjZffzoPeTsGu6wevPoGSmBdPuUw5yZqDeomnvyAAAAvEjhLQPlAsUyASc1Zi35exQ==}
@@ -3799,11 +3789,6 @@ snapshots:
       react-dom: 19.1.0(react@19.1.0)
 
   '@floating-ui/utils@0.2.9': {}
-
-  '@hono/trpc-server@0.3.4(@trpc/server@11.3.1(typescript@5.8.3))(hono@4.7.11)':
-    dependencies:
-      '@trpc/server': 11.3.1(typescript@5.8.3)
-      hono: 4.7.11
 
   '@hono/zod-openapi@0.19.8(hono@4.7.11)(zod@3.25.55)':
     dependencies:

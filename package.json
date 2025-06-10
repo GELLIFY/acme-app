@@ -30,7 +30,6 @@
     "@clerk/backend": "^2.0.0",
     "@clerk/elements": "^0.23.32",
     "@clerk/nextjs": "^6.21.0",
-    "@hono/trpc-server": "^0.3.4",
     "@hono/zod-openapi": "^0.19.8",
     "@hookform/resolvers": "^5.0.1",
     "@neondatabase/serverless": "^1.0.0",
