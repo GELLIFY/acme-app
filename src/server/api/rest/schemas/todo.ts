@@ -1,5 +1,23 @@
 import { z } from "@hono/zod-openapi";
 
+export const todosRequestSchema = z
+  .object({
+    text: z.string().nullable().openapi({
+      description: "Filter todo by text",
+      example: "todo",
+    }),
+    completed: z.boolean().nullable().openapi({
+      description: "To show completed todo.",
+      example: true,
+    }),
+    deleted: z.boolean().openapi({
+      description: "To show deleted todos.",
+      example: true,
+      default: false,
+    }),
+  })
+  .openapi("TodoRequest");
+
 export const createTodoSchema = z
   .object({
     text: z.string().openapi({
@@ -42,6 +60,10 @@ export const updateTodoSchema = z
       description: "The new text of the todo.",
       example: "Update the doc v2",
     }),
+    completed: z.boolean().openapi({
+      description: "The new state of the todo.",
+      example: true,
+    }),
   })
   .openapi("UpdateTodo");
 
@@ -60,6 +82,10 @@ export const todoResponseSchema = z
     text: z.string().openapi({
       description: "The text of the todo.",
       example: "Update the doc",
+    }),
+    completed: z.boolean().openapi({
+      description: "The new state of the todo.",
+      example: true,
     }),
   })
   .openapi("TodoResponse");

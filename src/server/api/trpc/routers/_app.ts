@@ -1,6 +1,5 @@
-import z from "zod/v4";
-
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
+import { checkHealth } from "@/server/services/health-service";
 import {
   createCallerFactory,
   createTRPCRouter,
@@ -15,17 +14,14 @@ import { todoRouter } from "./todo";
  */
 export const appRouter = createTRPCRouter({
   todo: todoRouter,
-  hello: publicProcedure
-    .input(
-      z.object({
-        text: z.string(),
-      }),
-    )
-    .query((opts) => {
-      return {
-        greeting: `hello ${opts.input.text}`,
-      };
-    }),
+  health: publicProcedure.query(async () => {
+    try {
+      await checkHealth();
+      return { status: "ok" };
+    } catch (error) {
+      return { status: "error", error };
+    }
+  }),
 });
 
 // export type definition of API
@@ -39,7 +35,6 @@ export type RouterOutput = inferRouterOutputs<AppRouter>;
  * Create a server-side caller for the tRPC API.
  * @example
  * const trpc = createCaller(createContext);
- * const res = await trpc.post.all();
- *       ^? Post[]
+ * const res = await trpc.todo.getAll();
  */
 export const createCaller = createCallerFactory(appRouter);

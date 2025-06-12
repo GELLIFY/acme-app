@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useTRPC } from "@/shared/helpers/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
-import { createTodoSchema } from "@/shared/validators/post.schema";
+import { createTodoSchema } from "@/shared/validators/todo.schema";
 
 export function CreatePostForm() {
   const t = useScopedI18n("todo");

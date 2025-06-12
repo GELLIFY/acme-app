@@ -2,6 +2,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
 import { secureHeaders } from "hono/secure-headers";
 
+import { checkHealth } from "@/server/services/health-service";
 import { protectedMiddleware } from "../init";
 import { todosRouter } from "./todos";
 
@@ -29,7 +30,7 @@ routers.doc("/openapi", {
   },
   servers: [
     {
-      url: "https://api.midday.ai",
+      url: "http://localhost:3000/api/rest/",
       description: "Production API",
     },
   ],
@@ -45,15 +46,14 @@ routers.get(
   Scalar({ url: "/api/rest/openapi", pageTitle: "GELLIFY API" }),
 );
 
-// routers.get("/health", async (c) => {
-//   try {
-//     await checkHealth();
-
-//     return c.json({ status: "ok" }, 200);
-//   } catch (error) {
-//     return c.json({ status: "error" }, 500);
-//   }
-// });
+routers.get("/health", async (c) => {
+  try {
+    await checkHealth();
+    return c.json({ status: "ok" }, 200);
+  } catch (error) {
+    return c.json({ status: "error", error }, 500);
+  }
+});
 
 routers.route("/todos", todosRouter);
 

@@ -4,6 +4,7 @@ import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 
+import { useTodoFilterParams } from "@/hooks/use-todo-filter-params";
 import { useTRPC } from "@/shared/helpers/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 import { Button } from "../ui/button";
@@ -12,8 +13,12 @@ import { Checkbox } from "../ui/checkbox";
 export function TodoList() {
   const t = useScopedI18n("todo");
 
+  const { filter } = useTodoFilterParams();
+
   const trpc = useTRPC();
-  const { data, refetch } = useSuspenseQuery(trpc.todo.getAll.queryOptions());
+  const { data, refetch } = useSuspenseQuery(
+    trpc.todo.getAll.queryOptions({ ...filter }),
+  );
 
   const toggleMutation = useMutation(
     trpc.todo.update.mutationOptions({
