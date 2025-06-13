@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { HomeIcon, LayersIcon } from "lucide-react";
 
 import Logo from "@/components/navbar-components/logo";
@@ -19,7 +20,7 @@ import LanguageSelector from "./navbar-components/language-selector";
 
 // Navigation links with icons for desktop icon-only navigation
 const navigationLinks = [
-  { href: "/protected", label: "Dashboard", icon: HomeIcon, active: true },
+  { href: "/dashboard", label: "Dashboard", icon: HomeIcon, active: true },
   { href: "/todo", label: "Todo", icon: LayersIcon },
 ];
 
@@ -92,9 +93,9 @@ export default function Navbar() {
           </Popover>
           <div className="flex items-center gap-6">
             {/* Logo */}
-            <a href="#" className="text-primary hover:text-primary/90">
+            <Link href="/" className="text-primary hover:text-primary/90">
               <Logo />
-            </a>
+            </Link>
             {/* Desktop navigation - icon only */}
             <NavigationMenu className="hidden md:flex">
               <NavigationMenuList className="gap-2">

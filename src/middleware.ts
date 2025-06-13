@@ -8,7 +8,7 @@ const I18nMiddleware = createI18nMiddleware({
   urlMappingStrategy: "rewriteDefault",
 });
 
-const isProtectedRoute = createRouteMatcher(["/protected(.*)"]);
+const isProtectedRoute = createRouteMatcher(["/dashboard(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) await auth.protect();

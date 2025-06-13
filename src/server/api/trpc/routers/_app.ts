@@ -5,6 +5,7 @@ import {
   createTRPCRouter,
   publicProcedure,
 } from "../init";
+import { dashboardRouter } from "./dashboard";
 import { todoRouter } from "./todo";
 
 /**
@@ -14,6 +15,7 @@ import { todoRouter } from "./todo";
  */
 export const appRouter = createTRPCRouter({
   todo: todoRouter,
+  dashboard: dashboardRouter,
   health: publicProcedure.query(async () => {
     try {
       await checkHealth();
