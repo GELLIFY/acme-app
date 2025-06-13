@@ -20,7 +20,7 @@ export const todosRequestSchema = z
 
 export const createTodoSchema = z
   .object({
-    text: z.string().openapi({
+    text: z.string().min(1).trim().openapi({
       description: "The text of the todo.",
       example: "Update the doc",
     }),
@@ -56,11 +56,11 @@ export const updateTodoSchema = z
           name: "id",
         },
       }),
-    text: z.string().openapi({
+    text: z.string().optional().openapi({
       description: "The new text of the todo.",
       example: "Update the doc v2",
     }),
-    completed: z.boolean().openapi({
+    completed: z.boolean().optional().openapi({
       description: "The new state of the todo.",
       example: true,
     }),

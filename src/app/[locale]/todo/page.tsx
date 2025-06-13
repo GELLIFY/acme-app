@@ -1,7 +1,7 @@
 import type { SearchParams } from "nuqs/server";
 import { Suspense } from "react";
-import { ErrorBoundary } from "next/dist/client/components/error-boundary";
 import { createLoader } from "nuqs/server";
+import { ErrorBoundary } from "react-error-boundary";
 
 import { ErrorFallback } from "@/components/error-fallback";
 import { CreatePostForm } from "@/components/todo/create-todo-form";
@@ -55,7 +55,7 @@ export default async function TodoPage(props: TodoPageProps) {
           <CardContent>
             <CreatePostForm />
             <TodoFilters />
-            <ErrorBoundary errorComponent={ErrorFallback}>
+            <ErrorBoundary fallbackRender={ErrorFallback}>
               <Suspense fallback={<TodoListLoading />}>
                 <TodoList />
               </Suspense>
