@@ -2,10 +2,13 @@ import "@/globals.css";
 
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
+import Navbar from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { I18nProviderClient } from "@/locales/client";
+import { TRPCReactProvider } from "@/shared/helpers/trpc/client";
+import { I18nProviderClient } from "@/shared/locales/client";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -31,17 +34,22 @@ export default async function RootLayout({
     <ClerkProvider dynamic>
       <html lang="en" suppressHydrationWarning>
         <body className={`font-sans ${inter.variable}`}>
-          <I18nProviderClient locale={locale}>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              {children}
-              <Toaster />
-            </ThemeProvider>
-          </I18nProviderClient>
+          <TRPCReactProvider>
+            <I18nProviderClient locale={locale}>
+              <NuqsAdapter>
+                <ThemeProvider
+                  attribute="class"
+                  defaultTheme="system"
+                  enableSystem
+                  disableTransitionOnChange
+                >
+                  <Navbar />
+                  {children}
+                  <Toaster />
+                </ThemeProvider>
+              </NuqsAdapter>
+            </I18nProviderClient>
+          </TRPCReactProvider>
         </body>
       </html>
     </ClerkProvider>

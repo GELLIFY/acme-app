@@ -1,0 +1,41 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: Table schema definition boilerplate
+globs: 
+alwaysApply: false
+---
+
+# General rules for AI 
+
+- Always use kebab-case for file names.
+- Typesafety and linting are a must in this project.
+- Use our internal definition pattern when defining new tables
+
+## Schema definition
+
+- New schema must be placed in: `/src/server/db/schema/[feature].ts`
+- New schema must be exported by: `/src/server/db/index.ts`
+- Always use snake_case for table names.
+
+[todos.ts](mdc:src/server/db/schema/todos.ts)
+[index.ts](mdc:src/server/db/index.ts)
+
+## Validators
+
+- Schema validators must be placed in: `/src/shared/validators/[feature].schema.ts`
+- Use `drizzle-zod` library to reduce boilerplating.
+
+[todo.schema.ts](mdc:src/shared/validators/todo.schema.ts)
+
+## Queries & Mutations
+
+- Always generate basic CRUD operation for a new schema
+- Queries for a given entity must go into: `/src/server/domain/[feature]/queries.ts`
+- Mutations for a given entity must go into: `/src/server/domain/[feature]/mutations.ts`
+
+[queries.ts](mdc:src/server/domain/todo/queries.ts)
+[mutations.ts](mdc:src/server/domain/todo/mutations.ts)

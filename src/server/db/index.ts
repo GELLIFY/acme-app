@@ -4,7 +4,7 @@ import { drizzle as drizzleWs } from "drizzle-orm/neon-serverless";
 import ws from "ws";
 
 import { env } from "@/env";
-import * as post from "./schema/posts";
+import * as todo from "./schema/todos";
 
 let connectionString = env.DATABASE_URL;
 
@@ -29,7 +29,7 @@ if (env.NODE_ENV === "development") {
 const sql = neon(connectionString);
 const pool = new Pool({ connectionString });
 
-export const schema = { ...post };
+export const schema = { ...todo };
 
 // Drizzle supports both HTTP and WebSocket clients. Choose the one that fits your needs:
 // HTTP Client:
