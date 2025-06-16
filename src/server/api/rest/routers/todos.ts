@@ -1,4 +1,4 @@
-import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 
 import type { Context } from "../init";
 import {
@@ -12,11 +12,11 @@ import { validateResponse } from "@/server/services/validation-service";
 import {
   createTodoSchema,
   deleteTodoSchema,
-  todoResponseSchema,
-  todosRequestSchema,
-  todosResponseSchema,
+  selectTodoSchema,
+  selectTodosSchema,
+  todoFilterSchema,
   updateTodoSchema,
-} from "../schemas/todo";
+} from "@/shared/validators/todo.schema";
 
 const app = new OpenAPIHono<Context>();
 
@@ -29,14 +29,14 @@ app.openapi(
     description: "Retrieve a list of todos.",
     tags: ["Todos"],
     request: {
-      query: todosRequestSchema,
+      query: todoFilterSchema,
     },
     responses: {
       200: {
         description: "Retrieve a list of todos.",
         content: {
           "application/json": {
-            schema: todosResponseSchema,
+            schema: selectTodosSchema,
           },
         },
       },
@@ -48,7 +48,7 @@ app.openapi(
 
     const result = await getTodos(filters);
 
-    return c.json(validateResponse({ data: result }, todosResponseSchema));
+    return c.json(validateResponse({ data: result }, selectTodosSchema));
   },
 );
 
@@ -61,14 +61,14 @@ app.openapi(
     description: "Retrieve a todo by ID.",
     tags: ["Todos"],
     request: {
-      params: todoResponseSchema.pick({ id: true }),
+      params: selectTodoSchema.pick({ id: true }),
     },
     responses: {
       200: {
         description: "Retrieve a todo by ID.",
         content: {
           "application/json": {
-            schema: todoResponseSchema,
+            schema: selectTodoSchema,
           },
         },
       },
@@ -80,7 +80,7 @@ app.openapi(
 
     const result = await getTodoById({ id });
 
-    return c.json(validateResponse(result, todoResponseSchema));
+    return c.json(validateResponse(result, selectTodoSchema));
   },
 );
 
@@ -106,7 +106,7 @@ app.openapi(
         description: "Todo created",
         content: {
           "application/json": {
-            schema: todoResponseSchema,
+            schema: selectTodoSchema,
           },
         },
       },
@@ -116,9 +116,9 @@ app.openapi(
   async (c) => {
     const body = c.req.valid("json");
 
-    const result = await createTodo({ ...body, completed: false });
+    const result = await createTodo({ ...body });
 
-    return c.json(validateResponse(result, todoResponseSchema));
+    return c.json(validateResponse(result[0], selectTodoSchema));
   },
 );
 
@@ -145,7 +145,7 @@ app.openapi(
         description: "Todo updated",
         content: {
           "application/json": {
-            schema: todoResponseSchema,
+            schema: selectTodoSchema,
           },
         },
       },
@@ -158,7 +158,7 @@ app.openapi(
 
     const result = await updateTodo({ id, ...params });
 
-    return c.json(validateResponse(result, todoResponseSchema));
+    return c.json(validateResponse(result[0], selectTodoSchema));
   },
 );
 
@@ -171,7 +171,7 @@ app.openapi(
     description: "Delete a todo by ID.",
     tags: ["Todos"],
     request: {
-      params: deleteTodoSchema.pick({ id: true }),
+      params: deleteTodoSchema,
     },
     responses: {
       204: {
@@ -185,7 +185,7 @@ app.openapi(
 
     const result = await deleteTodo({ id });
 
-    return c.json(validateResponse(result, todoResponseSchema));
+    return c.json(validateResponse(result, z.void()));
   },
 );
 

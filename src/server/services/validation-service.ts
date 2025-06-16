@@ -1,10 +1,10 @@
-import type { ZodSchema } from "zod";
+import { z } from "zod/v4";
 
-export const validateResponse = (data: unknown, schema: ZodSchema) => {
+export const validateResponse = <T>(data: T, schema: z.ZodType) => {
   const result = schema.safeParse(data);
 
   if (!result.success) {
-    const cause = result.error.flatten();
+    const cause = z.flattenError(result.error);
 
     console.error(cause);
 
@@ -16,6 +16,5 @@ export const validateResponse = (data: unknown, schema: ZodSchema) => {
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return result.data;
+  return result.data as T;
 };

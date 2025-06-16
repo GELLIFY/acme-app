@@ -6,14 +6,15 @@ import { shuffleTodos } from "./helpers";
 type Todo = Awaited<ReturnType<typeof getTodosQuery>>[number];
 
 function makeTodos(count: number): Todo[] {
-  return Array.from({ length: count }, (_, i) => ({
-    id: `id-${i}`,
-    text: `Todo ${i}`,
-    completed: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    deletedAt: null,
-  }));
+  return Array.from(
+    { length: count },
+    (_, i) =>
+      ({
+        id: `id-${i}`,
+        text: `Todo ${i}`,
+        completed: false,
+      }) satisfies Todo,
+  );
 }
 
 describe("shuffleTodos", () => {

@@ -26,7 +26,11 @@ export async function getTodosQuery(filters: z.infer<typeof todoFilterSchema>) {
   }
 
   return await db
-    .select()
+    .select({
+      id: todo_table.id,
+      text: todo_table.text,
+      completed: todo_table.completed,
+    })
     .from(todo_table)
     .where(and(...where))
     .orderBy(desc(todo_table.createdAt))
