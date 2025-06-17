@@ -83,17 +83,17 @@ jobs:
         with:
           VERCEL_TOKEN: ${{ secrets.vercel_token }}
 
-      - name: Deploy to Preview (Azure)
-        id: deploy_azure
-        uses: ./.github/workflows/cd/azure/deploy-preview
-        with:
-          AZURE_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_JOLLY_SAND_0ABCEB503 }}
-          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          # Add all necessary env at build and runtime
-          DATABASE_URL: ${{ steps.create_branch.outputs.db_url_with_pooler }}
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+      # - name: Deploy to Preview (Azure)
+      #   id: deploy_azure
+      #   uses: ./.github/workflows/cd/azure/deploy-preview
+      #   with:
+      #     AZURE_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_JOLLY_SAND_0ABCEB503 }}
+      #     AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      #     AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      #     # Add all necessary env at build and runtime
+      #     DATABASE_URL: ${{ steps.create_branch.outputs.db_url_with_pooler }}
+      #     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
 
       - name: Comment on Pull Request
         uses: thollander/actions-comment-pull-request@v3
@@ -101,5 +101,4 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           message: |
             Vercel Preview URL :rocket: : ${{ steps.deploy_vercel.outputs.preview_url }}
-            Azure Preview URL :rocket: : ${{ steps.deploy_azure.outputs.preview_url }}
             Neon branch :elephant: : https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ steps.create_branch.outputs.branch_id }}
