@@ -9,7 +9,7 @@ RUN pnpm i
 # Stage 2: Build the application
 FROM node:20-alpine AS builder
 ARG DATABASE_URL
-ARG NEXT_PUBLIC_CLIENTVAR
+ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
 WORKDIR /app
 RUN npm i -g pnpm
 COPY --from=deps /app/node_modules ./node_modules

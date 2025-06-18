@@ -26,7 +26,6 @@ runs:
         CUSTOM_BUILD_COMMAND: pnpm install && pnpm run build && cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/
         SKIP_ENV_VALIDATION: 1 # disable env validation on build step
         DATABASE_URL: ${{ inputs.DATABASE_URL }} # usefull to build static content that depends on DB
-        NEXT_PUBLIC_CLIENTVAR: "client_var"
         NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ inputs.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
       with:
         azure_static_web_apps_api_token: ${{ inputs.AZURE_TOKEN }}
