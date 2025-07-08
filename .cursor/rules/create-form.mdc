@@ -1,0 +1,22 @@
+---
+description: create form component
+globs:
+alwaysApply: false
+---
+
+# General rules for AI
+
+- Always use kebab-case for file names.
+- Typesafety and linting are a must in this project.
+- Use our internal definition pattern when defining new components
+
+## Form
+
+- Every form component must be placed in: `/src/components/[feature]/forms/`
+- New forms must be placed in: `/src/components/[feature]/forms/[action]-[feature]-form.tsx`
+
+[create-todo-form.tsx](mdc:src/components/todo/form/create-todo-form.tsx)
+
+## Interaction Model
+
+Only generate the code necessary to run a functional data-table with actual data from the DB when the tRPC endpoint exists. If not endpoint exists ask the user if they want to generate them first. Afterwards ask if the user wants to integrate data creation and deletion.

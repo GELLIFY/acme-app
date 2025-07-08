@@ -1,0 +1,25 @@
+---
+description: create data-table component
+globs:
+alwaysApply: false
+---
+
+# General rules for AI
+
+- Always use kebab-case for file names.
+- Typesafety and linting are a must in this project.
+- Use our internal definition pattern when defining new components
+
+## Data Table
+
+- Every table component must be placed in: `/src/components/[feature]/tables/`
+- New data-tables must be placed in: `/src/components/[feature]/tables/data-table.tsx`
+- Table columns definition should be extracted in: `/src/components/[feature]/tables/columns.tsx`
+- Don't include mutations if not specified by the user
+
+[data-table.tsx](mdc:src/components/todo/tables/data-table.tsx)
+[columns.tsx](mdc:src/components/todo/tables/columns.tsx)
+
+## Interaction Model
+
+Only generate the code necessary to run a functional data-table with actual data from the DB when the tRPC endpoint exists. If not endpoint exists ask the user if they want to generate them first. Afterwards ask if the user wants to integrate data creation and deletion.

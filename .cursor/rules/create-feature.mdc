@@ -1,0 +1,40 @@
+---
+description: Add a new feature to the app
+globs:
+alwaysApply: false
+---
+
+# General rules for AI
+
+- Always use kebab-case for file names.
+- Typesafety and linting are a must in this project.
+- Use our internal definition pattern when defining new features
+
+## Feature organization
+
+- Schema definition: `/src/server/db/schema/[feature].ts` <-- drizzle schema definition
+- Queries: `/src/server/domain/[feature]/queries.ts` <-- drizzle queries
+- Mutations: `/src/server/domain/[feature]/mutations.ts` <-- drizzle mutations
+- Schema validators: `/src/shared/validators/[feature]-schema.ts` <-- shared validators
+- tRPC endpoint: `/src/server/api/trpc/routers/[feature].ts` <-- endpoint for internal use
+- REST endpoint: `/src/server/api/rest/routers/[feature].ts` <-- public facing apis
+- Page: `/src/app/[locale]/[feature]/page.tsx` <-- server side page with prefetch
+
+## Backend
+
+To create the necessary backend part follow:
+
+@schema-boilerplate
+@api-boilerplate
+
+## Frontend
+
+To create the necessary frontend you can look at theese template files:
+
+[page.tsx](mdc:src/app/[locale]/todo/v1/page.tsx)
+[data-table.tsx](mdc:src/components/todo/tables/data-tables.tsx)
+[create-todo-dialog.tsx](mdc:src/components/todo/sheets/create-todo-dialog.tsx)
+
+## Interaction Model
+
+Only generate the code necessary to run a functional E2E feature. Follow the project pattern and code styles. Prompt the user between steps to validate you work.

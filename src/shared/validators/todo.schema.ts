@@ -121,3 +121,9 @@ export const todoFilterParamsSchema = {
   completed: parseAsBoolean,
   deleted: parseAsBoolean.withDefault(false),
 };
+
+// Search params for sheets
+export const todoParamsSchema = {
+  todoId: parseAsString,
+  createTodo: parseAsBoolean,
+};

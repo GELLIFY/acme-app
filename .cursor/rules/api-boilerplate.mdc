@@ -1,0 +1,31 @@
+---
+description: tRPC and REST API boilerplate
+globs:
+alwaysApply: false
+---
+
+# General rules for AI
+
+- Always use kebab-case for file names.
+- Typesafety and linting are a must in this project.
+- Use our internal definition pattern when defining new APIs
+
+## Endpoint definition
+
+- New rest apis must be placed in: `/src/server/api/rest/routers/[feature].ts`
+- New trpc apis must be placed in: `/src/server/api/trpc/routers/[feature].ts`
+- APIs input must be validated using correct validators
+- APIs should use services to keep the code DRY and to follow the SOLID principles
+
+[todos.ts](mdc:src/shared/validators/todo.schema.ts)
+[todos.ts](mdc:src/server/api/rest/routers/todos.ts)
+[todos.ts](mdc:src/server/api/trpc/routers/todos.ts)
+
+## Service layer
+
+- Always use services to encapsulate business logic
+- Services can use queries and mutation from any features
+- Queries for a given entity must go into: `/src/server/domain/[feature]/queries.ts`
+- Mutations for a given entity must go into: `/src/server/domain/[feature]/mutations.ts`
+
+[todos.ts](mdc:src/server/services/todo-service.ts)

@@ -1,15 +1,10 @@
 ---
-description: 
-globs: 
-alwaysApply: false
----
----
 description: Table schema definition boilerplate
-globs: 
+globs:
 alwaysApply: false
 ---
 
-# General rules for AI 
+# General rules for AI
 
 - Always use kebab-case for file names.
 - Typesafety and linting are a must in this project.
@@ -27,7 +22,8 @@ alwaysApply: false
 ## Validators
 
 - Schema validators must be placed in: `/src/shared/validators/[feature].schema.ts`
-- Use `drizzle-zod` library to reduce boilerplating.
+- Use `drizzle-zod` library if necessary to reduce boilerplating.
+- Add OpenAPI definitions to schemas
 
 [todo.schema.ts](mdc:src/shared/validators/todo.schema.ts)
 
