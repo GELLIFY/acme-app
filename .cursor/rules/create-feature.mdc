@@ -25,9 +25,12 @@ alwaysApply: false
 - New schema must be placed in: `/src/server/db/schema/[feature].ts`
 - New schema must be exported by: `/src/server/db/index.ts`
 - Always use snake_case for table names.
+- Run the `./start-localstack.sh` to push and seed the db.
+- Update the seed script to add fake data to the table.
 
 [todos.ts](mdc:src/server/db/schema/todos.ts)
 [index.ts](mdc:src/server/db/index.ts)
+[seed.ts](mdc:src/server/db/seed.ts)
 
 ## Queries
 
@@ -57,7 +60,7 @@ alwaysApply: false
 - New trpc routers must be exported by: `/src/server/api/trpc/routers/_app.ts`
 
 [\_app.ts](mdc:src/server/api/trpc/routers/_app.ts)
-[todos.ts](mdc:src/server/api/trpc/routers/todos.ts)
+[todo.ts](mdc:src/server/api/trpc/routers/todo.ts)
 
 ## REST endpoints
 
@@ -65,7 +68,7 @@ alwaysApply: false
 - New rest routers must be exported by: `/src/server/api/rest/routers/_app.ts`
 
 [\_app.ts](mdc:src/server/api/rest/routers/_app.ts)
-[todos.ts](mdc:src/server/api/rest/routers/todos.ts)
+[todo.ts](mdc:src/server/api/rest/routers/todo.ts)
 
 ## Page (server side)
 
