@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-type TodoType = RouterOutput["todo"]["getAll"][number];
+type TodoType = RouterOutput["todo"]["get"][number];
 
 export const columns: ColumnDef<TodoType>[] = [
   {

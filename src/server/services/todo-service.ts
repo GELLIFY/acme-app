@@ -5,7 +5,7 @@ import type z from "zod/v4";
 import type {
   createTodoSchema,
   deleteTodoSchema,
-  todoFilterSchema,
+  getTodoSchema,
   updateTodoSchema,
 } from "@/shared/validators/todo.schema";
 import { shuffleTodos } from "../domain/todo/helpers";
@@ -16,7 +16,7 @@ import {
 } from "../domain/todo/mutations";
 import { getTodoByIdQuery, getTodosQuery } from "../domain/todo/queries";
 
-export async function getTodos(filters: z.infer<typeof todoFilterSchema>) {
+export async function getTodos(filters: z.infer<typeof getTodoSchema>) {
   const todos = await getTodosQuery(filters);
 
   // NOTE: do whatever you want here, map, aggregate filter...

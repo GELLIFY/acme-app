@@ -10,35 +10,19 @@ const { createSelectSchema, createInsertSchema, createUpdateSchema } =
     zodInstance: z,
   });
 
-export const selectTodoSchema = createSelectSchema(todo_table, {
-  id: z.cuid2().openapi({
-    description: "The UUID of the todo.",
-    example: "b3b7c8e2-1f2a-4c3d-9e4f-5a6b7c8d9e0f",
-    param: {
-      in: "path",
-      name: "id",
-    },
+export const getTodoSchema = z.object({
+  text: z.string().nullable().openapi({
+    description: "Filter todo by text",
+    example: "todo",
   }),
-  text: (schema) =>
-    schema.openapi({
-      description: "The text of the todo.",
-      example: "Update the doc",
-    }),
-  completed: (schema) =>
-    schema.openapi({
-      description: "The new state of the todo.",
-      example: true,
-    }),
-})
-  .omit({
-    createdAt: true,
-    updatedAt: true,
-    deletedAt: true,
-  })
-  .openapi("Todo");
-
-export const selectTodosSchema = z.object({
-  data: z.array(selectTodoSchema).nullable(),
+  completed: z.boolean().nullable().openapi({
+    description: "To show completed todo.",
+    example: true,
+  }),
+  deleted: z.boolean().nullable().openapi({
+    description: "To show deleted todos.",
+    example: true,
+  }),
 });
 
 export const createTodoSchema = createInsertSchema(todo_table, {
@@ -100,29 +84,45 @@ export const deleteTodoSchema = z.object({
 });
 
 // Query filter schema
-export const todoFilterSchema = z.object({
-  text: z.string().nullable().openapi({
-    description: "Filter todo by text",
-    example: "todo",
+export const todoSchema = createSelectSchema(todo_table, {
+  id: z.cuid2().openapi({
+    description: "The UUID of the todo.",
+    example: "b3b7c8e2-1f2a-4c3d-9e4f-5a6b7c8d9e0f",
+    param: {
+      in: "path",
+      name: "id",
+    },
   }),
-  completed: z.boolean().nullable().openapi({
-    description: "To show completed todo.",
-    example: true,
-  }),
-  deleted: z.boolean().nullable().openapi({
-    description: "To show deleted todos.",
-    example: true,
-  }),
+  text: (schema) =>
+    schema.openapi({
+      description: "The text of the todo.",
+      example: "Update the doc",
+    }),
+  completed: (schema) =>
+    schema.openapi({
+      description: "The new state of the todo.",
+      example: true,
+    }),
+})
+  .omit({
+    createdAt: true,
+    updatedAt: true,
+    deletedAt: true,
+  })
+  .openapi("Todo");
+
+export const todosSchema = z.object({
+  data: z.array(todoSchema).nullable(),
 });
 
-// Search params filter schema
+// Search params for filtering
 export const todoFilterParamsSchema = {
   text: parseAsString,
   completed: parseAsBoolean,
   deleted: parseAsBoolean.withDefault(false),
 };
 
-// Search params for sheets
+// Search params for create and edit states
 export const todoParamsSchema = {
   todoId: parseAsString,
   createTodo: parseAsBoolean,

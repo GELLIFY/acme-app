@@ -48,9 +48,7 @@ export function DataTable() {
   const { filter } = useTodoFilterParams();
 
   const trpc = useTRPC();
-  const { data } = useSuspenseQuery(
-    trpc.todo.getAll.queryOptions({ ...filter }),
-  );
+  const { data } = useSuspenseQuery(trpc.todo.get.queryOptions({ ...filter }));
 
   const deleteTodoMutation = useMutation(trpc.todo.delete.mutationOptions());
 

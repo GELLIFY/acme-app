@@ -7,13 +7,13 @@ import {
 import {
   createTodoSchema,
   deleteTodoSchema,
-  todoFilterSchema,
+  getTodoSchema,
   updateTodoSchema,
 } from "@/shared/validators/todo.schema";
 import { createTRPCRouter, publicProcedure } from "../init";
 
 export const todoRouter = createTRPCRouter({
-  getAll: publicProcedure.input(todoFilterSchema).query(async ({ input }) => {
+  get: publicProcedure.input(getTodoSchema).query(async ({ input }) => {
     return await getTodos(input);
   }),
 

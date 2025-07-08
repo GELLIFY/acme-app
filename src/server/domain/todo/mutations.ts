@@ -1,24 +1,17 @@
 "server-only";
 
-import type z from "zod/v4";
 import { eq } from "drizzle-orm";
 
-import type {
-  createTodoSchema,
-  deleteTodoSchema,
-  updateTodoSchema,
-} from "@/shared/validators/todo.schema";
+import type { DB_TodoInsertType } from "@/server/db/schema/todos";
 import { db } from "@/server/db";
 import { todo_table } from "@/server/db/schema/todos";
 
-export async function createTodoMutation(
-  params: z.infer<typeof createTodoSchema>,
-) {
+export async function createTodoMutation(params: DB_TodoInsertType) {
   return await db.insert(todo_table).values(params).returning();
 }
 
 export async function updateTodoMutation(
-  params: z.infer<typeof updateTodoSchema>,
+  params: Partial<DB_TodoInsertType> & { id: string },
 ) {
   const { id, ...rest } = params;
   return await db
@@ -28,9 +21,7 @@ export async function updateTodoMutation(
     .returning();
 }
 
-export async function deleteTodoMutation(
-  params: z.infer<typeof deleteTodoSchema>,
-) {
+export async function deleteTodoMutation(params: { id: string }) {
   return await db
     .update(todo_table)
     .set({ deletedAt: new Date() }) // soft delete

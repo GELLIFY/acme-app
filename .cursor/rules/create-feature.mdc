@@ -20,20 +20,64 @@ alwaysApply: false
 - REST endpoint: `/src/server/api/rest/routers/[feature].ts` <-- public facing apis
 - Page: `/src/app/[locale]/[feature]/page.tsx` <-- server side page with prefetch
 
-## Backend
+## Schema definition
 
-To create the necessary backend part follow:
+- New schema must be placed in: `/src/server/db/schema/[feature].ts`
+- New schema must be exported by: `/src/server/db/index.ts`
+- Always use snake_case for table names.
 
-@schema-boilerplate
-@api-boilerplate
+[todos.ts](mdc:src/server/db/schema/todos.ts)
+[index.ts](mdc:src/server/db/index.ts)
 
-## Frontend
+## Queries
 
-To create the necessary frontend you can look at theese template files:
+- Queries for a given entity must go into: `/src/server/domain/[feature]/queries.ts`
 
-[page.tsx](mdc:src/app/[locale]/todo/v1/page.tsx)
-[data-table.tsx](mdc:src/components/todo/tables/data-tables.tsx)
-[create-todo-dialog.tsx](mdc:src/components/todo/sheets/create-todo-dialog.tsx)
+[queries.ts](mdc:src/server/domain/todo/queries.ts)
+
+## Mutation
+
+- Mutations for a given entity must go into: `/src/server/domain/[feature]/mutations.ts`
+
+[mutations.ts](mdc:src/server/domain/todo/mutations.ts)
+
+## Validators
+
+- Schema validators must be placed in: `/src/shared/validators/[feature].schema.ts`
+- Use `drizzle-zod` library if necessary to reduce boilerplating.
+- Add OpenAPI definitions to schemas
+- Be sure to use zod/v4 like in the example
+- Generate nuqs search params too
+
+[todo.schema.ts](mdc:src/shared/validators/todo.schema.ts)
+
+## tRPC endpoints
+
+- New trpc apis must be placed in: `/src/server/api/trpc/routers/[feature].ts`
+- New trpc routers must be exported by: `/src/server/api/trpc/routers/_app.ts`
+
+[\_app.ts](mdc:src/server/api/trpc/routers/_app.ts)
+[todos.ts](mdc:src/server/api/trpc/routers/todos.ts)
+
+## REST endpoints
+
+- New rest apis must be placed in: `/src/server/api/rest/routers/[feature].ts`
+- New rest routers must be exported by: `/src/server/api/rest/routers/_app.ts`
+
+[\_app.ts](mdc:src/server/api/rest/routers/_app.ts)
+[todos.ts](mdc:src/server/api/rest/routers/todos.ts)
+
+## Page (server side)
+
+- New feature page must be placed in: `/src/app/[locale]/[feature]/page.tsx`
+- nuqs must be used to retrieve and parse query params
+- tRPC must be used to prefetch data
+
+[page.tsx](mdc:src/app/[locale]/todo/page.tsx)
+
+## Page (client side)
+
+TODO. Stop here.
 
 ## Interaction Model
 

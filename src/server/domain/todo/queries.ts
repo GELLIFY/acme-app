@@ -3,11 +3,11 @@
 import type z from "zod/v4";
 import { and, desc, eq, ilike, isNotNull, isNull } from "drizzle-orm";
 
-import type { todoFilterSchema } from "@/shared/validators/todo.schema";
+import type { getTodoSchema } from "@/shared/validators/todo.schema";
 import { db } from "@/server/db";
 import { todo_table } from "@/server/db/schema/todos";
 
-export async function getTodosQuery(filters: z.infer<typeof todoFilterSchema>) {
+export async function getTodosQuery(filters: z.infer<typeof getTodoSchema>) {
   // @ts-expect-error placeholder condition incase we don't have any filters
   const where = [eq(1, 1)];
 

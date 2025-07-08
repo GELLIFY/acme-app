@@ -12,9 +12,9 @@ import { validateResponse } from "@/server/services/validation-service";
 import {
   createTodoSchema,
   deleteTodoSchema,
-  selectTodoSchema,
-  selectTodosSchema,
-  todoFilterSchema,
+  getTodoSchema,
+  todoSchema,
+  todosSchema,
   updateTodoSchema,
 } from "@/shared/validators/todo.schema";
 
@@ -29,14 +29,14 @@ app.openapi(
     description: "Retrieve a list of todos.",
     tags: ["Todos"],
     request: {
-      query: todoFilterSchema,
+      query: getTodoSchema,
     },
     responses: {
       200: {
         description: "Retrieve a list of todos.",
         content: {
           "application/json": {
-            schema: selectTodosSchema,
+            schema: todosSchema,
           },
         },
       },
@@ -48,7 +48,7 @@ app.openapi(
 
     const result = await getTodos(filters);
 
-    return c.json(validateResponse({ data: result }, selectTodosSchema));
+    return c.json(validateResponse({ data: result }, todosSchema));
   },
 );
 
@@ -61,14 +61,14 @@ app.openapi(
     description: "Retrieve a todo by ID.",
     tags: ["Todos"],
     request: {
-      params: selectTodoSchema.pick({ id: true }),
+      params: todoSchema.pick({ id: true }),
     },
     responses: {
       200: {
         description: "Retrieve a todo by ID.",
         content: {
           "application/json": {
-            schema: selectTodoSchema,
+            schema: todoSchema,
           },
         },
       },
@@ -80,7 +80,7 @@ app.openapi(
 
     const result = await getTodoById({ id });
 
-    return c.json(validateResponse(result, selectTodoSchema));
+    return c.json(validateResponse(result, todoSchema));
   },
 );
 
@@ -106,7 +106,7 @@ app.openapi(
         description: "Todo created",
         content: {
           "application/json": {
-            schema: selectTodoSchema,
+            schema: todoSchema,
           },
         },
       },
@@ -118,7 +118,7 @@ app.openapi(
 
     const result = await createTodo({ ...body });
 
-    return c.json(validateResponse(result[0], selectTodoSchema));
+    return c.json(validateResponse(result[0], todoSchema));
   },
 );
 
@@ -145,7 +145,7 @@ app.openapi(
         description: "Todo updated",
         content: {
           "application/json": {
-            schema: selectTodoSchema,
+            schema: todoSchema,
           },
         },
       },
@@ -158,7 +158,7 @@ app.openapi(
 
     const result = await updateTodo({ id, ...params });
 
-    return c.json(validateResponse(result[0], selectTodoSchema));
+    return c.json(validateResponse(result[0], todoSchema));
   },
 );
 

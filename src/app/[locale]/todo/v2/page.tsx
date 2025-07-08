@@ -4,9 +4,7 @@ import { createLoader } from "nuqs/server";
 import { ErrorBoundary } from "react-error-boundary";
 
 import { ErrorFallback } from "@/components/error-fallback";
-import { CreatePostForm } from "@/components/todo/create-todo-form";
 import { DataTable } from "@/components/todo/tables/data-table";
-import { TodoFilters } from "@/components/todo/todo-filters";
 import { TodoListLoading } from "@/components/todo/todo-list.loading";
 import {
   getQueryClient,
@@ -29,7 +27,7 @@ export default async function TodoPage(props: TodoPageProps) {
   const queryClient = getQueryClient();
   // Change this to prefetch once this is fixed: https://github.com/trpc/trpc/issues/6632
   // prefetch(trpc.todo.getAll.queryOptions());
-  await queryClient.fetchQuery(trpc.todo.getAll.queryOptions({ ...filter }));
+  await queryClient.fetchQuery(trpc.todo.get.queryOptions({ ...filter }));
 
   return (
     <HydrateClient>
