@@ -1,11 +1,11 @@
 # Acme App
 
-The GELLIFY Stack is a modern web development stack designed for simplicity, modularity, and full-stack TypeScript safety. Created and refined by [Matteo Badini↗](https://x.com/badini_matteo) and the GELLIFY team, it brings together battle-tested technologies to help developers build scalable, maintainable, and performant applications with minimal friction. Plese refer to the [official documentation↗](https://gellify.dev)
+The GELLIFY Stack is a modern web development stack designed for simplicity, modularity, and full-stack TypeScript safety. Created and refined by [Matteo Badini↗](https://x.com/badini_matteo) and the GELLIFY team, it brings together battle-tested technologies to help developers build scalable, maintainable, and performant applications with minimal friction. Please refer to the [official documentation↗](https://gellify.dev)
 
 ## Requirements
 
 - Docker or Podman
-- Node Version Manager (fnm reccomended to switch version automagically)
+- Node Version Manager (fnm recommended to switch version automagically)
 
 ## Getting started
 
@@ -16,6 +16,26 @@ cp .env.example .env
 ```
 
 Then follow the instruction below to fill the `.env` with the required pieces to get you started.
+
+### Setup your environment locally
+
+This project uses [pnpm](https://pnpm.io) as its package manager. Install it if you haven't already:
+
+```bash
+npm install -g pnpm
+```
+
+Then, install the project's dependencies:
+
+```bash
+pnpm install
+```
+
+This project uses [bun](https://bun.com/) as test runner. If you haven't already installed it, make sure to do so:
+
+```bash
+curl -fsSL https://bun.sh/install | bash
+```
 
 ### Database
 
