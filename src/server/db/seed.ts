@@ -2,7 +2,8 @@ import "dotenv/config";
 
 import { reset, seed } from "drizzle-seed";
 
-import { db, schema } from ".";
+import { db } from ".";
+import { schema } from "./schema";
 import { todo_table } from "./schema/todos";
 
 async function main() {

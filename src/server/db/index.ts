@@ -1,10 +1,10 @@
-import { neon, neonConfig, Pool } from "@neondatabase/serverless";
-import { drizzle as drizzleHttp } from "drizzle-orm/neon-http";
+import { neonConfig, Pool } from "@neondatabase/serverless";
+// import { drizzle as drizzleHttp } from "drizzle-orm/neon-http";
 import { drizzle as drizzleWs } from "drizzle-orm/neon-serverless";
 import ws from "ws";
 
 import { env } from "@/env";
-import * as todo from "./schema/todos";
+import { schema } from "./schema";
 
 let connectionString = env.DATABASE_URL;
 
@@ -26,23 +26,18 @@ if (env.NODE_ENV === "development") {
   neonConfig.webSocketConstructor = ws;
 }
 
-const sql = neon(connectionString);
-const pool = new Pool({ connectionString });
-
-export const schema = { ...todo };
-
 // Drizzle supports both HTTP and WebSocket clients. Choose the one that fits your needs:
 // HTTP Client:
 // - Best for serverless functions and Lambda environments
 // - Ideal for stateless operations and quick queries
 // - Lower overhead for single queries
 // - Better for applications with sporadic database access
-export const drizzleClientHttp = drizzleHttp({
-  client: sql,
-  schema,
-  logger: false, // env.NODE_ENV !== "production",
-  casing: "snake_case",
-});
+// export const drizzleClientHttp = drizzleHttp({
+//   client: neon(connectionString),
+//   schema,
+//   logger: env.NODE_ENV !== "production",
+//   casing: "snake_case",
+// });
 
 // WebSocket Client:
 // - Best for long-running applications (like servers)
@@ -50,10 +45,15 @@ export const drizzleClientHttp = drizzleHttp({
 // - More efficient for multiple sequential queries
 // - Better for high-frequency database operations
 export const drizzleClientWs = drizzleWs({
-  client: pool,
+  client: new Pool({ connectionString }),
   schema,
   logger: env.NODE_ENV !== "production",
   casing: "snake_case",
 });
 
 export const db = drizzleClientWs;
+
+// Helper type for database client
+export type DBType = typeof db;
+export type TXType = Parameters<Parameters<DBType["transaction"]>[0]>[0];
+export type DBClient = DBType | TXType;

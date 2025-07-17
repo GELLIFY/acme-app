@@ -22,7 +22,7 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "typecheck": "tsc --noEmit",
-    "test": "bun test",
+    "test": "bun test --preload ./src/setup.ts",
     "start": "node .next/standalone/server.js"
   },
   "dependencies": {
@@ -67,6 +67,7 @@
     "zod": "^3.25.55"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.3.5",
     "@eslint/eslintrc": "^3.3.1",
     "@ianvs/prettier-plugin-sort-imports": "^4.4.2",
     "@tailwindcss/postcss": "^4.1.8",

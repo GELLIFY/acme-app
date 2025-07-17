@@ -1,13 +1,17 @@
 "server-only";
 
-import type z from "zod/v4";
 import { and, desc, eq, ilike, isNotNull, isNull } from "drizzle-orm";
 
-import type { todoFilterSchema } from "@/shared/validators/todo.schema";
 import { db } from "@/server/db";
 import { todo_table } from "@/server/db/schema/todos";
 
-export async function getTodosQuery(filters: z.infer<typeof todoFilterSchema>) {
+type GetTodosRequest = {
+  text: string | null;
+  completed: boolean | null;
+  deleted: boolean | null;
+};
+
+export async function getTodosQuery(filters?: GetTodosRequest) {
   // @ts-expect-error placeholder condition incase we don't have any filters
   const where = [eq(1, 1)];
 
@@ -37,7 +41,11 @@ export async function getTodosQuery(filters: z.infer<typeof todoFilterSchema>) {
     .limit(10);
 }
 
-export async function getTodoByIdQuery(params: { id: string }) {
+type GetTodoByIdRequest = {
+  id: string;
+};
+
+export async function getTodoByIdQuery(params: GetTodoByIdRequest) {
   const result = await db
     .select()
     .from(todo_table)
