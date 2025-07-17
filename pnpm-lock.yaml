@@ -60,13 +60,13 @@ importers:
         version: 16.5.0
       drizzle-orm:
         specifier: ^0.44.2
-        version: 0.44.2(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)(bun-types@1.2.15)(pg@8.16.0)
+        version: 0.44.2(@electric-sql/pglite@0.3.5)(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)(bun-types@1.2.15)(pg@8.16.0)
       drizzle-seed:
         specifier: ^0.3.1
-        version: 0.3.1(drizzle-orm@0.44.2(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)(bun-types@1.2.15)(pg@8.16.0))
+        version: 0.3.1(drizzle-orm@0.44.2(@electric-sql/pglite@0.3.5)(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)(bun-types@1.2.15)(pg@8.16.0))
       drizzle-zod:
         specifier: ^0.8.2
-        version: 0.8.2(drizzle-orm@0.44.2(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)(bun-types@1.2.15)(pg@8.16.0))(zod@3.25.55)
+        version: 0.8.2(drizzle-orm@0.44.2(@electric-sql/pglite@0.3.5)(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)(bun-types@1.2.15)(pg@8.16.0))(zod@3.25.55)
       hono:
         specifier: ^4.7.11
         version: 4.7.11
@@ -129,6 +129,9 @@ importers:
         specifier: ^4.0.8
         version: 4.0.9
     devDependencies:
+      "@electric-sql/pglite":
+        specifier: ^0.3.5
+        version: 0.3.5
       "@eslint/eslintrc":
         specifier: ^3.3.1
         version: 3.3.1
@@ -339,6 +342,12 @@ packages:
     resolution:
       {
         integrity: sha512-z33Il7l5dKjUgGULTqBsQBQwckHh5AbIuxhdsIxDDiZAzBOrZO6q9ogcWC65kU382AfynTfgNumVcNIjuIua6w==,
+      }
+
+  "@electric-sql/pglite@0.3.5":
+    resolution:
+      {
+        integrity: sha512-fhODErXJjOrnsJj5f1A8sH/Zj0INpLUbqOCiskufIUImUsFOBNHE6/FApY656Q2VSOp46wkXX3rvbBBO8O8Cag==,
       }
 
   "@emnapi/core@1.4.3":
@@ -5773,6 +5782,8 @@ snapshots:
 
   "@drizzle-team/brocli@0.10.2": {}
 
+  "@electric-sql/pglite@0.3.5": {}
+
   "@emnapi/core@1.4.3":
     dependencies:
       "@emnapi/wasi-threads": 1.0.2
@@ -7565,22 +7576,23 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.44.2(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)(bun-types@1.2.15)(pg@8.16.0):
+  drizzle-orm@0.44.2(@electric-sql/pglite@0.3.5)(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)(bun-types@1.2.15)(pg@8.16.0):
     optionalDependencies:
+      "@electric-sql/pglite": 0.3.5
       "@neondatabase/serverless": 1.0.1
       "@types/pg": 8.15.4
       bun-types: 1.2.15
       pg: 8.16.0
 
-  drizzle-seed@0.3.1(drizzle-orm@0.44.2(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)(bun-types@1.2.15)(pg@8.16.0)):
+  drizzle-seed@0.3.1(drizzle-orm@0.44.2(@electric-sql/pglite@0.3.5)(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)(bun-types@1.2.15)(pg@8.16.0)):
     dependencies:
       pure-rand: 6.1.0
     optionalDependencies:
-      drizzle-orm: 0.44.2(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)(bun-types@1.2.15)(pg@8.16.0)
+      drizzle-orm: 0.44.2(@electric-sql/pglite@0.3.5)(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)(bun-types@1.2.15)(pg@8.16.0)
 
-  drizzle-zod@0.8.2(drizzle-orm@0.44.2(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)(bun-types@1.2.15)(pg@8.16.0))(zod@3.25.55):
+  drizzle-zod@0.8.2(drizzle-orm@0.44.2(@electric-sql/pglite@0.3.5)(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)(bun-types@1.2.15)(pg@8.16.0))(zod@3.25.55):
     dependencies:
-      drizzle-orm: 0.44.2(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)(bun-types@1.2.15)(pg@8.16.0)
+      drizzle-orm: 0.44.2(@electric-sql/pglite@0.3.5)(@neondatabase/serverless@1.0.1)(@types/pg@8.15.4)(bun-types@1.2.15)(pg@8.16.0)
       zod: 3.25.55
 
   dunder-proto@1.0.1:

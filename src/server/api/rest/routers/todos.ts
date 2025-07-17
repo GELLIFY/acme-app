@@ -12,9 +12,9 @@ import { validateResponse } from "@/server/services/validation-service";
 import {
   createTodoSchema,
   deleteTodoSchema,
+  getTodosSchema,
   selectTodoSchema,
   selectTodosSchema,
-  todoFilterSchema,
   updateTodoSchema,
 } from "@/shared/validators/todo.schema";
 
@@ -29,7 +29,7 @@ app.openapi(
     description: "Retrieve a list of todos.",
     tags: ["Todos"],
     request: {
-      query: todoFilterSchema,
+      query: getTodosSchema,
     },
     responses: {
       200: {
@@ -118,7 +118,7 @@ app.openapi(
 
     const result = await createTodo({ ...body });
 
-    return c.json(validateResponse(result[0], selectTodoSchema));
+    return c.json(validateResponse(result, selectTodoSchema));
   },
 );
 
@@ -158,7 +158,7 @@ app.openapi(
 
     const result = await updateTodo({ id, ...params });
 
-    return c.json(validateResponse(result[0], selectTodoSchema));
+    return c.json(validateResponse(result, selectTodoSchema));
   },
 );
 

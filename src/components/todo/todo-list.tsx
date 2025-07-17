@@ -17,7 +17,7 @@ export function TodoList() {
 
   const trpc = useTRPC();
   const { data, refetch } = useSuspenseQuery(
-    trpc.todo.getAll.queryOptions({ ...filter }),
+    trpc.todo.get.queryOptions({ ...filter }),
   );
 
   const toggleMutation = useMutation(

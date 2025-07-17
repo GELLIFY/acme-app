@@ -100,7 +100,7 @@ export const deleteTodoSchema = z.object({
 });
 
 // Query filter schema
-export const todoFilterSchema = z.object({
+export const getTodosSchema = z.object({
   text: z.string().nullable().openapi({
     description: "Filter todo by text",
     example: "todo",

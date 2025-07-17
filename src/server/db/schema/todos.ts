@@ -13,7 +13,7 @@ export const todo_table = createTable(
       .$defaultFn(() => createId()),
 
     text: d.varchar({ length: 256 }).notNull(),
-    completed: d.boolean().notNull(),
+    completed: d.boolean().default(false).notNull(),
 
     ...timestamps,
   }),
