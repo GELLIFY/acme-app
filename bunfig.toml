@@ -1,7 +1,7 @@
 [test]
 
 # always enable coverage
-coverage = true
+coverage = false
 
 coverageReporter = ["lcov"]  # default ["text"]
 coverageDir = "coverage"  # default "coverage"
