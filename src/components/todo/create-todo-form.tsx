@@ -42,7 +42,7 @@ export function CreatePostForm() {
   const createMutation = useMutation(
     trpc.todo.create.mutationOptions({
       onSuccess: () => {
-        void queryClient.invalidateQueries(trpc.todo.getAll.queryFilter());
+        void queryClient.invalidateQueries(trpc.todo.get.queryFilter());
         form.reset();
       },
     }),

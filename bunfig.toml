@@ -1,0 +1,25 @@
+[test]
+
+# always enable coverage
+coverage = false
+
+coverageReporter = ["lcov"]  # default ["text"]
+coverageDir = "coverage"  # default "coverage"
+
+# to require 90% line-level and function-level coverage
+coverageThreshold = 0.9
+
+# to set different thresholds for lines and functions
+#coverageThreshold = { lines = 0.9, functions = 0.9, statements = 0.9 }
+
+# Multiple patterns
+coveragePathIgnorePatterns = [
+  "src/app/**",
+  "src/components/**",
+  "src/hooks/**",
+  "src/instrumentation.ts",
+  "src/middleware.ts",
+  "*.config.js",
+  "*.config.ts",
+  "*.config.cjs",
+]
