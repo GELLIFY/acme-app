@@ -8,18 +8,15 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Install Vercel CLI
-      run: npm install --global vercel@latest
+    - name: 📤 Pull Vercel Environment Information
+      run: pnpm dlx vercel env pull .env --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+    - name: 📤 Pull Vercel Environment Information
+      run: pnpm dlx vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+    - name: 🏗 Build Project Artifacts
+      run: pnpm dlx vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
       shell: bash
 
-    - name: Pull Vercel Environment Information
-      run: vercel pull --yes --environment=production --token=${{ inputs.VERCEL_TOKEN }}
-      shell: bash
-
-    - name: Build Project Artifacts
-      run: vercel build --prod --token=${{ inputs.VERCEL_TOKEN }}
-      shell: bash
-
-    - name: Deploy Project Artifacts to Vercel
-      run: vercel deploy --prebuilt --prod --token=${{ inputs.VERCEL_TOKEN }}
+    - name: 🚀 Deploy Project Artifacts to Vercel
+      run: pnpm dlx vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
       shell: bash

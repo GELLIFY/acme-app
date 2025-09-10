@@ -9,9 +9,14 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  run_migrations:
-    name: Run migrations
+  ci_checks:
+    name: CI Checks
+    uses: ./.github/workflows/ci.yml
+
+  apply_migrations:
+    name: Apply migrations
     runs-on: ubuntu-latest
+    needs: ci_checks
     permissions:
       contents: read
       pull-requests: write
@@ -21,7 +26,7 @@ jobs:
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
 
-      - name: Apply Migrations
+      - name: 🐘 Apply Migrations
         run: |
           touch .env
           echo SKIP_ENV_VALIDATION=1 >> .env
@@ -32,23 +37,11 @@ jobs:
     name: Deploy Vercel Production
     runs-on: ubuntu-latest
     environment: production
-    needs: run_migrations
+    needs: [ci_checks, apply_migrations]
     permissions:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Install dependencies & tooling
-        uses: ./.github/workflows/setup
-
-      - name: Apply Migrations
-        run: |
-          touch .env
-          echo SKIP_ENV_VALIDATION=1 >> .env
-          echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env
-          pnpm run db:migrate
-
       - name: Deploy to Production
         uses: ./.github/workflows/cd/vercel/deploy-production
         with:
@@ -57,7 +50,7 @@ jobs:
   # deploy_azure_production:
   #   name: Deploy Azure Production
   #   runs-on: ubuntu-latest
-  #   needs: run_migrations
+  #   needs: [ci_checks, apply_migrations]
   #   permissions:
   #     contents: read
   #     pull-requests: write
@@ -71,5 +64,25 @@ jobs:
   #       uses: ./.github/workflows/cd/azure/deploy-production
   #       with:
   #         AZURE_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_JOLLY_SAND_0ABCEB503 }}
+  #         DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  #         NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+
+  # deploy_aws_production:
+  #   name: Deploy AWS Production (Amplify)
+  #   runs-on: ubuntu-latest
+  #   environment: production
+  #   needs: [ci_checks, apply_migrations]
+  #   permissions:
+  #     contents: read
+  #     pull-requests: write
+  #   steps:
+  #     - name: Deploy to Production (AWS Amplify Hosting)
+  #       uses: ./.github/workflows/cd/aws/deploy-production
+  #       with:
+  #         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         AWS_REGION: ${{ vars.AWS_REGION }}
+  #         AMPLIFY_APP_ID: ${{ vars.AMPLIFY_APP_ID }}
+  #         AMPLIFY_BRANCH: main
   #         DATABASE_URL: ${{ secrets.DATABASE_URL }}
   #         NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}

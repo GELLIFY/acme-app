@@ -11,94 +11,116 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  setup:
-    name: Setup
-    outputs:
-      branch: ${{ steps.branch_name.outputs.current_branch }}
+  prepare_db:
+    name: Prepare Preview DB (Neon)
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Install dependencies & tooling
-        id: setup
-        uses: ./.github/workflows/setup
-
-      - name: Get branch name
-        id: branch_name
-        uses: tj-actions/branch-names@v8
-
-  ci:
-    name: CI checks
-    needs: setup
-    uses: ./.github/workflows/ci.yml
-
-  deploy_preview:
-    name: Deploy Preview
-    environment: Preview
-    runs-on: ubuntu-latest
-    needs: [setup, ci]
     permissions:
       contents: read
       pull-requests: write
       id-token: write
+    outputs:
+      neon_branch_id: ${{ steps.create_branch.outputs.branch_id }}
+      neon_branch_name: ${{ steps.create_branch.outputs.branch_name }}
+      neon_db_url: ${{ steps.create_branch.outputs.db_url_with_pooler }}
+      pr_branch_name: ${{ steps.branch_name.outputs.current_branch }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
 
-      - name: Create Neon Branch
+      - name: 🐘 Get branch name
+        id: branch_name
+        uses: tj-actions/branch-names@v8
+
+      - name: 🐘 Create Neon Branch
         id: create_branch
         uses: neondatabase/create-branch-action@v5
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
-          # parent: main # optional (defaults to your primary branch)
-          branch_name: preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }}
+          branch_name: preview/pr-${{ github.event.number }}-${{ steps.branch_name.outputs.current_branch }}
           database: neondb
           username: neondb_owner
           api_key: ${{ secrets.NEON_API_KEY }}
 
-      - name: Run Migrations
-        run: |
-          touch .env
-          echo SKIP_ENV_VALIDATION=1 >> .env
-          echo DATABASE_URL=${{ steps.create_branch.outputs.db_url_with_pooler }} >> .env
-          echo DIRECT_URL=${{ steps.create_branch.outputs.db_url }} >> .env
-          pnpm run db:migrate
+      - name: 🐘 Apply Migrations
+        env:
+          SKIP_ENV_VALIDATION: 1
+          DATABASE_URL: ${{ steps.create_branch.outputs.db_url_with_pooler }}
+        run: pnpm run db:migrate
 
-      - name: Post Schema Diff Comment to PR
+      - name: 🐘 Post Schema Diff to PR
         uses: neondatabase/schema-diff-action@v1
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
-          compare_branch: preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }}
+          compare_branch: preview/pr-${{ github.event.number }}-${{ steps.branch_name.outputs.current_branch }}
           database: neondb
           github-token: ${{ secrets.GITHUB_TOKEN }}
           base_branch: main
           api_key: ${{ secrets.NEON_API_KEY }}
 
-      - name: Deploy to Preview (Vercel)
+  deploy_vercel:
+    name: Deploy Preview (Vercel)
+    runs-on: ubuntu-latest
+    needs: prepare_db
+    permissions:
+      contents: read
+    outputs:
+      preview_url: ${{ steps.deploy_vercel.outputs.preview_url }}
+    steps:
+      - name: 🚀 Deploy to Preview (Vercel)
         id: deploy_vercel
         uses: ./.github/workflows/cd/vercel/deploy-preview
         with:
-          VERCEL_TOKEN: ${{ secrets.vercel_token }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
-      # - name: Deploy to Preview (Azure)
-      #   id: deploy_azure
-      #   uses: ./.github/workflows/cd/azure/deploy-preview
-      #   with:
-      #     AZURE_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_JOLLY_SAND_0ABCEB503 }}
-      #     AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      #     AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      #     # Add all necessary env at build and runtime
-      #     DATABASE_URL: ${{ steps.create_branch.outputs.db_url_with_pooler }}
-      #     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+  # deploy_azure:
+  #   name: Deploy Preview (Azure App Service)
+  #   runs-on: ubuntu-latest
+  #   needs: prepare_db
+  #   permissions:
+  #     contents: read
+  #   steps:
+  #     - name: Deploy to Preview (Azure)
+  #       id: deploy_azure
+  #       uses: ./.github/workflows/cd/azure/deploy-preview
+  #       with:
+  #         AZURE_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_JOLLY_SAND_0ABCEB503 }}
+  #         AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  #         AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  #         AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  #         DATABASE_URL: ${{ needs.prepare_db.outputs.neon_db_url }}
+  #         NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
 
+  # deploy_aws:
+  #   name: Deploy Preview (AWS Amplify)
+  #   runs-on: ubuntu-latest
+  #   needs: prepare_db
+  #   permissions:
+  #     contents: read
+  #   steps:
+  #     - name: Deploy to Preview (AWS Amplify Hosting)
+  #       id: deploy_aws
+  #       uses: ./.github/workflows/cd/aws/deploy-preview
+  #       with:
+  #         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         AWS_REGION: ${{ vars.AWS_REGION }}
+  #         AMPLIFY_APP_ID: ${{ vars.AMPLIFY_APP_ID }}
+  #         AMPLIFY_BRANCH: preview/pr-${{ github.event.number }}-${{ needs.prepare_db.outputs.pr_branch_name }}
+  #         DATABASE_URL: ${{ needs.prepare_db.outputs.neon_db_url }}
+  #         NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+
+  comment_pr:
+    name: Comment Preview Links on PR
+    runs-on: ubuntu-latest
+    needs: [prepare_db, deploy_vercel]
+    steps:
       - name: Comment on Pull Request
         uses: thollander/actions-comment-pull-request@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           message: |
-            Vercel Preview URL :rocket: : ${{ steps.deploy_vercel.outputs.preview_url }}
-            Neon branch :elephant: : https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ steps.create_branch.outputs.branch_id }}
+            Vercel Preview URL :rocket: : ${{ needs.deploy_vercel.outputs.preview_url }}
+            Neon branch :elephant: : https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ needs.prepare_db.outputs.neon_branch_id }}
+            # AWS Amplify Preview URL (if enabled) :cloud: : ${{ needs.deploy_aws.outputs.preview_url }}

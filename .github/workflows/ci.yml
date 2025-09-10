@@ -3,9 +3,21 @@ name: CI
 on:
   workflow_call:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+# You can leverage Vercel Remote Caching with Turbo to speed up your builds
+# @link https://turborepo.org/docs/core-concepts/remote-caching#remote-caching-on-vercel-builds
+# env:
+#   FORCE_COLOR: 3
+#   TURBO_TEAM: ${{ vars.VERCEL_TEAM }}
+#   TURBO_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
 jobs:
-  lint:
+  build-lint:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -16,35 +28,11 @@ jobs:
 
       - run: cp .env.example .env
 
-      - name: Lint
+      - name: 🔦 Lint
         run: pnpm run lint
 
-  typecheck:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Install dependencies & tooling
-        id: setup
-        uses: ./.github/workflows/setup
-
-      - run: cp .env.example .env
-
-      - name: Typecheck
+      - name: 🪐 Typecheck
         run: pnpm run typecheck
 
-  format:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Install dependencies & tooling
-        id: setup
-        uses: ./.github/workflows/setup
-
-      - run: cp .env.example .env
-
-      - name: Format
+      - name: 💼 Format
         run: pnpm run format:check

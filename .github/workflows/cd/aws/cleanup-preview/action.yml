@@ -1,0 +1,42 @@
+name: Cleanup AWS Amplify Preview (stub)
+
+inputs:
+  AWS_ACCESS_KEY_ID:
+    description: AWS access key id
+    required: true
+  AWS_SECRET_ACCESS_KEY:
+    description: AWS secret access key
+    required: true
+  AWS_REGION:
+    description: AWS region, e.g. eu-central-1
+    required: true
+  AMPLIFY_APP_ID:
+    description: Amplify App ID
+    required: true
+  AMPLIFY_BRANCH:
+    description: Preview branch name to delete
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ inputs.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ inputs.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ inputs.AWS_REGION }}
+
+    # NOTE: This is a stub. Uncomment to delete Amplify preview branch when PR closes.
+    # - name: Delete Amplify Preview Branch
+    #   shell: bash
+    #   run: |
+    #     set -euo pipefail
+    #     APP_ID="${{ inputs.AMPLIFY_APP_ID }}"
+    #     BRANCH_NAME="${{ inputs.AMPLIFY_BRANCH }}"
+    #     if aws amplify get-branch --app-id "$APP_ID" --branch-name "$BRANCH_NAME" >/dev/null 2>&1; then
+    #       echo "Deleting branch: $BRANCH_NAME"
+    #       aws amplify delete-branch --app-id "$APP_ID" --branch-name "$BRANCH_NAME"
+    #     else
+    #       echo "Branch not found: $BRANCH_NAME (skip)"
+    #     fi

@@ -1,0 +1,78 @@
+name: Deploy Production on AWS Amplify (stub)
+
+inputs:
+  AWS_ACCESS_KEY_ID:
+    description: AWS access key id
+    required: true
+  AWS_SECRET_ACCESS_KEY:
+    description: AWS secret access key
+    required: true
+  AWS_REGION:
+    description: AWS region, e.g. eu-central-1
+    required: true
+  AMPLIFY_APP_ID:
+    description: Amplify App ID
+    required: true
+  AMPLIFY_BRANCH:
+    description: Branch name to deploy (e.g., main)
+    required: true
+  DATABASE_URL:
+    description: Runtime/build env var
+    required: false
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
+    description: Example of public runtime env var
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ inputs.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ inputs.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ inputs.AWS_REGION }}
+
+    # NOTE: This is a stub. Uncomment to update env vars and kick off production build in Amplify.
+    # - name: Ensure Amplify production branch exists
+    #   shell: bash
+    #   run: |
+    #     set -euo pipefail
+    #     APP_ID="${{ inputs.AMPLIFY_APP_ID }}"
+    #     BRANCH_NAME="${{ inputs.AMPLIFY_BRANCH }}"
+    #     if aws amplify get-branch --app-id "$APP_ID" --branch-name "$BRANCH_NAME" >/dev/null 2>&1; then
+    #       echo "Branch exists: $BRANCH_NAME"
+    #     else
+    #       echo "Creating branch: $BRANCH_NAME"
+    #       aws amplify create-branch --app-id "$APP_ID" --branch-name "$BRANCH_NAME"
+    #     fi
+    #
+    # - name: Update environment variables
+    #   shell: bash
+    #   run: |
+    #     set -euo pipefail
+    #     APP_ID="${{ inputs.AMPLIFY_APP_ID }}"
+    #     BRANCH_NAME="${{ inputs.AMPLIFY_BRANCH }}"
+    #     declare -A envs
+    #     [ -n "${{ inputs.DATABASE_URL }}" ] && envs[DATABASE_URL]='${{ inputs.DATABASE_URL }}'
+    #     [ -n "${{ inputs.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}" ] && envs[NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY]='${{ inputs.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}'
+    #     if [ ${#envs[@]} -gt 0 ]; then
+    #       # Build JSON for --environment-variables
+    #       json="{"
+    #       first=true
+    #       for k in "${!envs[@]}"; do
+    #         if [ "$first" = true ]; then first=false; else json+=" ,"; fi
+    #         json+="\"$k\":\"${envs[$k]}\""
+    #       done
+    #       json+="}"
+    #       aws amplify update-branch --app-id "$APP_ID" --branch-name "$BRANCH_NAME" --environment-variables "$json"
+    #     fi
+    #
+    # - name: Trigger production build
+    #   shell: bash
+    #   run: |
+    #     set -euo pipefail
+    #     APP_ID="${{ inputs.AMPLIFY_APP_ID }}"
+    #     BRANCH_NAME="${{ inputs.AMPLIFY_BRANCH }}"
+    #     JOB_ID=$(aws amplify start-job --app-id "$APP_ID" --branch-name "$BRANCH_NAME" --job-type RELEASE --query jobSummary.jobId --output text)
+    #     echo "Triggered Amplify production build job: $JOB_ID"
