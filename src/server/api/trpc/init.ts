@@ -10,7 +10,7 @@ import { cache } from "react";
 import { auth } from "@clerk/nextjs/server";
 import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
-import { ZodError } from "zod/v4";
+import { ZodError } from "zod";
 
 import { db } from "../../db";
 import { authMiddleware } from "./middleware/auth";

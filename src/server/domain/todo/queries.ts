@@ -1,6 +1,6 @@
 "server-only";
 
-import { and, desc, eq, ilike, isNotNull, isNull } from "drizzle-orm";
+import { and, desc, eq, ilike } from "drizzle-orm";
 
 import { db } from "@/server/db";
 import { todo_table } from "@/server/db/schema/todos";
@@ -8,7 +8,6 @@ import { todo_table } from "@/server/db/schema/todos";
 type GetTodosRequest = {
   text: string | null;
   completed: boolean | null;
-  deleted: boolean | null;
 };
 
 export async function getTodosQuery(filters?: GetTodosRequest) {
@@ -21,12 +20,6 @@ export async function getTodosQuery(filters?: GetTodosRequest) {
 
   if (filters?.completed) {
     where.push(eq(todo_table.completed, filters.completed));
-  }
-
-  if (filters?.deleted) {
-    where.push(isNotNull(todo_table.deletedAt));
-  } else {
-    where.push(isNull(todo_table.deletedAt));
   }
 
   return await db

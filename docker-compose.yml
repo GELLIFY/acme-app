@@ -31,6 +31,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    logging:
+      driver: "local"
+      options:
+        max-size: "20m"
+        max-file: "5"
 
   neon-proxy:
     image: ghcr.io/timowilhelm/local-neon-http-proxy:main
@@ -38,6 +43,11 @@ services:
       - PG_CONNECTION_STRING=postgres://postgres:postgres@db:5432/main
     ports:
       - "4444:4444"
+    logging:
+      driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "3"
     depends_on:
       db:
         condition: service_healthy

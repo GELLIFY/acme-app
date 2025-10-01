@@ -35,8 +35,7 @@ export async function updateTodoMutation(
 
 export async function deleteTodoMutation(db: DBClient, params: { id: string }) {
   return await db
-    .update(todo_table)
-    .set({ deletedAt: new Date() }) // soft delete
+    .delete(todo_table)
     .where(eq(todo_table.id, params.id))
     .returning();
 }

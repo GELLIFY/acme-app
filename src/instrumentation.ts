@@ -1,15 +1,11 @@
-declare global {
-  // eslint-disable-next-line no-var
-  var secrets: {
-    apiKey?: string;
-  };
-}
-
+/**
+ * Registers application instrumentation.
+ *
+ * This function can be used to initialize monitoring, tracing,
+ * or to load secrets from a secret manager if required.
+ * Call this early in your application's lifecycle.
+ */
 export async function register() {
-  global.secrets = {};
-
-  // you can fetch from secretmanager here if needed
-  global.secrets.apiKey = "None for demo";
-
-  console.log("Secrets loaded!");
+  // Example: fetch secrets from a secret manager here if needed
+  console.debug("Secrets loaded!");
 }

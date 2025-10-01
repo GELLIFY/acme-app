@@ -26,7 +26,7 @@ export function TodoList() {
         void refetch();
       },
       onError: ({ message }) => {
-        void toast.error(message);
+        toast.error(message);
       },
     }),
   );
@@ -37,7 +37,7 @@ export function TodoList() {
         void refetch();
       },
       onError: ({ message }) => {
-        void toast.error(message);
+        toast.error(message);
       },
     }),
   );

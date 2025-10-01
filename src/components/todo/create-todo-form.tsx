@@ -1,7 +1,7 @@
 "use client";
 
-import type z from "zod/v4";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import type z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2Icon } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -24,8 +24,8 @@ export function CreatePostForm() {
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof createTodoSchema>>({
-    resolver: standardSchemaResolver(createTodoSchema),
-    defaultValues: { text: "", completed: false },
+    resolver: zodResolver(createTodoSchema),
+    defaultValues: { text: "" },
   });
 
   // 2. Define a submit handler.
@@ -41,8 +41,11 @@ export function CreatePostForm() {
 
   const createMutation = useMutation(
     trpc.todo.create.mutationOptions({
-      onSuccess: () => {
-        void queryClient.invalidateQueries(trpc.todo.get.queryFilter());
+      onSuccess: async () => {
+        // invalidate query
+        await queryClient.invalidateQueries({
+          queryKey: trpc.todo.get.queryKey(),
+        });
         form.reset();
       },
     }),

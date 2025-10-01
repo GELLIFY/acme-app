@@ -41,7 +41,7 @@ app.openapi(
         },
       },
     },
-    // middleware: [withRequiredScope("tags.read")],
+    // middleware: [withRequiredScope("todos.read")],
   }),
   async (c) => {
     const filters = c.req.valid("query");

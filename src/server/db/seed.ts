@@ -12,7 +12,6 @@ async function main() {
     todo_table: {
       columns: {
         text: f.loremIpsum(),
-        deletedAt: f.default({ defaultValue: null }),
       },
       count: 5,
     },
