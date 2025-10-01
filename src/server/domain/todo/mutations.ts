@@ -3,12 +3,16 @@
 import { eq } from "drizzle-orm";
 
 import type { DBClient } from "@/server/db";
-import type { DB_TodoInsertType } from "@/server/db/schema/todos";
 import { todo_table } from "@/server/db/schema/todos";
+
+type CreateTodoParams = {
+  text: string;
+  completed?: boolean;
+};
 
 export async function createTodoMutation(
   db: DBClient,
-  params: DB_TodoInsertType,
+  params: CreateTodoParams,
 ) {
   const [result] = await db
     .insert(todo_table)
@@ -19,21 +23,34 @@ export async function createTodoMutation(
   return result;
 }
 
+type UpdateTodoParams = {
+  id: string;
+  text?: string;
+  completed?: boolean;
+};
+
 export async function updateTodoMutation(
   db: DBClient,
-  params: Partial<DB_TodoInsertType>,
+  params: UpdateTodoParams,
 ) {
   const { id, ...rest } = params;
   const [result] = await db
     .update(todo_table)
     .set(rest)
-    .where(eq(todo_table.id, id!))
+    .where(eq(todo_table.id, id))
     .returning();
 
   return result;
 }
 
-export async function deleteTodoMutation(db: DBClient, params: { id: string }) {
+type DeleteTodoParams = {
+  id: string;
+};
+
+export async function deleteTodoMutation(
+  db: DBClient,
+  params: DeleteTodoParams,
+) {
   return await db
     .delete(todo_table)
     .where(eq(todo_table.id, params.id))

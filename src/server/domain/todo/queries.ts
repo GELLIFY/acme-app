@@ -2,15 +2,15 @@
 
 import { and, desc, eq, ilike } from "drizzle-orm";
 
-import { db } from "@/server/db";
+import { type DBClient } from "@/server/db";
 import { todo_table } from "@/server/db/schema/todos";
 
 type GetTodosRequest = {
-  text: string | null;
-  completed: boolean | null;
+  text?: string | null;
+  completed?: boolean | null;
 };
 
-export async function getTodosQuery(filters?: GetTodosRequest) {
+export async function getTodosQuery(db: DBClient, filters: GetTodosRequest) {
   // @ts-expect-error placeholder condition incase we don't have any filters
   const where = [eq(1, 1)];
 
@@ -38,9 +38,16 @@ type GetTodoByIdRequest = {
   id: string;
 };
 
-export async function getTodoByIdQuery(params: GetTodoByIdRequest) {
+export async function getTodoByIdQuery(
+  db: DBClient,
+  params: GetTodoByIdRequest,
+) {
   const result = await db
-    .select()
+    .select({
+      id: todo_table.id,
+      text: todo_table.text,
+      completed: todo_table.completed,
+    })
     .from(todo_table)
     .where(eq(todo_table.id, params.id));
 

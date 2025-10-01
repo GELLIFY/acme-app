@@ -8,7 +8,7 @@ export default {
   "todo.subtitle": "Manage your tasks efficiently",
   "todo.placeholder": "Add a new task...",
   "todo.add": "Add",
-  "todo.filter": "Show deleted",
+  "todo.filter": "Show completed",
   "todo.items#zero": "No todos",
   "todo.items#one": "One todo",
   "todo.items#other": "{count} todos",

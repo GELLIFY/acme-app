@@ -1,6 +1,7 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 
 import type { Context } from "../init";
+import { db } from "@/server/db";
 import {
   createTodo,
   deleteTodo,
@@ -13,8 +14,8 @@ import {
   createTodoSchema,
   deleteTodoSchema,
   getTodosSchema,
-  selectTodoSchema,
-  selectTodosSchema,
+  todoResponseSchema,
+  todosResponseSchema,
   updateTodoSchema,
 } from "@/shared/validators/todo.schema";
 
@@ -36,7 +37,7 @@ app.openapi(
         description: "Retrieve a list of todos.",
         content: {
           "application/json": {
-            schema: selectTodosSchema,
+            schema: todosResponseSchema,
           },
         },
       },
@@ -46,9 +47,9 @@ app.openapi(
   async (c) => {
     const filters = c.req.valid("query");
 
-    const result = await getTodos(filters);
+    const result = await getTodos(db, filters);
 
-    return c.json(validateResponse({ data: result }, selectTodosSchema));
+    return c.json(validateResponse({ data: result }, todosResponseSchema));
   },
 );
 
@@ -61,26 +62,34 @@ app.openapi(
     description: "Retrieve a todo by ID.",
     tags: ["Todos"],
     request: {
-      params: selectTodoSchema.pick({ id: true }),
+      params: todoResponseSchema.pick({ id: true }),
     },
     responses: {
       200: {
         description: "Retrieve a todo by ID.",
         content: {
           "application/json": {
-            schema: selectTodoSchema,
+            schema: todoResponseSchema,
           },
         },
       },
+      404: {
+        description: "Todo not found",
+      },
+      500: {
+        description: "Internal server error",
+      },
     },
-    // middleware: [withRequiredScope("tags.read")],
+    // middleware: [withRequiredScope("todo.read")],
   }),
   async (c) => {
     const { id } = c.req.valid("param");
 
-    const result = await getTodoById({ id });
+    const result = await getTodoById(db, { id });
 
-    return c.json(validateResponse(result, selectTodoSchema));
+    if (!result) return c.json({}, 404);
+
+    return c.json(validateResponse(result, todoResponseSchema), 200);
   },
 );
 
@@ -106,19 +115,25 @@ app.openapi(
         description: "Todo created",
         content: {
           "application/json": {
-            schema: selectTodoSchema,
+            schema: todoResponseSchema,
           },
         },
       },
+      404: {
+        description: "Todo not found",
+      },
+      500: {
+        description: "Internal server error",
+      },
     },
-    // middleware: [withRequiredScope("tags.write")],
+    // middleware: [withRequiredScope("todo.write")],
   }),
   async (c) => {
     const body = c.req.valid("json");
 
-    const result = await createTodo({ ...body });
+    const result = await createTodo(db, { ...body });
 
-    return c.json(validateResponse(result, selectTodoSchema));
+    return c.json(validateResponse(result, todoResponseSchema));
   },
 );
 
@@ -135,7 +150,7 @@ app.openapi(
       body: {
         content: {
           "application/json": {
-            schema: updateTodoSchema.pick({ text: true, completed: true }),
+            schema: updateTodoSchema.omit({ id: true }),
           },
         },
       },
@@ -145,20 +160,26 @@ app.openapi(
         description: "Todo updated",
         content: {
           "application/json": {
-            schema: selectTodoSchema,
+            schema: todoResponseSchema,
           },
         },
       },
+      404: {
+        description: "Todo not found",
+      },
+      500: {
+        description: "Internal server error",
+      },
     },
-    // middleware: [withRequiredScope("tags.write")],
+    // middleware: [withRequiredScope("todo.write")],
   }),
   async (c) => {
     const { id } = c.req.valid("param");
     const params = c.req.valid("json");
 
-    const result = await updateTodo({ id, ...params });
+    const result = await updateTodo(db, { id, ...params });
 
-    return c.json(validateResponse(result, selectTodoSchema));
+    return c.json(validateResponse(result, todoResponseSchema));
   },
 );
 
@@ -178,12 +199,12 @@ app.openapi(
         description: "Todo deleted",
       },
     },
-    // middleware: [withRequiredScope("tags.write")],
+    // middleware: [withRequiredScope("todo.write")],
   }),
   async (c) => {
     const { id } = c.req.valid("param");
 
-    const result = await deleteTodo({ id });
+    const result = await deleteTodo(db, { id });
 
     return c.json(validateResponse(result, z.void()));
   },

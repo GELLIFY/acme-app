@@ -14,11 +14,11 @@ export function TodoFilters() {
     <div className="mb-4 flex flex-col gap-4">
       <div className="flex items-center gap-3">
         <Checkbox
-          checked={filter.deleted}
+          checked={filter.completed ?? false}
           onCheckedChange={(value) => {
             const newValue = value.valueOf();
             void setFilter({
-              deleted: typeof newValue === "boolean" ? newValue : false,
+              completed: typeof newValue === "boolean" ? newValue : false,
             });
           }}
           id="todo-state"

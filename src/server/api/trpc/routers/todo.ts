@@ -13,25 +13,27 @@ import {
 import { createTRPCRouter, publicProcedure } from "../init";
 
 export const todoRouter = createTRPCRouter({
-  get: publicProcedure.input(getTodosSchema).query(async ({ input }) => {
-    return await getTodos(input);
-  }),
+  get: publicProcedure
+    .input(getTodosSchema)
+    .query(async ({ ctx: { db }, input }) => {
+      return await getTodos(db, input);
+    }),
 
   create: publicProcedure
     .input(createTodoSchema)
-    .mutation(async ({ input }) => {
-      return await createTodo(input);
+    .mutation(async ({ ctx: { db }, input }) => {
+      return await createTodo(db, input);
     }),
 
   update: publicProcedure
     .input(updateTodoSchema)
-    .mutation(async ({ input }) => {
-      return await updateTodo(input);
+    .mutation(async ({ ctx: { db }, input }) => {
+      return await updateTodo(db, input);
     }),
 
   delete: publicProcedure
     .input(deleteTodoSchema)
-    .mutation(async ({ input }) => {
-      return await deleteTodo(input);
+    .mutation(async ({ ctx: { db }, input }) => {
+      return await deleteTodo(db, input);
     }),
 });
