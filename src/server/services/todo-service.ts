@@ -4,16 +4,14 @@ import type z from "zod";
 
 import type { DBClient } from "../db";
 import type {
-  createTodoSchema,
-  deleteTodoSchema,
+  getTodoByIdSchema,
   getTodosSchema,
-  updateTodoSchema,
+  upsertTodoSchema,
 } from "@/shared/validators/todo.schema";
 import { shuffleTodos } from "../domain/todo/helpers";
 import {
-  createTodoMutation,
   deleteTodoMutation,
-  updateTodoMutation,
+  upsertTodoMutation,
 } from "../domain/todo/mutations";
 import { getTodoByIdQuery, getTodosQuery } from "../domain/todo/queries";
 
@@ -28,27 +26,23 @@ export async function getTodos(
   return shuffleTodos(todos);
 }
 
-export async function getTodoById(db: DBClient, params: { id: string }) {
-  return await getTodoByIdQuery(db, params);
+export async function getTodoById(
+  db: DBClient,
+  filters: z.infer<typeof getTodoByIdSchema>,
+) {
+  return await getTodoByIdQuery(db, filters);
 }
 
-export async function createTodo(
+export async function upsertTodo(
   db: DBClient,
-  params: z.infer<typeof createTodoSchema>,
+  params: z.infer<typeof upsertTodoSchema>,
 ) {
-  return await createTodoMutation(db, params);
-}
-
-export async function updateTodo(
-  db: DBClient,
-  params: z.infer<typeof updateTodoSchema>,
-) {
-  return await updateTodoMutation(db, params);
+  return await upsertTodoMutation(db, params);
 }
 
 export async function deleteTodo(
   db: DBClient,
-  params: z.infer<typeof deleteTodoSchema>,
+  params: z.infer<typeof getTodoByIdSchema>,
 ) {
   return await deleteTodoMutation(db, params);
 }

@@ -42,14 +42,15 @@ export async function getTodoByIdQuery(
   db: DBClient,
   params: GetTodoByIdRequest,
 ) {
-  const result = await db
+  const [result] = await db
     .select({
       id: todo_table.id,
       text: todo_table.text,
       completed: todo_table.completed,
     })
     .from(todo_table)
-    .where(eq(todo_table.id, params.id));
+    .where(eq(todo_table.id, params.id))
+    .limit(1);
 
-  return result[0];
+  return result;
 }

@@ -8,12 +8,13 @@ export const validateResponse = <T>(data: T, schema: z.ZodType) => {
 
     console.error(cause);
 
-    return {
-      success: false,
-      error: "Response validation failed",
-      details: cause,
-      data: null,
-    };
+    return;
+    // return {
+    //   success: false,
+    //   error: "Response validation failed",
+    //   details: cause,
+    //   data: null,
+    // };
   }
 
   return result.data as T;

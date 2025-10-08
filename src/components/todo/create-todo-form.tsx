@@ -17,19 +17,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { useTRPC } from "@/shared/helpers/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
-import { createTodoSchema } from "@/shared/validators/todo.schema";
+import { upsertTodoSchema } from "@/shared/validators/todo.schema";
 
 export function CreatePostForm() {
   const t = useScopedI18n("todo");
 
   // 1. Define your form.
-  const form = useForm<z.infer<typeof createTodoSchema>>({
-    resolver: zodResolver(createTodoSchema),
+  const form = useForm<z.infer<typeof upsertTodoSchema>>({
+    resolver: zodResolver(upsertTodoSchema),
     defaultValues: { text: "" },
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof createTodoSchema>) {
+  function onSubmit(values: z.infer<typeof upsertTodoSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values);
@@ -40,7 +40,7 @@ export function CreatePostForm() {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation(
-    trpc.todo.create.mutationOptions({
+    trpc.todo.upsert.mutationOptions({
       onSuccess: async () => {
         // invalidate query
         await queryClient.invalidateQueries({

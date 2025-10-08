@@ -12,17 +12,28 @@ export const getTodosSchema = z.object({
   }),
 });
 
+export const getTodoByIdSchema = z.object({
+  id: z.guid().openapi({
+    description: "Unique identifier of the todo to retrieve",
+    example: "b3b7c1e2-4c2a-4e7a-9c1a-2b7c1e24c2a4",
+    param: {
+      in: "path",
+      name: "id",
+    },
+  }),
+});
+
 export const todoResponseSchema = z.object({
-  // FIXME: uuid() check won't work
-  id: z.string().openapi({
-    description: "Unique identifier of the todo",
+  // TODO: investigate why drizzle generate a guid
+  id: z.guid().openapi({
+    description: "Unique identifier of the customer",
     example: "b3b7c1e2-4c2a-4e7a-9c1a-2b7c1e24c2a4",
   }),
-  text: z.string().min(1).trim().openapi({
+  text: z.string().openapi({
     description: "The text of the todo.",
     example: "Update the doc",
   }),
-  completed: z.boolean().default(false).openapi({
+  completed: z.boolean().openapi({
     description: "The new state of the todo.",
     example: true,
   }),
@@ -32,49 +43,25 @@ export const todosResponseSchema = z.object({
   data: z.array(todoResponseSchema).nullable(),
 });
 
-export const createTodoSchema = z
-  .object({
-    text: z.string().min(1).trim().openapi({
-      description: "The text of the todo.",
-      example: "Update the doc",
+export const upsertTodoSchema = z.object({
+  id: z
+    .uuid()
+    .optional()
+    .openapi({
+      description: "The ID of the todo to update.",
+      example: "b3b7c8e2-1f2a-4c3d-9e4f-5a6b7c8d9e0f",
+      param: {
+        in: "path",
+        name: "id",
+      },
     }),
-    completed: z.boolean().optional().openapi({
-      description: "The new state of the todo.",
-      example: true,
-    }),
-  })
-  .openapi("CreateTodo");
-
-export const updateTodoSchema = z.object({
-  // Overwrites the field, including its nullability
-  id: z.uuid().openapi({
-    description: "The ID of the todo to update.",
-    example: "b3b7c8e2-1f2a-4c3d-9e4f-5a6b7c8d9e0f",
-    param: {
-      in: "path",
-      name: "id",
-    },
-  }),
-  // Extends schema
-  text: z.string().optional().openapi({
+  text: z.string().openapi({
     description: "The new text of the todo.",
     example: "Update the doc v2",
   }),
-  // Extends schema before becoming nullable/optional
   completed: z.boolean().optional().openapi({
     description: "The new state of the todo.",
     example: true,
-  }),
-});
-
-export const deleteTodoSchema = z.object({
-  id: z.uuid().openapi({
-    description: "The UUID of the todo to delete.",
-    example: "b3b7c8e2-1f2a-4c3d-9e4f-5a6b7c8d9e0f",
-    param: {
-      in: "path",
-      name: "id",
-    },
   }),
 });
 
