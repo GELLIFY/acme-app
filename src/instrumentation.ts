@@ -1,3 +1,5 @@
+import { OTLPHttpJsonTraceExporter, registerOTel } from "@vercel/otel";
+
 /**
  * Registers application instrumentation.
  *
@@ -6,6 +8,13 @@
  * Call this early in your application's lifecycle.
  */
 export async function register() {
-  // Example: fetch secrets from a secret manager here if needed
-  console.debug("Secrets loaded!");
+  registerOTel({
+    serviceName: "acme-app",
+    traceExporter: new OTLPHttpJsonTraceExporter({
+      // Prefer traces-specific endpoint, fallback to base
+      url:
+        process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT ??
+        process.env.OTEL_EXPORTER_OTLP_ENDPOINT,
+    }),
+  });
 }
