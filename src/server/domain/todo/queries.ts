@@ -2,7 +2,7 @@
 
 import { and, desc, eq, ilike } from "drizzle-orm";
 
-import { type DBClient } from "@/server/db";
+import type { DBClient } from "@/server/db";
 import { todo_table } from "@/server/db/schema/todos";
 
 type GetTodosRequest = {

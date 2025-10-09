@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { HomeIcon, LayersIcon } from "lucide-react";
+import Link from "next/link";
 
 import Logo from "@/components/navbar-components/logo";
 import ThemeToggle from "@/components/navbar-components/theme-toggle";
@@ -71,7 +71,10 @@ export default function Navbar() {
                   {navigationLinks.map((link, index) => {
                     const Icon = link.icon;
                     return (
-                      <NavigationMenuItem key={index} className="w-full">
+                      <NavigationMenuItem
+                        key={`${link.label}-${index}`}
+                        className="w-full"
+                      >
                         <NavigationMenuLink
                           href={link.href}
                           className="flex-row items-center gap-2 py-1.5"

@@ -1,7 +1,7 @@
 "use client";
 
-import { useId } from "react";
 import { GlobeIcon } from "lucide-react";
+import { useId } from "react";
 
 import { useChangeLocale, useCurrentLocale } from "@/shared/locales/client";
 import {
