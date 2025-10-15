@@ -1,13 +1,12 @@
 "server-only";
 
 import type z from "zod";
-
-import type { DBClient } from "../db";
 import type {
   getTodoByIdSchema,
   getTodosSchema,
   upsertTodoSchema,
 } from "@/shared/validators/todo.schema";
+import type { DBClient } from "../db";
 import { shuffleTodos } from "../domain/todo/helpers";
 import {
   deleteTodoMutation,

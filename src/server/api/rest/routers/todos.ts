@@ -1,6 +1,4 @@
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
-
-import type { Context } from "../init";
 import { db } from "@/server/db";
 import {
   deleteTodo,
@@ -16,6 +14,7 @@ import {
   todosResponseSchema,
   upsertTodoSchema,
 } from "@/shared/validators/todo.schema";
+import type { Context } from "../init";
 
 const app = new OpenAPIHono<Context>();
 

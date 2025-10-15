@@ -11,42 +11,27 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  setup:
-    name: Setup
-    outputs:
-      branch: ${{ steps.branch_name.outputs.current_branch }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Install dependencies & tooling
-        id: setup
-        uses: ./.github/workflows/setup
-
-      - name: Get branch name
-        id: branch_name
-        uses: tj-actions/branch-names@v8
-
-  ci:
-    name: CI checks
-    needs: setup
+  code_quality:
+    name: Code quality
     uses: ./.github/workflows/ci.yml
 
   deploy_preview:
     name: Deploy Preview
     environment: Preview
     runs-on: ubuntu-latest
-    needs: [setup, ci]
     permissions:
       contents: read
       pull-requests: write
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
+
+      - name: Get branch name
+        id: branch_name
+        uses: tj-actions/branch-names@v9
 
       - name: Create Neon Branch
         id: create_branch
@@ -54,7 +39,7 @@ jobs:
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
           # parent: main # optional (defaults to your primary branch)
-          branch_name: preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }}
+          branch_name: preview/pr-${{ github.event.number }}-${{ steps.branch_name.outputs.current_branch }}
           database: neondb
           username: neondb_owner
           api_key: ${{ secrets.NEON_API_KEY }}
@@ -71,7 +56,7 @@ jobs:
         uses: neondatabase/schema-diff-action@v1
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
-          compare_branch: preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }}
+          compare_branch: preview/pr-${{ github.event.number }}-${{ steps.branch_name.outputs.current_branch }}
           database: neondb
           github-token: ${{ secrets.GITHUB_TOKEN }}
           base_branch: main

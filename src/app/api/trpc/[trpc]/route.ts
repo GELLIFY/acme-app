@@ -1,5 +1,5 @@
-import type { NextRequest } from "next/server";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
+import type { NextRequest } from "next/server";
 
 import { env } from "@/env";
 import { createTRPCContext } from "@/server/api/trpc/init";

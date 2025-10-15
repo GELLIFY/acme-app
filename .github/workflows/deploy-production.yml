@@ -9,14 +9,19 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
+  code_quality:
+    name: Code quality
+    uses: ./.github/workflows/ci.yml
+
   run_migrations:
     name: Run migrations
     runs-on: ubuntu-latest
+    needs: [code_quality]
     permissions:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
@@ -32,12 +37,12 @@ jobs:
     name: Deploy Vercel Production
     runs-on: ubuntu-latest
     environment: production
-    needs: run_migrations
+    needs: [code_quality, run_migrations]
     permissions:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup

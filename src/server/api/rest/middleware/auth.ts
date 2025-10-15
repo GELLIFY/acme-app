@@ -1,5 +1,5 @@
-import type { MiddlewareHandler } from "hono";
 import { auth } from "@clerk/nextjs/server";
+import type { MiddlewareHandler } from "hono";
 
 /**
  * Database middleware that connects to the database and sets it on context

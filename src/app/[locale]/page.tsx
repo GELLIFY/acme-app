@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Github } from "lucide-react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { useTRPC } from "@/shared/helpers/trpc/client";

@@ -1,5 +1,5 @@
-import { PGlite } from "@electric-sql/pglite";
 import { afterAll, afterEach, beforeEach, mock } from "bun:test";
+import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import { reset } from "drizzle-seed";

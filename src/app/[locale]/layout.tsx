@@ -1,7 +1,7 @@
 import "@/globals.css";
 
-import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Inter } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import Navbar from "@/components/navbar";
