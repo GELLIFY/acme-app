@@ -35,20 +35,20 @@ jobs:
 
       - name: Create Neon Branch
         id: create_branch
-        uses: neondatabase/create-branch-action@v5
+        uses: neondatabase/create-branch-action@v6
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
           # parent: main # optional (defaults to your primary branch)
           branch_name: preview/pr-${{ github.event.number }}-${{ steps.branch_name.outputs.current_branch }}
           database: neondb
-          username: neondb_owner
+          role: neondb_owner
           api_key: ${{ secrets.NEON_API_KEY }}
 
       - name: Apply Migrations
         run: |
           touch .env
           echo SKIP_ENV_VALIDATION=1 >> .env
-          echo DATABASE_URL=${{ steps.create_branch.outputs.db_url_with_pooler }} >> .env
+          echo DATABASE_URL=${{ steps.create_branch.outputs.db_url_pooled }} >> .env
           echo DIRECT_URL=${{ steps.create_branch.outputs.db_url }} >> .env
           pnpm run db:migrate
 
