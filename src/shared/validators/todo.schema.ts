@@ -45,7 +45,7 @@ export const todosResponseSchema = z.object({
 
 export const upsertTodoSchema = z.object({
   id: z
-    .uuid()
+    .guid()
     .optional()
     .openapi({
       description: "The ID of the todo to update.",
