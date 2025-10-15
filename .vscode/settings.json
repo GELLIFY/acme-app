@@ -1,4 +1,7 @@
 {
+  "editor.codeActionsOnSave": {
+    "source.fixAll.biome": "always"
+  },
   "editor.defaultFormatter": "biomejs.biome",
   "editor.formatOnSave": true,
   "files.associations": {
@@ -14,7 +17,4 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
-  "[javascript]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  }
 }
