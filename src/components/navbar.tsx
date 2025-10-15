@@ -103,7 +103,7 @@ export default function Navbar() {
             <NavigationMenu className="hidden md:flex">
               <NavigationMenuList className="gap-2">
                 {navigationLinks.map((link, index) => (
-                  <NavigationMenuItem key={index}>
+                  <NavigationMenuItem key={`${link.label}-${index}`}>
                     <NavigationMenuLink
                       active={link.active}
                       href={link.href}

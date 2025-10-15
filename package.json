@@ -15,7 +15,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx src/server/db/seed.ts",
-    "ui-add": "pnpm dlx shadcn add && prettier src --write --list-different",
+    "ui-add": "pnpm dlx shadcn add",
     "dev": "next dev --turbopack",
     "format": "biome format --write .",
     "lint": "biome check .",
