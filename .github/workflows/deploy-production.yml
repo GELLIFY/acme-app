@@ -14,7 +14,7 @@ jobs:
     uses: ./.github/workflows/ci.yml
 
   run_migrations:
-    name: Run migrations
+    name: Run Migrations
     runs-on: ubuntu-latest
     needs: [code_quality]
     permissions:
@@ -33,8 +33,8 @@ jobs:
           echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env
           pnpm run db:migrate
 
-  deploy_vercel_production:
-    name: Deploy Vercel Production
+  deploy_production:
+    name: Deploy Production
     runs-on: ubuntu-latest
     environment: production
     needs: [code_quality, run_migrations]
