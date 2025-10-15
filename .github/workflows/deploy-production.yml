@@ -9,14 +9,19 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
+  code_quality:
+    name: Code quality
+    uses: ./.github/workflows/ci.yml
+
   run_migrations:
-    name: Run migrations
+    name: Run Migrations
     runs-on: ubuntu-latest
+    needs: [code_quality]
     permissions:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
@@ -28,16 +33,16 @@ jobs:
           echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env
           pnpm run db:migrate
 
-  deploy_vercel_production:
-    name: Deploy Vercel Production
+  deploy_production:
+    name: Deploy Production
     runs-on: ubuntu-latest
     environment: production
-    needs: run_migrations
+    needs: [code_quality, run_migrations]
     permissions:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
@@ -53,23 +58,3 @@ jobs:
         uses: ./.github/workflows/cd/vercel/deploy-production
         with:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-
-  # deploy_azure_production:
-  #   name: Deploy Azure Production
-  #   runs-on: ubuntu-latest
-  #   needs: run_migrations
-  #   permissions:
-  #     contents: read
-  #     pull-requests: write
-  #   steps:
-  #     - uses: actions/checkout@v4
-
-  #     - name: Install dependencies & tooling
-  #       uses: ./.github/workflows/setup
-
-  #     - name: Deploy to Production
-  #       uses: ./.github/workflows/cd/azure/deploy-production
-  #       with:
-  #         AZURE_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_JOLLY_SAND_0ABCEB503 }}
-  #         DATABASE_URL: ${{ secrets.DATABASE_URL }}
-  #         NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}

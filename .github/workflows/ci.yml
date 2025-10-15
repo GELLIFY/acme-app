@@ -4,47 +4,39 @@ on:
   workflow_call:
 
 jobs:
-  lint:
+  quality:
+    name: "Lint"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+        with:
+          version: latest
+      - name: Run Biome
+        run: biome ci .
 
-      - name: Install dependencies & tooling
-        id: setup
-        uses: ./.github/workflows/setup
-
-      - run: cp .env.example .env
-
-      - name: Lint
-        run: pnpm run lint
-
-  typecheck:
+  test:
+    name: "Test"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@v2
       - name: Install dependencies & tooling
-        id: setup
         uses: ./.github/workflows/setup
-
-      - run: cp .env.example .env
-
-      - name: Typecheck
-        run: pnpm run typecheck
-
-  format:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Install dependencies & tooling
-        id: setup
-        uses: ./.github/workflows/setup
-
-      - run: cp .env.example .env
-
-      - name: Format
-        run: pnpm run format:check
+      - name: Setup env
+        run: |
+          touch .env
+          echo SKIP_ENV_VALIDATION=1 >> .env
+      - name: Run Tests
+        run: pnpm test

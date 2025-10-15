@@ -1,7 +1,6 @@
 import { describe, expect, it } from "bun:test";
-
-import type { getTodosQuery } from "./queries";
 import { shuffleTodos } from "./helpers";
+import type { getTodosQuery } from "./queries";
 
 type Todo = Awaited<ReturnType<typeof getTodosQuery>>[number];
 

@@ -1,6 +1,6 @@
 import type { SearchParams } from "nuqs/server";
-import { Suspense } from "react";
 import { createLoader } from "nuqs/server";
+import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
 import { ErrorFallback } from "@/components/error-fallback";

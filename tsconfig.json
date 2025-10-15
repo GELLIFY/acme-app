@@ -34,7 +34,6 @@
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
   },
   "include": [
-    "eslint.config.js",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",

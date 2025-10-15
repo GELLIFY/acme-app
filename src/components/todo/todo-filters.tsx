@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import { useTodoFilterParams } from "@/hooks/use-todo-filter-params";
 import { useScopedI18n } from "@/shared/locales/client";
 import { Checkbox } from "../ui/checkbox";
@@ -7,6 +8,7 @@ import { Label } from "../ui/label";
 
 export function TodoFilters() {
   const t = useScopedI18n("todo");
+  const id = useId();
 
   const { filter, setFilter } = useTodoFilterParams();
 
@@ -21,7 +23,7 @@ export function TodoFilters() {
               completed: typeof newValue === "boolean" ? newValue : false,
             });
           }}
-          id="todo-state"
+          id={id}
         />
         <Label htmlFor="todo-state">{t("filter")}</Label>
       </div>

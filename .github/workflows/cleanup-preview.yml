@@ -32,7 +32,7 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
@@ -42,9 +42,3 @@ jobs:
         uses: ./.github/workflows/cd/vercel/cleanup-preview
         with:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-
-      # - name: Cleanup Preview Deployment
-      #   id: cleanup_azure
-      #   uses: ./.github/workflows/cd/azure/cleanup-preview
-      #   with:
-      #     AZURE_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_JOLLY_SAND_0ABCEB503 }}

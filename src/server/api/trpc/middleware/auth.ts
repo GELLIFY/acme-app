@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 
-import { type createTRPCContext } from "../init";
+import type { createTRPCContext } from "../init";
 
 type TRPCContextType = Awaited<ReturnType<typeof createTRPCContext>>;
 

@@ -15,12 +15,11 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx src/server/db/seed.ts",
-    "ui-add": "pnpm dlx shadcn add && prettier src --write --list-different",
+    "ui-add": "pnpm dlx shadcn add",
     "dev": "next dev --turbopack",
-    "format:check": "prettier --check . !pnpm-lock.yaml !package.json",
-    "format:write": "prettier --write .",
-    "lint": "eslint .",
-    "lint:fix": "eslint --fix .",
+    "format": "biome format --write .",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
     "typecheck": "tsc --noEmit",
     "test": "bun test --preload ./src/setup.ts",
     "start": "node .next/standalone/server.js"
@@ -67,9 +66,8 @@
     "zod": "4.1.9"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.2.5",
     "@electric-sql/pglite": "^0.3.10",
-    "@eslint/eslintrc": "^3.3.1",
-    "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
     "@tailwindcss/postcss": "^4.1.13",
     "@types/bun": "^1.2.23",
     "@types/node": "^22.15.30",
@@ -77,15 +75,9 @@
     "@types/react-dom": "^19",
     "@types/ws": "^8.18.1",
     "drizzle-kit": "^0.31.5",
-    "eslint": "^9.36.0",
-    "eslint-config-next": "15.5.4",
-    "eslint-plugin-drizzle": "^0.2.3",
     "postcss": "^8.5.6",
-    "prettier": "^3.6.2",
-    "prettier-plugin-tailwindcss": "^0.6.14",
     "tsx": "^4.20.6",
-    "typescript": "5.8.3",
-    "typescript-eslint": "^8.45.0"
+    "typescript": "5.8.3"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
