@@ -44,7 +44,7 @@ jobs:
           username: neondb_owner
           api_key: ${{ secrets.NEON_API_KEY }}
 
-      - name: Run Migrations
+      - name: Apply Migrations
         run: |
           touch .env
           echo SKIP_ENV_VALIDATION=1 >> .env
