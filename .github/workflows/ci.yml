@@ -32,5 +32,9 @@ jobs:
       - uses: oven-sh/setup-bun@v2
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
+      - name: Setup env
+        run: |
+          touch .env
+          echo SKIP_ENV_VALIDATION=1 >> .env
       - name: Run Tests
         run: pnpm test
