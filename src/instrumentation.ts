@@ -2,6 +2,7 @@ import { OTLPHttpJsonTraceExporter, registerOTel } from "@vercel/otel";
 
 /**
  * Registers application instrumentation.
+ * @ref https://github.com/kubiks-inc/otel
  *
  * This function can be used to initialize monitoring, tracing,
  * or to load secrets from a secret manager if required.

@@ -2,10 +2,13 @@
 
 The GELLIFY Stack is a modern web development stack designed for simplicity, modularity, and full-stack TypeScript safety. Created and refined by [Matteo Badini↗](https://x.com/badini_matteo) and the GELLIFY team, it brings together battle-tested technologies to help developers build scalable, maintainable, and performant applications with minimal friction. Please refer to the [official documentation↗](https://gellify.dev)
 
-## Requirements
+## Prerequisites
 
-- Docker or Podman
-- Node Version Manager (fnm recommended to switch version automagically)
+Before you begin, make sure you have the following:
+
+- `docker` ➡️ localstack for local development
+- `fnm` ➡️ node version manager
+- `bun` ➡️ test runner
 
 ## Getting started
 
@@ -17,26 +20,6 @@ cp .env.example .env
 
 Then follow the instruction below to fill the `.env` with the required pieces to get you started.
 
-### Setup your environment locally
-
-This project uses [pnpm](https://pnpm.io) as its package manager. Install it if you haven't already:
-
-```bash
-npm install -g pnpm
-```
-
-Then, install the project's dependencies:
-
-```bash
-pnpm install
-```
-
-This project uses [bun](https://bun.com/) as test runner. If you haven't already installed it, make sure to do so:
-
-```bash
-curl -fsSL https://bun.sh/install | bash
-```
-
 ### Database
 
 GELLIFY app will come with a `start-localstack.sh` bash script that can create a docker container with a database for local development.
@@ -46,21 +29,7 @@ If you already have a database, feel free to delete this file and put your datab
 ./start-localstack.sh
 ```
 
-The `.env` file in your project directory already contains a valid DB url for local development via Docker.
-Your app is already configured to talk to Neon and has a local Postgres via Docker for local development, we get you started. No initial setup on your part is needed.
-
-Sooner or later you will have to create a remote instance to deploy to. Here the basic steps:
-
-1. If you're already signed up or coming to Neon from Azure, you can skip ahead to Step 2.<br />
-   If you haven't signed up yet, you can sign up for free here: [Create a Neon Account↗](https://console.neon.tech/signup)
-
-2. Create a Neon project and get the necessary `DATABASE_URL`
-
-Once everything is completed you can update the `.env` with Clerk variables to point to your remote DB instance.
-
-```
-DATABASE_URL=***
-```
+The `.env` file in your project directory already contains a valid DB url for local development via Docker. No initial setup on your part is needed.
 
 ### Authentication
 
@@ -95,14 +64,9 @@ We recommended using [Cursor↗](https://www.cursor.com/) a fork of VSCode with 
 The following extensions are recommended for an optimal developer experience. The links below provide editor specific plugin support.
 
 - [Tailwind CSS IntelliSense Extension↗](https://tailwindcss.com/docs/editor-setup)
-- [Prettier Extension↗](https://prettier.io/docs/en/editors.html)
+- [Biome Extension↗](https://biomejs.dev/reference/vscode/)
 - [Pretty TypeScript Errors↗](https://marketplace.visualstudio.com/items?itemName=yoavbls.pretty-ts-errors)
 
 ## Next Steps
 
 Have a look around the [docs↗](https://gellify.dev), as well as the docs of the packages that your app includes.
-
-## Notes 2025-02-12
-
-- [ ] fix clerk element login
-- [ ] fix rest api auth middleware
