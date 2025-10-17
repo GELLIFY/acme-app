@@ -55,7 +55,7 @@ export const upsertTodoSchema = z.object({
         name: "id",
       },
     }),
-  text: z.string().openapi({
+  text: z.string().min(3).openapi({
     description: "The new text of the todo.",
     example: "Update the doc v2",
   }),

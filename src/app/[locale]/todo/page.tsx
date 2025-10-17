@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
 import { ErrorFallback } from "@/components/error-fallback";
-import { CreatePostForm } from "@/components/todo/create-todo-form";
+import { CreateTodoForm } from "@/components/todo/create-todo-form";
 import { TodoFilters } from "@/components/todo/todo-filters";
 import { TodoList } from "@/components/todo/todo-list";
 import { TodoListLoading } from "@/components/todo/todo-list.loading";
@@ -36,12 +36,10 @@ export default async function TodoPage(props: TodoPageProps) {
   const loadTodoFilterParams = createLoader(todoFilterParamsSchema);
   const filter = loadTodoFilterParams(searchParams);
 
-  // Prepare query client form tRPC calls
+  // Prefetch data on the server, they will be hydated on the client
   const queryClient = getQueryClient();
-  // Change this to prefetch once this is fixed: https://github.com/trpc/trpc/issues/6632
-  // prefetch(trpc.todo.getAll.queryOptions());
-  await queryClient.fetchQuery(trpc.todo.get.queryOptions({ ...filter }));
-  // Or use the caller directly without using `.prefetch()`
+  await queryClient.prefetchQuery(trpc.todo.get.queryOptions({ ...filter }));
+  // Or use the caller directly to get the actual data
   // const todos = await caller.todo.getAll();
 
   return (
@@ -53,7 +51,7 @@ export default async function TodoPage(props: TodoPageProps) {
             <CardDescription>{t("subtitle")}</CardDescription>
           </CardHeader>
           <CardContent>
-            <CreatePostForm />
+            <CreateTodoForm />
             <TodoFilters />
             <ErrorBoundary fallbackRender={ErrorFallback}>
               <Suspense fallback={<TodoListLoading />}>

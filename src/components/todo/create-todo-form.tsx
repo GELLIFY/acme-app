@@ -3,23 +3,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2Icon } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import type z from "zod";
 
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useTRPC } from "@/shared/helpers/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 import { upsertTodoSchema } from "@/shared/validators/todo.schema";
+import { Field, FieldError } from "../ui/field";
 
-export function CreatePostForm() {
+export function CreateTodoForm() {
   const t = useScopedI18n("todo");
 
   // 1. Define your form.
@@ -52,35 +46,32 @@ export function CreatePostForm() {
   );
 
   return (
-    <Form {...form}>
-      <form
-        className="mb-6 flex items-center space-x-2"
-        onSubmit={form.handleSubmit(onSubmit)}
-      >
-        <FormField
-          control={form.control}
-          name="text"
-          render={({ field }) => (
-            <FormItem className="w-full">
-              <FormControl>
-                <Input
-                  {...field}
-                  placeholder={t("placeholder")}
-                  disabled={createMutation.isPending}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit" disabled={createMutation.isPending}>
-          {createMutation.isPending ? (
-            <Loader2Icon className="h-4 w-4 animate-spin" />
-          ) : (
-            t("add")
-          )}
-        </Button>
-      </form>
-    </Form>
+    <form
+      className="mb-6 flex items-center space-x-2"
+      onSubmit={form.handleSubmit(onSubmit)}
+    >
+      <Controller
+        name="text"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <Input
+              {...field}
+              aria-invalid={fieldState.invalid}
+              placeholder={t("placeholder")}
+              autoComplete="off"
+            />
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
+      <Button type="submit" disabled={createMutation.isPending}>
+        {createMutation.isPending ? (
+          <Loader2Icon className="h-4 w-4 animate-spin" />
+        ) : (
+          t("add")
+        )}
+      </Button>
+    </form>
   );
 }
