@@ -2,7 +2,7 @@ import {
   deleteTodo,
   getTodos,
   upsertTodo,
-} from "@/server/services/todo-service";
+} from "@/server/domains/todo/todo-service";
 import {
   getTodoByIdSchema,
   getTodosSchema,

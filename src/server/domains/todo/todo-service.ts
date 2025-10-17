@@ -1,18 +1,15 @@
 "server-only";
 
 import type z from "zod";
+import type { DBClient } from "@/server/db";
 import type {
   getTodoByIdSchema,
   getTodosSchema,
   upsertTodoSchema,
 } from "@/shared/validators/todo.schema";
-import type { DBClient } from "../db";
-import { shuffleTodos } from "../domain/todo/helpers";
-import {
-  deleteTodoMutation,
-  upsertTodoMutation,
-} from "../domain/todo/mutations";
-import { getTodoByIdQuery, getTodosQuery } from "../domain/todo/queries";
+import { shuffleTodos } from "./helpers";
+import { deleteTodoMutation, upsertTodoMutation } from "./mutations";
+import { getTodoByIdQuery, getTodosQuery } from "./queries";
 
 export async function getTodos(
   db: DBClient,

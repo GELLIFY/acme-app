@@ -5,7 +5,7 @@ import {
   getTodoById,
   getTodos,
   upsertTodo,
-} from "@/server/services/todo-service";
+} from "@/server/domains/todo/todo-service";
 import { validateResponse } from "@/server/services/validation-service";
 import {
   getTodoByIdSchema,
