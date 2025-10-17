@@ -8,6 +8,7 @@ import type z from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useTodoFilterParams } from "@/hooks/use-todo-filter-params";
 import { useTRPC } from "@/shared/helpers/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 import { upsertTodoSchema } from "@/shared/validators/todo.schema";
@@ -15,6 +16,8 @@ import { Field, FieldError } from "../ui/field";
 
 export function CreateTodoForm() {
   const t = useScopedI18n("todo");
+
+  const { filter } = useTodoFilterParams();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof upsertTodoSchema>>({
@@ -35,11 +38,52 @@ export function CreateTodoForm() {
 
   const createMutation = useMutation(
     trpc.todo.upsert.mutationOptions({
-      onSuccess: async () => {
-        // invalidate query
-        await queryClient.invalidateQueries({
-          queryKey: trpc.todo.get.queryKey(),
+      onMutate: async (variables) => {
+        // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+        await queryClient.cancelQueries({
+          queryKey: trpc.todo.get.queryKey({ ...filter }),
         });
+
+        // Snapshot the previous value
+        const previousData = queryClient.getQueryData(
+          trpc.todo.get.queryKey({ ...filter }),
+        );
+
+        // Optimistically update the cache
+        queryClient.setQueryData(
+          trpc.todo.get.queryKey({ ...filter }),
+          (old) => {
+            if (!old) return old;
+
+            return [
+              ...old,
+              {
+                id: "placeholder_id", // better to make this unique
+                completed: false,
+                text: variables.text,
+              },
+            ];
+          },
+        );
+
+        // Return a context object with the snapshotted value
+        return { previousData };
+      },
+      onError: (_, __, context) => {
+        // If the mutation fails, use the context returned from onMutate to roll back
+        if (context?.previousData) {
+          queryClient.setQueryData(
+            trpc.todo.get.queryKey({ ...filter }),
+            context.previousData,
+          );
+        }
+      },
+      onSettled: () => {
+        // Always refetch after error or success to ensure we have the latest data
+        queryClient.invalidateQueries({
+          queryKey: trpc.todo.get.queryKey({ ...filter }),
+        });
+
         form.reset();
       },
     }),

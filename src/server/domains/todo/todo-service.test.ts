@@ -1,12 +1,6 @@
 import { expect, test } from "bun:test";
-
-import { db } from "../db";
-import {
-  deleteTodo,
-  getTodoById,
-  getTodos,
-  upsertTodo,
-} from "../domain/todo/todo-service";
+import { db } from "@/server/db";
+import { deleteTodo, getTodoById, getTodos, upsertTodo } from "./todo-service";
 
 test("create user", async () => {
   const todo = await upsertTodo(db, { text: "text" });
