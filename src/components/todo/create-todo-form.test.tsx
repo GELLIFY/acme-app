@@ -4,17 +4,19 @@ import { act, render, screen } from "@/tests/test-utils";
 import { CreateTodoForm } from "./create-todo-form";
 
 describe("CreateTodoForm component", () => {
-  test("should add a todo", async () => {
+  test("should prompt for invalid todo text", async () => {
     // 1. Arrange
     await act(async () => {
       render(<CreateTodoForm />);
     });
 
     // 2. Act
-    await userEvent.type(screen.getByRole("textbox"), "test");
     await userEvent.click(screen.getByRole("button"));
 
     // 3. Assert
     expect(screen.getByRole("textbox")).toHaveValue("");
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Too small: expected string to have >=3 characters",
+    );
   });
 });
