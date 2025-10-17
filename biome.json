@@ -36,8 +36,8 @@
         "useExhaustiveDependencies": "off"
       },
       "suspicious": {
-        "noExplicitAny": "off",
-        "noUnknownAtRules": "off"
+        "noUnknownAtRules": "off",
+        "noArrayIndexKey": "off"
       }
     }
   },
