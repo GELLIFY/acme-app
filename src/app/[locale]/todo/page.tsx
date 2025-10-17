@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
 import { ErrorFallback } from "@/components/error-fallback";
-import { CreatePostForm } from "@/components/todo/create-todo-form";
+import { CreateTodoForm } from "@/components/todo/create-todo-form";
 import { TodoFilters } from "@/components/todo/todo-filters";
 import { TodoList } from "@/components/todo/todo-list";
 import { TodoListLoading } from "@/components/todo/todo-list.loading";
@@ -51,7 +51,7 @@ export default async function TodoPage(props: TodoPageProps) {
             <CardDescription>{t("subtitle")}</CardDescription>
           </CardHeader>
           <CardContent>
-            <CreatePostForm />
+            <CreateTodoForm />
             <TodoFilters />
             <ErrorBoundary fallbackRender={ErrorFallback}>
               <Suspense fallback={<TodoListLoading />}>
