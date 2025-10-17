@@ -21,6 +21,14 @@ await mock.module("./server/db", () => {
   return { client, db };
 });
 
+// await mock.module("next/router", () => ({
+//   useRouter: mock(() => ({
+//     locale: "it",
+//     defaultLocale: "it",
+//     locales: ["it", "en"],
+//   })),
+// }));
+
 // Apply migrations before each test
 beforeEach(async () => {
   await migrate(db, { migrationsFolder: "src/server/db/migrations" });

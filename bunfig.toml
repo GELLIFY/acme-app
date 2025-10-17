@@ -1,5 +1,11 @@
 [test]
 
+# preload for testing
+preload = [
+  "./src/tests/happydom.ts",
+  "./src/tests/testing-library.ts"
+]
+
 # always enable coverage
 coverage = false
 
