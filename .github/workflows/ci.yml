@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  quality:
+  lint:
     name: "Lint"
     runs-on: ubuntu-latest
     permissions:
@@ -20,6 +20,21 @@ jobs:
           version: latest
       - name: Run Biome
         run: biome ci .
+
+  typecheck:
+    name: "Typecheck"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Install dependencies & tooling
+        uses: ./.github/workflows/setup
+      - name: Run Checks
+        run: pnpm run typecheck
 
   test:
     name: "Test"

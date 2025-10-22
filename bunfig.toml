@@ -1,13 +1,20 @@
 [test]
 
-# always enable coverage
-coverage = false
+# preload for testing
+preload = [
+  "./src/tests/happydom.ts",
+  "./src/tests/testing-db.ts",
+  "./src/tests/testing-library.ts"
+]
 
-coverageReporter = ["lcov"]  # default ["text"]
+# always enable coverage
+coverage = true
+
+coverageReporter = ["text", "lcov"]  # default ["text"]
 coverageDir = "coverage"  # default "coverage"
 
 # to require 90% line-level and function-level coverage
-coverageThreshold = 0.9
+#coverageThreshold = 0.9
 
 # to set different thresholds for lines and functions
 #coverageThreshold = { lines = 0.9, functions = 0.9, statements = 0.9 }
@@ -15,11 +22,12 @@ coverageThreshold = 0.9
 # Multiple patterns
 coveragePathIgnorePatterns = [
   "src/app/**",
-  "src/components/**",
-  "src/hooks/**",
+  "src/server/db/**",
+  "src/shared/locales/**",
+  "src/shared/helpers/trpc/**",
+  "src/components/ui/**",
+  "src/tests/**",
   "src/instrumentation.ts",
   "src/middleware.ts",
-  "*.config.js",
-  "*.config.ts",
-  "*.config.cjs",
+  "*.config.*",
 ]

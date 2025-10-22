@@ -4,13 +4,13 @@ import { drizzle } from "drizzle-orm/pglite";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import { reset } from "drizzle-seed";
 
-import { db } from "./server/db";
-import { schema } from "./server/db/schema";
+import { db } from "../server/db";
+import { schema } from "../server/db/schema";
 
 let client: PGlite;
 
 // Replace the database with a new in-memory database
-await mock.module("./server/db", () => {
+await mock.module("../server/db", () => {
   client = new PGlite();
   const db = drizzle({
     client,
@@ -20,6 +20,14 @@ await mock.module("./server/db", () => {
   });
   return { client, db };
 });
+
+// await mock.module("next/router", () => ({
+//   useRouter: mock(() => ({
+//     locale: "it",
+//     defaultLocale: "it",
+//     locales: ["it", "en"],
+//   })),
+// }));
 
 // Apply migrations before each test
 beforeEach(async () => {
