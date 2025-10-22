@@ -6,7 +6,6 @@ import type { MiddlewareHandler } from "hono";
  */
 export const withAuth: MiddlewareHandler = async (c, next) => {
   const session = await auth();
-  console.log(session);
 
   if (!session?.userId) {
     throw new Error("UNAUTHORIZED");

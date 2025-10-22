@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { logger } from "@/lib/logger";
 
 export const validateResponse = <T>(data: T, schema: z.ZodType) => {
   const result = schema.safeParse(data);
@@ -6,7 +7,7 @@ export const validateResponse = <T>(data: T, schema: z.ZodType) => {
   if (!result.success) {
     const cause = z.flattenError(result.error);
 
-    console.error(cause);
+    logger.error(cause);
 
     return;
     // return {
