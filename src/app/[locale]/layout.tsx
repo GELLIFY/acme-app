@@ -3,7 +3,7 @@ import "@/globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { NuqsTestingAdapter } from "nuqs/adapters/testing";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import Navbar from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -36,7 +36,7 @@ export default async function RootLayout({
         <body className={`font-sans ${inter.variable}`}>
           <TRPCReactProvider>
             <I18nProviderClient locale={locale}>
-              <NuqsTestingAdapter>
+              <NuqsAdapter>
                 <ThemeProvider
                   attribute="class"
                   defaultTheme="system"
@@ -47,7 +47,7 @@ export default async function RootLayout({
                   {children}
                   <Toaster />
                 </ThemeProvider>
-              </NuqsTestingAdapter>
+              </NuqsAdapter>
             </I18nProviderClient>
           </TRPCReactProvider>
         </body>
