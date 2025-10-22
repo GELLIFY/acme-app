@@ -3,6 +3,7 @@
 # preload for testing
 preload = [
   "./src/tests/happydom.ts",
+  "./src/tests/testing-db.ts",
   "./src/tests/testing-library.ts"
 ]
 

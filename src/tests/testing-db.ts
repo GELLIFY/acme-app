@@ -4,13 +4,13 @@ import { drizzle } from "drizzle-orm/pglite";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import { reset } from "drizzle-seed";
 
-import { db } from "./server/db";
-import { schema } from "./server/db/schema";
+import { db } from "../server/db";
+import { schema } from "../server/db/schema";
 
 let client: PGlite;
 
 // Replace the database with a new in-memory database
-await mock.module("./server/db", () => {
+await mock.module("../server/db", () => {
   client = new PGlite();
   const db = drizzle({
     client,

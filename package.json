@@ -21,7 +21,7 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "typecheck": "tsc --noEmit",
-    "test": "bun test --preload ./src/setup.ts",
+    "test": "bun test",
     "start": "node .next/standalone/server.js"
   },
   "dependencies": {
