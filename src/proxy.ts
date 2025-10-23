@@ -1,5 +1,5 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { getSessionCookie } from "better-auth/cookies";
+import { type NextRequest, NextResponse } from "next/server";
 import { createI18nMiddleware } from "next-international/middleware";
 
 const I18nMiddleware = createI18nMiddleware({
@@ -8,22 +8,49 @@ const I18nMiddleware = createI18nMiddleware({
   urlMappingStrategy: "rewriteDefault",
 });
 
-const isProtectedRoute = createRouteMatcher(["/dashboard(.*)"]);
+export async function proxy(request: NextRequest) {
+  const response = I18nMiddleware(request);
+  const sessionCookie = getSessionCookie(request);
+  const nextUrl = request.nextUrl;
+  const pathnameLocale = nextUrl.pathname.split("/", 2)?.[1];
 
-export default clerkMiddleware(async (auth, req) => {
-  if (isProtectedRoute(req)) await auth.protect();
+  // Remove the locale from the pathname
+  const pathnameWithoutLocale = pathnameLocale
+    ? nextUrl.pathname.slice(pathnameLocale.length + 1)
+    : nextUrl.pathname;
 
-  // avoid i18n middleware in /api routes
-  if (req.nextUrl.pathname.startsWith("/api")) return NextResponse.next();
+  // Create a new URL without the locale in the pathname
+  const newUrl = new URL(pathnameWithoutLocale || "/", request.url);
 
-  return I18nMiddleware(req);
-});
+  const encodedSearchParams = `${newUrl?.pathname?.substring(1)}${
+    newUrl.search
+  }`;
+
+  // 1. Not authenticated
+  if (
+    !sessionCookie &&
+    newUrl.pathname !== "/" &&
+    newUrl.pathname !== "/sign-in" &&
+    newUrl.pathname !== "/sign-up"
+  ) {
+    const url = new URL("/sign-in", request.url);
+
+    if (encodedSearchParams) {
+      url.searchParams.append("return_to", encodedSearchParams);
+    }
+
+    return NextResponse.redirect(url);
+  }
+
+  // 2. If authenticated, proceed with other checks
+  // if (sessionCookie) {
+  //
+  // }
+
+  // If all checks pass, return the original or updated response
+  return response;
+}
 
 export const config = {
-  matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    "/((?!api|static|.*\\..*|_next|favicon.ico|robots.txt).*)",
-    // Always run for API routes
-    "/(api|trpc)(.*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api).*)"],
 };

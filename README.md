@@ -31,33 +31,6 @@ If you already have a database, feel free to delete this file and put your datab
 
 The `.env` file in your project directory already contains a valid DB url for local development via Docker. No initial setup on your part is needed.
 
-### Authentication
-
-Your app includes Clerk, we get you started. This is one of the simplest providers, but it still requires a bit of initial setup on your part.
-Of course, if you prefer to use a different auth provider, you can also opt-out of Clerk and use something link [NextAuth.js](https://next-auth.js.org/) instead.
-
-You will need to:
-
-1. Sign into Clerk
-   [Create a Clerk account↗](https://dashboard.clerk.com/sign-up) or [sign into the Clerk Dashboard↗](https://dashboard.clerk.com/).
-
-2. Create a Clerk application
-   If you've just created an account for the first time, you'll be taken directly to the interactive authentication setup form.
-   Otherwise, you'll be redirected to the [Clerk Dashboard↗](https://dashboard.clerk.com/). To create a new app, select the **Create application** card.
-   You'll be redirected to the interactive authentication setup form.
-
-3. Select identifiers and social providers
-   Once you are in the interactive authentication setup form, you will be asked to build your authentication flow.
-   Here, Clerk provides various options for setting up your sign-up and sign-in flows. You can choose to use email, phone, or username as [identifiers](https://clerk.com/docs/authentication/configuration/sign-up-sign-in-options#identifiers), and you can enable [social authentication providers](https://clerk.com/docs/authentication/social-connections/overview).
-   Once the application is created, you can also customize your authentication flow by selecting different authentication strategies, verification methods, and more. [Learn more about sign-up and sign-in options](https://clerk.com/docs/authentication/configuration/sign-up-sign-in-options).
-
-Once everything is completed update the `.env` with Clerk variables
-
-```
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_***
-CLERK_SECRET_KEY=sk_test_***
-```
-
 ## Editor Setup
 
 We recommended using [Cursor↗](https://www.cursor.com/) a fork of VSCode with a deeper integration with different AI models. We also provide a `.cursorrules` file to give the AI the necessary context on technologies, patterns, conventions...

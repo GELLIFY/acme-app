@@ -1,9 +1,8 @@
 import { HomeIcon, LayersIcon } from "lucide-react";
+import { headers } from "next/headers";
 import Link from "next/link";
-
 import Logo from "@/components/navbar-components/logo";
 import ThemeToggle from "@/components/navbar-components/theme-toggle";
-import UserMenu from "@/components/navbar-components/user-menu";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -16,7 +15,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { auth } from "@/shared/helpers/better-auth/auth";
 import LanguageSelector from "./navbar-components/language-selector";
+import { UserMenu } from "./navbar-components/user-menu";
 
 // Navigation links with icons for desktop icon-only navigation
 const navigationLinks = [
@@ -24,7 +25,9 @@ const navigationLinks = [
   { href: "/todo", label: "Todo", icon: LayersIcon },
 ];
 
-export default function Navbar() {
+export default async function Navbar() {
+  const session = await auth.api.getSession({ headers: await headers() });
+
   return (
     <header className="border-b px-4 md:px-6">
       <div className="flex h-16 items-center justify-between gap-4">
@@ -124,7 +127,16 @@ export default function Navbar() {
           {/* Language selector */}
           <LanguageSelector />
           {/* User menu */}
-          <UserMenu />
+
+          {session?.user ? (
+            <UserMenu user={session.user} />
+          ) : (
+            <Link href="/sign-in">
+              <Button size="sm" variant="ghost">
+                Sign in
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
     </header>
