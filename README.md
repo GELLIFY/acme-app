@@ -43,3 +43,11 @@ The following extensions are recommended for an optimal developer experience. Th
 ## Next Steps
 
 Have a look around the [docs↗](https://gellify.dev), as well as the docs of the packages that your app includes.
+
+## Notes 2025-10-23
+
+- [ ] sign in with correct redirect
+- [ ] i18n for auth routes
+- [ ] link todos to user
+
+- [ ] apiKey plugin for REST apis
