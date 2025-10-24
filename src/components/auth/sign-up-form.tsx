@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon, XIcon } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -58,8 +57,6 @@ export const SignUpForm = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const router = useRouter();
-
   const t = useScopedI18n("auth.signup");
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -77,13 +74,15 @@ export const SignUpForm = () => {
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       // Call the authClient's forgetPassword method, passing the email and a redirect URL.
-      await authClient.signUp.email({
-        email: data.email,
-        password: data.password,
-        name: `${data.firstName} ${data.lastName}`,
-        image: data.image ? await convertImageToBase64(data.image) : "",
-        callbackURL: "/dashboard",
-        fetchOptions: {
+      await authClient.signUp.email(
+        {
+          email: data.email,
+          password: data.password,
+          name: `${data.firstName} ${data.lastName}`,
+          image: data.image ? await convertImageToBase64(data.image) : "",
+          callbackURL: "/dashboard",
+        },
+        {
           onResponse: () => {
             setLoading(false);
           },
@@ -93,11 +92,8 @@ export const SignUpForm = () => {
           onError: (ctx) => {
             toast.error(ctx.error.message);
           },
-          onSuccess: async () => {
-            router.push("/dashboard");
-          },
         },
-      });
+      );
     } catch (error) {
       // catch the error
       console.log(error);
