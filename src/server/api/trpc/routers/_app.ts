@@ -7,6 +7,7 @@ import {
 } from "../init";
 import { dashboardRouter } from "./dashboard";
 import { todoRouter } from "./todo";
+import { userRouter } from "./user";
 
 /**
  * This is the primary router for your server.
@@ -14,6 +15,7 @@ import { todoRouter } from "./todo";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
+  user: userRouter,
   todo: todoRouter,
   dashboard: dashboardRouter,
   health: publicProcedure.query(async () => {

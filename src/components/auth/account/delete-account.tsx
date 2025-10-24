@@ -4,8 +4,6 @@ import { useMutation } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useTRPC } from "~/shared/helpers/trpc/client";
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,19 +14,22 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "../ui/alert-dialog";
-import { Button } from "../ui/button";
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../ui/card";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useTRPC } from "@/shared/helpers/trpc/client";
 
 export function DeleteAccount() {
+  const [value, setValue] = useState("");
+
   const trpc = useTRPC();
 
   const deleteUserMutation = useMutation(
@@ -41,19 +42,16 @@ export function DeleteAccount() {
     }),
   );
 
-  const [value, setValue] = useState("");
-
   return (
     <Card className="border-destructive">
       <CardHeader>
         <CardTitle>Delete account</CardTitle>
         <CardDescription>
-          Permanently remove your Personal Account and all of its contents from
-          the Badget platform. This action is not reversible, so please continue
-          with caution.
+          Permanently remove your Personal Account and all of its contents. This
+          action is not reversible, so please continue with caution.
         </CardDescription>
       </CardHeader>
-      <CardFooter className="flex justify-between">
+      <CardFooter className="border-t text-muted-foreground text-sm justify-between">
         <div />
 
         <AlertDialog>
