@@ -46,8 +46,8 @@ Have a look around the [docs↗](https://gellify.dev), as well as the docs of th
 
 ## Notes 2025-10-23
 
-- [ ] sign in with correct redirect
-- [ ] i18n for auth routes
+- [ ] forgot/reset password flow
+- [ ] resend email integration
 - [ ] link todos to user
 
 - [ ] apiKey plugin for REST apis

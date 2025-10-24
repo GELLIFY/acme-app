@@ -6,19 +6,19 @@ export default {
   // auth
   "auth.account": "Already have an account?",
   "auth.no_account": "Don't have an account?",
-
   "auth.signin.title": "Sign In",
   "auth.signin.subtitle": "Enter your email below to login to your account",
   "auth.signin.forgot": "Forgot your password?",
   "auth.signin.submit": "Login",
-
   "auth.signup.title": "Sign Up",
   "auth.signup.subtitle": "Enter your information to create an account",
   "auth.signup.submit": "Sign Up",
-
   "auth.forgot.title": "Forgot password",
   "auth.forgot.subtitle": "Enter your email to reset your password",
   "auth.forgot.submit": "Send reset link",
+  "auth.reset.title": "Password reset",
+  "auth.reset.subtitle": "Create and confirm your new password",
+  "auth.reset.submit": "Reset password",
 
   // todo feature
   "todo.title": "Todo list",
