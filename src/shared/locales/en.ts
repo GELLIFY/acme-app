@@ -3,6 +3,23 @@ export default {
   "home.welcome": "Hello {name}!",
   "home.doc": "Read Documentation",
 
+  // auth
+  "auth.account": "Already have an account?",
+  "auth.no_account": "Don't have an account?",
+
+  "auth.signin.title": "Sign In",
+  "auth.signin.subtitle": "Enter your email below to login to your account",
+  "auth.signin.forgot": "Forgot your password?",
+  "auth.signin.submit": "Login",
+
+  "auth.signup.title": "Sign Up",
+  "auth.signup.subtitle": "Enter your information to create an account",
+  "auth.signup.submit": "Sign Up",
+
+  "auth.forgot.title": "Forgot password",
+  "auth.forgot.subtitle": "Enter your email to reset your password",
+  "auth.forgot.submit": "Send reset link",
+
   // todo feature
   "todo.title": "Todo list",
   "todo.subtitle": "Manage your tasks efficiently",

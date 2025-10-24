@@ -1,287 +1,44 @@
-"use client";
-
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, X } from "lucide-react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { SignUpForm } from "@/components/auth/sign-up-form";
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { authClient } from "@/shared/helpers/better-auth/auth-client";
+import { getScopedI18n } from "@/shared/locales/server";
 
-const formSchema = z
-  .object({
-    firstName: z.string().min(1),
-    lastName: z.string().min(1),
-    email: z.email(),
-    password: z.string().min(8).max(32),
-    passwordConfirmation: z.string().min(8).max(32),
-    image: z
-      .file()
-      .min(1) // 1 byte
-      .max(1024 * 1024) // 1 MB
-      .mime([
-        "image/png",
-        "image/jpeg",
-        "image/jpg",
-        "image/svg+xml",
-        "image/gif",
-      ])
-      .nullable(),
-  })
-  .superRefine((val, ctx) => {
-    if (val.password !== val.passwordConfirmation) {
-      ctx.issues.push({
-        code: "custom",
-        message: "Password is not the same as confirm password",
-        input: val.passwordConfirmation,
-        path: ["password"],
-      });
-    }
-  });
+export const metadata: Metadata = {
+  title: "Sign Up | Acme.",
+};
 
-export default function SignUp() {
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const router = useRouter();
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      passwordConfirmation: "",
-      image: null,
-    },
-  });
-
-  async function onSubmit(data: z.infer<typeof formSchema>) {
-    authClient.signUp.email({
-      email: data.email,
-      password: data.password,
-      name: `${data.firstName} ${data.lastName}`,
-      image: data.image ? await convertImageToBase64(data.image) : "",
-      callbackURL: "/dashboard",
-      fetchOptions: {
-        onResponse: () => {
-          setLoading(false);
-        },
-        onRequest: () => {
-          setLoading(true);
-        },
-        onError: (ctx) => {
-          toast.error(ctx.error.message);
-        },
-        onSuccess: async () => {
-          router.push("/dashboard");
-        },
-      },
-    });
-  }
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+export default async function SignUp() {
+  const t = await getScopedI18n("auth");
 
   return (
     <Card className="z-50  max-w-md">
       <CardHeader>
-        <CardTitle className="text-lg md:text-xl">Sign Up</CardTitle>
+        <CardTitle className="text-lg md:text-xl">
+          {t("signup.title")}
+        </CardTitle>
         <CardDescription className="text-xs md:text-sm">
-          Enter your information to create an account
+          {t("signup.subtitle")}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-          <div className="grid grid-cols-2 gap-4">
-            <Controller
-              name="firstName"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="first-name">First name</FieldLabel>
-                  <Input
-                    {...field}
-                    id="first-name"
-                    placeholder="Max"
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-            <Controller
-              name="lastName"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="last-name">Last name</FieldLabel>
-                  <Input
-                    {...field}
-                    id="last-name"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="Robinson"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-          </div>
-          <Controller
-            name="email"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input
-                  {...field}
-                  id="email"
-                  aria-invalid={fieldState.invalid}
-                  autoComplete="username"
-                  placeholder="m@example.com"
-                />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-          <Controller
-            name="password"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="password">Password</FieldLabel>
-                <Input
-                  {...field}
-                  id="password"
-                  aria-invalid={fieldState.invalid}
-                  type="password"
-                  placeholder="password"
-                  autoComplete="new-password"
-                />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-          <Controller
-            name="passwordConfirmation"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="password_confirmation">
-                  Confirm Password
-                </FieldLabel>
-                <Input
-                  {...field}
-                  id="password_confirmation"
-                  aria-invalid={fieldState.invalid}
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="Confirm Password"
-                />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-
-          <Controller
-            name="image"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="image">
-                  Profile Image (optional)
-                </FieldLabel>
-                <div className="flex items-end gap-4">
-                  {imagePreview && (
-                    <div className="relative w-9 h-9 rounded-sm overflow-hidden">
-                      <Image
-                        src={imagePreview}
-                        height={36}
-                        width={36}
-                        alt="Profile preview"
-                      />
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2 w-full">
-                    <Input
-                      id="image"
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0] ?? null;
-                        field.onChange(file);
-                        handleImageChange(e);
-                      }}
-                      aria-invalid={fieldState.invalid}
-                      className="w-full"
-                    />
-                    {imagePreview && (
-                      <X
-                        className="cursor-pointer"
-                        onClick={() => {
-                          form.resetField("image");
-                          setImagePreview(null);
-                        }}
-                      />
-                    )}
-                  </div>
-                </div>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-
-          <Button type="submit" className="w-full mt-2" disabled={loading}>
-            {loading ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              "Create an account"
-            )}
-          </Button>
-        </form>
+        <SignUpForm />
       </CardContent>
+      <CardFooter className="flex justify-center">
+        <span className="text-sm text-muted-foreground">
+          {t("account")}{" "}
+          <Link href="/sign-in" className="text-primary underline">
+            {t("signin.submit")}
+          </Link>
+        </span>
+      </CardFooter>
     </Card>
   );
-}
-
-async function convertImageToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
 }

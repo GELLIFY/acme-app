@@ -31,7 +31,8 @@ export async function proxy(request: NextRequest) {
     !sessionCookie &&
     newUrl.pathname !== "/" &&
     newUrl.pathname !== "/sign-in" &&
-    newUrl.pathname !== "/sign-up"
+    newUrl.pathname !== "/sign-up" &&
+    newUrl.pathname !== "/forgot-password"
   ) {
     const url = new URL("/sign-in", request.url);
 
