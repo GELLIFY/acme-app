@@ -9,18 +9,18 @@ import { todosRouter } from "./todos";
 
 const routers = new OpenAPIHono();
 
+routers.use(secureHeaders());
+
 routers.use(
   "*",
   cors({
-    origin: "http://localhost:3000", // replace with your origin
+    origin: process.env.ALLOWED_API_ORIGINS?.split(",") ?? [],
     allowHeaders: ["Content-Type", "Authorization"],
-    allowMethods: ["POST", "GET", "PATCH", "PUT", "DELETE", "OPTIONS"],
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     exposeHeaders: ["Content-Length"],
-    maxAge: 600,
-    credentials: true,
+    maxAge: 86400,
   }),
 );
-routers.use(secureHeaders());
 
 routers.doc("/openapi", {
   openapi: "3.1.0",
@@ -29,13 +29,13 @@ routers.doc("/openapi", {
     title: "GELLIFY API",
     description: "Description",
     contact: {
-      name: "Midday Support",
-      email: "engineer@midday.ai",
-      url: "https://midday.ai",
+      name: "GELLIFY Support",
+      email: "engineer@gellify.dev",
+      url: "https://gellify.dev",
     },
     license: {
       name: "AGPL-3.0 license",
-      url: "https://github.com/midday-ai/midday/blob/main/LICENSE",
+      url: "https://github.com/GELLIFY/acme-app/blob/main/LICENSE",
     },
   },
   servers: [
@@ -51,11 +51,15 @@ routers.doc("/openapi", {
   ],
 });
 
-routers.get(
-  "/scalar",
-  Scalar({ url: "/api/rest/openapi", pageTitle: "GELLIFY API" }),
-);
+// Register security scheme
+routers.openAPIRegistry.registerComponent("securitySchemes", "token", {
+  type: "http",
+  scheme: "bearer",
+  description: "Default authentication mechanism",
+  "x-speakeasy-example": "ACME_API_KEY",
+});
 
+// Mount publicly accessible routes first
 routers.get("/health", async (c) => {
   try {
     await checkHealth();
@@ -65,7 +69,12 @@ routers.get("/health", async (c) => {
   }
 });
 
-// protect routes from now on
+routers.get(
+  "/scalar",
+  Scalar({ url: "/api/rest/openapi", pageTitle: "GELLIFY API" }),
+);
+
+// Mount protected routes
 routers.use(...protectedMiddleware);
 routers.route("/todos", todosRouter);
 
