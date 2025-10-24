@@ -19,7 +19,7 @@ jobs:
         with:
           version: "2.3.0"
       - name: Run Biome
-        run: biome ci .
+        run: biome check .
 
   typecheck:
     name: "Typecheck"
