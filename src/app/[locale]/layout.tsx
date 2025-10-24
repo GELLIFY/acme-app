@@ -1,10 +1,8 @@
 import "@/globals.css";
 
-import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import Navbar from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TRPCReactProvider } from "@/shared/helpers/trpc/client";
@@ -31,27 +29,24 @@ export default async function RootLayout({
   const { locale } = await params;
 
   return (
-    <ClerkProvider dynamic>
-      <html lang="en" suppressHydrationWarning>
-        <body className={`font-sans ${inter.variable}`}>
-          <TRPCReactProvider>
-            <I18nProviderClient locale={locale}>
-              <NuqsAdapter>
-                <ThemeProvider
-                  attribute="class"
-                  defaultTheme="system"
-                  enableSystem
-                  disableTransitionOnChange
-                >
-                  <Navbar />
-                  {children}
-                  <Toaster />
-                </ThemeProvider>
-              </NuqsAdapter>
-            </I18nProviderClient>
-          </TRPCReactProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`font-sans ${inter.variable}`}>
+        <TRPCReactProvider>
+          <I18nProviderClient locale={locale}>
+            <NuqsAdapter>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+              >
+                {children}
+                <Toaster />
+              </ThemeProvider>
+            </NuqsAdapter>
+          </I18nProviderClient>
+        </TRPCReactProvider>
+      </body>
+    </html>
   );
 }

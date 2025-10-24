@@ -1,14 +1,14 @@
-import type { auth } from "@clerk/nextjs/server";
 import type { MiddlewareHandler } from "hono";
 
 import type { db } from "@/server/db";
-// import { withAuth } from "./middleware/auth";
+import type { auth } from "@/shared/helpers/better-auth/auth";
+import { withAuth } from "./middleware/auth";
 import { withDatabase } from "./middleware/db";
 
 export type Context = {
   Variables: {
     db: typeof db;
-    session: Awaited<ReturnType<typeof auth>>;
+    session: Awaited<ReturnType<typeof auth.api.getSession>>;
   };
 };
 
@@ -25,7 +25,7 @@ export const publicMiddleware: MiddlewareHandler[] = [withDatabase];
  */
 export const protectedMiddleware: MiddlewareHandler[] = [
   withDatabase,
-  // withAuth,
+  withAuth,
   //   rateLimiter({
   //     windowMs: 10 * 60 * 1000, // 10 minutes
   //     limit: 100,

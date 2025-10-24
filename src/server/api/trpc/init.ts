@@ -7,14 +7,12 @@
  * need to use are documented accordingly near the end.
  */
 
-import { auth } from "@clerk/nextjs/server";
-import { initTRPC } from "@trpc/server";
+import { initTRPC, TRPCError } from "@trpc/server";
 import { cache } from "react";
 import superjson from "superjson";
 import { ZodError } from "zod";
-
+import { auth } from "@/shared/helpers/better-auth/auth";
 import { db } from "../../db";
-import { authMiddleware } from "./middleware/auth";
 import { timingMiddleware } from "./middleware/timing";
 
 /**
@@ -30,7 +28,7 @@ import { timingMiddleware } from "./middleware/timing";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = cache(async (opts: { headers: Headers }) => {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: opts.headers });
   return {
     db,
     session,
@@ -94,4 +92,16 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
  *
  * Use this when you need to guarantee that a user querying is authorized.
  */
-export const protectedProcedure = t.procedure.use(authMiddleware);
+export const protectedProcedure = t.procedure.use(async (opts) => {
+  const { session } = opts.ctx;
+
+  if (!session) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  return opts.next({
+    ctx: {
+      session,
+    },
+  });
+});
