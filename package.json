@@ -30,7 +30,6 @@
     "@hookform/resolvers": "^5.2.2",
     "@kubiks/otel-drizzle": "^2.1.0",
     "@neondatabase/serverless": "^1.0.2",
-    "@radix-ui/react-tabs": "^1.1.13",
     "@scalar/hono-api-reference": "^0.9.22",
     "@t3-oss/env-nextjs": "^0.13.8",
     "@tanstack/react-query": "^5.90.3",
