@@ -20,6 +20,30 @@ export default {
   "auth.reset.subtitle": "Crea e confera la tua nuova password",
   "auth.reset.submit": "Resetta password",
 
+  // account
+  "account.save": "Salva",
+  "account.avatar": "Avatar",
+  "account.avatar.description":
+    "Clicca sull'avatar per caricarne uno personalizzato dai tuoi file.",
+  "account.avatar.message": "Un avatar è opzionale ma fortemente consigliato.",
+  "account.name": "Nome",
+  "account.name.description":
+    "Inserisci il tuo nome completo, oppure un nome visualizzato.",
+  "account.name.message": "Utilizza un massimo di 32 caratteri.",
+  "account.email": "Email",
+  "account.email.description":
+    "Inserisci l'indirizzo email che vuoi usare per accedere.",
+  "account.email.message": "Per favore inserisci un indirizzo email valido.",
+  "account.delete": "Elimina account",
+  "account.delete.description":
+    "Rimuovi definitivamente il tuo account personale e tutti i suoi contenuti. Questa azione non è reversibile, quindi procedi con cautela.",
+  "account.delete.confirm_title": "Sei assolutamente sicuro?",
+  "account.delete.confirm_description":
+    "Questa azione non può essere annullata. Questo eliminerà definitivamente il tuo account e rimuoverà i tuoi dati dai nostri server.",
+  "account.delete.confirm_type": "Digita 'DELETE' per confermare.",
+  "account.delete.confirm_cancel": "Annulla",
+  "account.delete.confirm_continue": "Continua",
+
   // todo feature
   "todo.title": "List todo",
   "todo.subtitle": "Gestisci i tuoi task in modo efficiente",
