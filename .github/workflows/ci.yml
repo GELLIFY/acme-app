@@ -17,9 +17,9 @@ jobs:
       - name: Setup Biome
         uses: biomejs/setup-biome@v2
         with:
-          version: "2.3.0"
+          version: "2.3.1"
       - name: Run Biome
-        run: biome check .
+        run: biome ci .
 
   typecheck:
     name: "Typecheck"
