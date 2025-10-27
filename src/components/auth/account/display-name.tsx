@@ -16,12 +16,15 @@ import {
 import { Field, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useUserMutation, useUserQuery } from "@/hooks/use-user";
+import { useScopedI18n } from "@/shared/locales/client";
 
 const formSchema = z.object({
   name: z.string().min(1).max(32).optional(),
 });
 
 export function DisplayName() {
+  const t = useScopedI18n("account");
+
   const { data: user } = useUserQuery();
   const updateUserMutation = useUserMutation();
 
@@ -42,10 +45,8 @@ export function DisplayName() {
     <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
       <Card>
         <CardHeader>
-          <CardTitle>Name</CardTitle>
-          <CardDescription>
-            Please enter your full name, or a display name.
-          </CardDescription>
+          <CardTitle>{t("name")}</CardTitle>
+          <CardDescription>{t("name.description")}</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -68,12 +69,12 @@ export function DisplayName() {
         </CardContent>
 
         <CardFooter className="border-t text-muted-foreground text-sm justify-between">
-          <div>Please use 32 characters at maximum.</div>
+          <div>{t("name.message")}</div>
           <Button type="submit" disabled={updateUserMutation.isPending}>
             {updateUserMutation.isPending ? (
               <Loader2Icon size={16} className="animate-spin" />
             ) : (
-              <p> Save </p>
+              <p> {t("save")} </p>
             )}
           </Button>
         </CardFooter>

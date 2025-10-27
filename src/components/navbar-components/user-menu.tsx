@@ -1,6 +1,5 @@
 "use client";
 
-import type { User } from "better-auth";
 import { BadgeCheckIcon, LogOutIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -14,10 +13,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useUserQuery } from "@/hooks/use-user";
 import { authClient } from "@/shared/helpers/better-auth/auth-client";
 
-export function UserMenu({ user }: { user: User }) {
+export function UserMenu() {
   const router = useRouter();
+  const { data: user } = useUserQuery();
 
   return (
     <DropdownMenu>

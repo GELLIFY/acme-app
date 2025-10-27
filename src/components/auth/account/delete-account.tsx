@@ -26,9 +26,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTRPC } from "@/shared/helpers/trpc/client";
+import { useScopedI18n } from "@/shared/locales/client";
 
 export function DeleteAccount() {
   const [value, setValue] = useState("");
+
+  const t = useScopedI18n("account");
 
   const trpc = useTRPC();
 
@@ -45,11 +48,8 @@ export function DeleteAccount() {
   return (
     <Card className="border-destructive">
       <CardHeader>
-        <CardTitle>Delete account</CardTitle>
-        <CardDescription>
-          Permanently remove your Personal Account and all of its contents. This
-          action is not reversible, so please continue with caution.
-        </CardDescription>
+        <CardTitle>{t("delete")}</CardTitle>
+        <CardDescription>{t("delete.description")}</CardDescription>
       </CardHeader>
       <CardFooter className="border-t text-muted-foreground text-sm justify-between">
         <div />
@@ -65,10 +65,9 @@ export function DeleteAccount() {
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogTitle>{t("delete.confirm_title")}</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete your
-                account and remove your data from our servers.
+                {t("delete.confirm_description")}
               </AlertDialogDescription>
             </AlertDialogHeader>
 
@@ -84,7 +83,9 @@ export function DeleteAccount() {
             </div>
 
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel>
+                {t("delete.confirm_cancel")}
+              </AlertDialogCancel>
               <AlertDialogAction
                 onClick={() => deleteUserMutation.mutate()}
                 disabled={value !== "DELETE"}
@@ -92,7 +93,7 @@ export function DeleteAccount() {
                 {deleteUserMutation.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  "Continue"
+                  t("delete.confirm_continue")
                 )}
               </AlertDialogAction>
             </AlertDialogFooter>

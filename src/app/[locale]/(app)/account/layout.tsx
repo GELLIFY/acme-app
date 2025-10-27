@@ -1,7 +1,3 @@
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="max-w-md mx-auto">
-      <main className="mt-8">{children}</main>
-    </div>
-  );
+  return <main className="max-w-xl mx-auto p-4">{children}</main>;
 }

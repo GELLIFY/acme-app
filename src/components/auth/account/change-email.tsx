@@ -16,12 +16,15 @@ import {
 import { Field, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useUserMutation, useUserQuery } from "@/hooks/use-user";
+import { useScopedI18n } from "@/shared/locales/client";
 
 const formSchema = z.object({
   email: z.email(),
 });
 
 export function ChangeEmail() {
+  const t = useScopedI18n("account");
+
   const { data: user } = useUserQuery();
   const updateUserMutation = useUserMutation();
 
@@ -42,10 +45,8 @@ export function ChangeEmail() {
     <form onSubmit={onSubmit}>
       <Card>
         <CardHeader>
-          <CardTitle>Email</CardTitle>
-          <CardDescription>
-            Enter the email address you want to use to log in.
-          </CardDescription>
+          <CardTitle>{t("email")}</CardTitle>
+          <CardDescription>{t("email.description")}</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -69,12 +70,12 @@ export function ChangeEmail() {
         </CardContent>
 
         <CardFooter className="border-t text-muted-foreground text-sm justify-between">
-          <div>Please enter a valid email address.</div>
+          <div>{t("email.message")}</div>
           <Button type="submit" disabled={updateUserMutation.isPending}>
             {updateUserMutation.isPending ? (
               <Loader2Icon size={16} className="animate-spin" />
             ) : (
-              <p> Save </p>
+              <p> {t("save")} </p>
             )}
           </Button>
         </CardFooter>

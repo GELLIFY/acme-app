@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SignUpForm } from "@/components/auth/sign-up-form";
+import { TermsPrivacyLinks } from "@/components/auth/terms privacy-links";
 import {
   Card,
   CardContent,
@@ -19,26 +20,29 @@ export default async function SignUp() {
   const t = await getScopedI18n("auth");
 
   return (
-    <Card className="z-50  max-w-md">
-      <CardHeader>
-        <CardTitle className="text-lg md:text-xl">
-          {t("signup.title")}
-        </CardTitle>
-        <CardDescription className="text-xs md:text-sm">
-          {t("signup.subtitle")}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <SignUpForm />
-      </CardContent>
-      <CardFooter className="flex justify-center">
-        <span className="text-sm text-muted-foreground">
-          {t("account")}{" "}
-          <Link href="/sign-in" className="text-primary underline">
-            {t("signin.submit")}
-          </Link>
-        </span>
-      </CardFooter>
-    </Card>
+    <div className="flex flex-col gap-6">
+      <Card className="z-50  max-w-md">
+        <CardHeader>
+          <CardTitle className="text-lg md:text-xl">
+            {t("signup.title")}
+          </CardTitle>
+          <CardDescription className="text-xs md:text-sm">
+            {t("signup.subtitle")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <SignUpForm />
+        </CardContent>
+        <CardFooter className="flex justify-center">
+          <span className="text-sm text-muted-foreground">
+            {t("account")}{" "}
+            <Link href="/sign-in" className="text-primary underline">
+              {t("signin.submit")}
+            </Link>
+          </span>
+        </CardFooter>
+      </Card>
+      <TermsPrivacyLinks />
+    </div>
   );
 }
