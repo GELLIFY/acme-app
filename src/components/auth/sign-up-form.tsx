@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon, XIcon } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -49,6 +50,7 @@ export const SignUpForm = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const router = useRouter();
   const t = useScopedI18n("auth.signup");
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -72,7 +74,6 @@ export const SignUpForm = () => {
           password: data.password,
           name: `${data.firstName} ${data.lastName}`,
           image: data.image ? await convertImageToBase64(data.image) : "",
-          callbackURL: "/dashboard",
         },
         {
           onResponse: () => {
@@ -83,6 +84,9 @@ export const SignUpForm = () => {
           },
           onError: (ctx) => {
             toast.error(ctx.error.message);
+          },
+          onSuccess: () => {
+            router.push("/dashboard");
           },
         },
       );

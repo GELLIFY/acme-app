@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -23,6 +24,7 @@ export const SignInForm = () => {
   const [loading, setLoading] = useState(false);
   const [returnTo] = useQueryState("return_to");
 
+  const router = useRouter();
   const t = useScopedI18n("auth.signin");
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -39,7 +41,6 @@ export const SignInForm = () => {
       await authClient.signIn.email(
         {
           ...data,
-          callbackURL: returnTo ? `/${returnTo}` : "/dashboard",
         },
         {
           onRequest: () => {
@@ -47,6 +48,12 @@ export const SignInForm = () => {
           },
           onResponse: () => {
             setLoading(false);
+          },
+          onError: (ctx) => {
+            toast.error(ctx.error.message);
+          },
+          onSuccess: () => {
+            router.push(returnTo ? `/${returnTo}` : "/dashboard");
           },
         },
       );
