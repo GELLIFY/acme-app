@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
+import { openAPI } from "better-auth/plugins";
 import { db } from "@/server/db";
 
 export const auth = betterAuth({
@@ -18,5 +19,5 @@ export const auth = betterAuth({
       // Send an email to the user with a link to reset their password
     },
   },
-  plugins: [nextCookies()],
+  plugins: [openAPI({ disableDefaultReference: true }), nextCookies()],
 });

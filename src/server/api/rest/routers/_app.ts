@@ -51,14 +51,6 @@ routers.doc("/openapi", {
   ],
 });
 
-// Register security scheme
-routers.openAPIRegistry.registerComponent("securitySchemes", "token", {
-  type: "http",
-  scheme: "bearer",
-  description: "Default authentication mechanism",
-  "x-speakeasy-example": "ACME_API_KEY",
-});
-
 // Mount publicly accessible routes first
 routers.get("/health", async (c) => {
   try {
@@ -71,7 +63,14 @@ routers.get("/health", async (c) => {
 
 routers.get(
   "/scalar",
-  Scalar({ url: "/api/rest/openapi", pageTitle: "GELLIFY API" }),
+  Scalar({
+    pageTitle: "Acme API",
+    sources: [
+      { url: "/api/rest/openapi", title: "API" },
+      // Better Auth schema generation endpoint
+      { url: "/api/auth/open-api/generate-schema", title: "Auth" },
+    ],
+  }),
 );
 
 // Mount protected routes
