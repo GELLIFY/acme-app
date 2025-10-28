@@ -1,4 +1,5 @@
 import { HomeIcon, LayersIcon } from "lucide-react";
+import { headers } from "next/headers";
 import Link from "next/link";
 import Logo from "@/components/navbar-components/logo";
 import ThemeToggle from "@/components/navbar-components/theme-toggle";
@@ -14,7 +15,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { getQueryClient, trpc } from "@/shared/helpers/trpc/server";
+import { auth } from "@/shared/helpers/better-auth/auth";
+import { getScopedI18n } from "@/shared/locales/server";
 import LanguageSelector from "./navbar-components/language-selector";
 import { UserMenu } from "./navbar-components/user-menu";
 
@@ -24,9 +26,9 @@ const navigationLinks = [
   { href: "/todo", label: "Todo", icon: LayersIcon },
 ];
 
-export default function Navbar() {
-  const queryClient = getQueryClient();
-  queryClient.prefetchQuery(trpc.user.me.queryOptions());
+export default async function Navbar() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  const t = await getScopedI18n("auth");
 
   return (
     <header className="border-b px-4 md:px-6">
@@ -124,7 +126,13 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           <ThemeToggle />
           <LanguageSelector />
-          <UserMenu />
+          {session?.user ? (
+            <UserMenu user={session.user} />
+          ) : (
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/sign-in"> {t("signin.title")}</Link>
+            </Button>
+          )}
         </div>
       </div>
     </header>
