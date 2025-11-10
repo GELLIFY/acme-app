@@ -15,6 +15,13 @@
       "when": 1761224703129,
       "tag": "0001_fantastic_nekra",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1762262211965,
+      "tag": "0002_glamorous_crusher_hogan",
+      "breakpoints": true
     }
   ]
 }

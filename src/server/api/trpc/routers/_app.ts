@@ -6,6 +6,7 @@ import {
   publicProcedure,
 } from "../init";
 import { dashboardRouter } from "./dashboard";
+import { tasksRouter } from "./tasks";
 import { todoRouter } from "./todo";
 import { userRouter } from "./user";
 
@@ -17,6 +18,7 @@ import { userRouter } from "./user";
 export const appRouter = createTRPCRouter({
   user: userRouter,
   todo: todoRouter,
+  tasks: tasksRouter,
   dashboard: dashboardRouter,
   health: publicProcedure.query(async () => {
     try {
