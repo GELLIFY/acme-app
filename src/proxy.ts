@@ -8,6 +8,15 @@ const I18nMiddleware = createI18nMiddleware({
   urlMappingStrategy: "rewriteDefault",
 });
 
+const AUTH_ROUTES = [
+  "/sign-in",
+  "/sign-up",
+  "/forgot-password",
+  "/reset-password",
+];
+
+const PUBLIC_ROUTES = ["/", "/privacy", "/terms", ...AUTH_ROUTES];
+
 export async function proxy(request: NextRequest) {
   const response = I18nMiddleware(request);
   const sessionCookie = getSessionCookie(request);
@@ -27,14 +36,7 @@ export async function proxy(request: NextRequest) {
   }`;
 
   // 1. Not authenticated
-  if (
-    !sessionCookie &&
-    newUrl.pathname !== "/" &&
-    newUrl.pathname !== "/sign-in" &&
-    newUrl.pathname !== "/sign-up" &&
-    newUrl.pathname !== "/forgot-password" &&
-    newUrl.pathname !== "/reset-password"
-  ) {
+  if (!sessionCookie && !PUBLIC_ROUTES.includes(newUrl.pathname)) {
     const url = new URL("/sign-in", request.url);
 
     if (encodedSearchParams) {
@@ -45,9 +47,11 @@ export async function proxy(request: NextRequest) {
   }
 
   // 2. If authenticated, proceed with other checks
-  // if (sessionCookie) {
-  //
-  // }
+  if (sessionCookie && AUTH_ROUTES.includes(newUrl.pathname)) {
+    const url = new URL("/", request.url);
+
+    return NextResponse.redirect(url);
+  }
 
   // If all checks pass, return the original or updated response
   return response;
