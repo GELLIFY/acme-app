@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import type { SearchParams } from "nuqs/server";
 import { createLoader, parseAsString } from "nuqs/server";
 import { ResetPasswordForm } from "@/components/auth/reset-password-form";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -17,7 +19,7 @@ export const metadata: Metadata = {
 
 // Describe your search params, and reuse this in useQueryStates / createSerializer:
 const resetPasswordSearchParams = {
-  token: parseAsString.withDefault(""),
+  token: parseAsString,
 };
 
 type PageProps = {
@@ -30,6 +32,26 @@ export default async function ResetPasswordPage(props: PageProps) {
 
   const loadParams = createLoader(resetPasswordSearchParams);
   const params = loadParams(searchParams);
+
+  if (!params.token) {
+    return (
+      <Card className="max-w-md">
+        <CardHeader>
+          <CardTitle className="text-lg md:text-xl">
+            {t("reset.error")}
+          </CardTitle>
+          <CardDescription className="text-xs md:text-sm">
+            {t("reset.invalid")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button type="button" className="w-full mt-2" asChild>
+            <Link href="/sign-in">{t("reset.back")}</Link>
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="max-w-md">

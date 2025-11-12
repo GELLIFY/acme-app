@@ -19,6 +19,9 @@ export default {
   "auth.reset.title": "Password reset",
   "auth.reset.subtitle": "Create and confirm your new password",
   "auth.reset.submit": "Reset password",
+  "auth.reset.error": "Invalid reset link",
+  "auth.reset.invalid": "The password reset link is invalid or expired",
+  "auth.reset.back": "Back to login",
 
   // account
   "account.save": "Save",
