@@ -34,7 +34,7 @@ export default async function ForgotPasswordPage() {
       <CardFooter className="flex justify-center">
         <span className="text-sm text-muted-foreground">
           {t("account")}{" "}
-          <Link href="/sign-up" className="text-primary underline">
+          <Link href="/sign-in" className="text-primary underline">
             {t("signin.submit")}
           </Link>
         </span>
