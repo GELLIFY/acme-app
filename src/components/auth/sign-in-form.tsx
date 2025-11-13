@@ -52,8 +52,9 @@ export const SignInForm = () => {
           onError: (ctx) => {
             toast.error(ctx.error.message);
           },
-          onSuccess: () => {
-            router.push(returnTo ? `/${returnTo}` : "/dashboard");
+          onSuccess: (ctx) => {
+            if (ctx.data.twoFactorRedirect) router.push("/2fa");
+            else router.push(returnTo ? `/${returnTo}` : "/");
           },
         },
       );

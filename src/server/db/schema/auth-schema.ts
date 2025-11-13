@@ -9,6 +9,7 @@ export const user = createTable("user", (d) => ({
   email: d.text("email").notNull().unique(),
   emailVerified: d.boolean("email_verified").default(false).notNull(),
   image: d.text("image"),
+  twoFactorEnabled: d.boolean("two_factor_enabled").default(false),
 }));
 
 export const session = createTable("session", (d) => ({
@@ -53,4 +54,14 @@ export const verification = createTable("verification", (d) => ({
   identifier: d.text("identifier").notNull(),
   value: d.text("value").notNull(),
   expiresAt: d.timestamp("expires_at").notNull(),
+}));
+
+export const twoFactor = createTable("two_factor", (d) => ({
+  id: d.uuid().defaultRandom().primaryKey(),
+  secret: d.text("secret").notNull(),
+  backupCodes: d.text("backup_codes").notNull(),
+  userId: d
+    .uuid("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
 }));
