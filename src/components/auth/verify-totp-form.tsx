@@ -7,7 +7,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type z from "zod";
 import { authClient } from "@/shared/helpers/better-auth/auth-client";
-import { verifyToptSchema } from "@/shared/validators/user.schema";
+import { verifyTotpSchema } from "@/shared/validators/user.schema";
 import { Button } from "../ui/button";
 import { Field, FieldError, FieldLabel } from "../ui/field";
 import {
@@ -18,11 +18,11 @@ import {
 } from "../ui/input-otp";
 import { Spinner } from "../ui/spinner";
 
-export function VerifyToptForm() {
+export function VerifyTotpForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const onSubmit = async (data: z.infer<typeof verifyToptSchema>) => {
+  const onSubmit = async (data: z.infer<typeof verifyTotpSchema>) => {
     try {
       await authClient.twoFactor.verifyTotp(data, {
         onRequest: () => {
@@ -45,8 +45,8 @@ export function VerifyToptForm() {
     }
   };
 
-  const form = useForm<z.infer<typeof verifyToptSchema>>({
-    resolver: zodResolver(verifyToptSchema),
+  const form = useForm<z.infer<typeof verifyTotpSchema>>({
+    resolver: zodResolver(verifyTotpSchema),
     defaultValues: { code: "", trustDevice: false },
   });
 

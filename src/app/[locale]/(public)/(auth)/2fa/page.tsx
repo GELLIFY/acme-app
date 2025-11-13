@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { BackupCodeForm } from "@/components/auth/backup-code-form";
-import { VerifyToptForm } from "@/components/auth/verify-topt-form";
+import { VerifyTotpForm } from "@/components/auth/verify-totp-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { auth } from "@/shared/helpers/better-auth/auth";
@@ -25,7 +25,7 @@ export default async function TwoFactorPage() {
             </TabsList>
 
             <TabsContent value="totp">
-              <VerifyToptForm />
+              <VerifyTotpForm />
             </TabsContent>
 
             <TabsContent value="backup">

@@ -1,9 +1,4 @@
 import {
-  disableTwoFactor,
-  enableTwoFactor,
-  verifyTopt,
-} from "@/server/domains/auth/two-factor-service";
-import {
   changeEmail,
   changePassword,
   deleteUser,
@@ -13,9 +8,7 @@ import {
 import {
   changeEmailSchema,
   changePasswordSchema,
-  twoFactorSchema,
   updateUserSchema,
-  verifyToptSchema,
 } from "@/shared/validators/user.schema";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
@@ -52,23 +45,4 @@ export const userRouter = createTRPCRouter({
       return await listSessions(headers, session.session.id);
     },
   ),
-
-  // Two-Factor
-  enableTwoFactor: protectedProcedure
-    .input(twoFactorSchema)
-    .mutation(async ({ ctx: { headers }, input }) => {
-      return await enableTwoFactor(headers, input);
-    }),
-
-  disableTwoFactor: protectedProcedure
-    .input(twoFactorSchema)
-    .mutation(async ({ ctx: { headers }, input }) => {
-      return await disableTwoFactor(headers, input);
-    }),
-
-  verifyTopt: protectedProcedure
-    .input(verifyToptSchema)
-    .mutation(async ({ ctx: { headers }, input }) => {
-      return await verifyTopt(headers, input);
-    }),
 });

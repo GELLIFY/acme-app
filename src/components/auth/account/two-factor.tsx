@@ -1,9 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CopyIcon, DownloadIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { type Dispatch, type SetStateAction, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import QRCode from "react-qr-code";
@@ -33,67 +32,94 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { Spinner } from "@/components/ui/spinner";
-import { useUserQuery } from "@/hooks/use-user";
-import type { RouterOutput } from "@/server/api/trpc/routers/_app";
+import { authClient } from "@/shared/helpers/better-auth/auth-client";
 import { useTRPC } from "@/shared/helpers/trpc/client";
 import {
   twoFactorSchema,
-  verifyToptSchema,
+  verifyTotpSchema,
 } from "@/shared/validators/user.schema";
 
-type TwoFactorData = RouterOutput["user"]["enableTwoFactor"];
+type TwoFactorData = {
+  totpURI: string;
+  backupCodes: string[];
+};
 
 function TwoFactorAuthForm({
   twoFactorEnabled,
   setTwoFactorData,
 }: {
   twoFactorEnabled: boolean;
-  setTwoFactorData: Dispatch<SetStateAction<TwoFactorData | undefined>>;
+  setTwoFactorData: Dispatch<SetStateAction<TwoFactorData | null>>;
 }) {
-  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  const queryClient = useQueryClient();
   const trpc = useTRPC();
 
   const form = useForm<z.infer<typeof twoFactorSchema>>({
     resolver: zodResolver(twoFactorSchema),
     defaultValues: {
       password: "",
+      issuer: "acme-app",
     },
   });
 
-  const enable2FAMutation = useMutation(
-    trpc.user.enableTwoFactor.mutationOptions({
-      onError: (error) => {
-        console.error(error);
-        toast.error(error.message || "Failed to enable 2FA");
+  async function handleDisable2FA(data: z.infer<typeof twoFactorSchema>) {
+    await authClient.twoFactor.disable(
+      {
+        password: data.password,
       },
-      onSuccess: (data) => {
-        setTwoFactorData(data);
-        form.reset();
-      },
-    }),
-  );
+      {
+        onRequest: () => {
+          setLoading(true);
+        },
+        onResponse: () => {
+          setLoading(false);
+        },
+        onError: (error) => {
+          toast.error(error.error.message || "Failed to disable 2FA");
+        },
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: trpc.user.me.queryKey(),
+          });
 
-  const disable2FAMutation = useMutation(
-    trpc.user.disableTwoFactor.mutationOptions({
-      onError: (error) => {
-        console.error(error);
-        toast.error(error.message || "Failed to disable 2FA");
+          form.reset();
+        },
       },
-      onSuccess: () => {
-        form.reset();
-        router.refresh();
+    );
+  }
+
+  async function handleEnable2FA(data: z.infer<typeof twoFactorSchema>) {
+    const result = await authClient.twoFactor.enable(
+      {
+        password: data.password,
+        issuer: data.issuer,
       },
-    }),
-  );
+      {
+        onRequest: () => {
+          setLoading(true);
+        },
+        onResponse: () => {
+          setLoading(false);
+        },
+      },
+    );
+
+    if (result.error) {
+      toast.error(result.error.message || "Failed to enable 2FA");
+    }
+    setTwoFactorData(result.data);
+    form.reset();
+  }
+
+  const onSubmit = async (data: z.infer<typeof twoFactorSchema>) => {
+    if (twoFactorEnabled) handleDisable2FA(data);
+    else handleEnable2FA(data);
+  };
 
   return (
-    <form
-      className="grid gap-4"
-      onSubmit={form.handleSubmit((data) => {
-        if (twoFactorEnabled) disable2FAMutation.mutate(data);
-        else enable2FAMutation.mutate(data);
-      })}
-    >
+    <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
       <Controller
         name="password"
         control={form.control}
@@ -111,17 +137,8 @@ function TwoFactorAuthForm({
           </Field>
         )}
       />
-      <Button
-        type="submit"
-        disabled={enable2FAMutation.isPending || disable2FAMutation.isPending}
-      >
-        {enable2FAMutation.isPending || disable2FAMutation.isPending ? (
-          <Spinner />
-        ) : twoFactorEnabled ? (
-          "Disable"
-        ) : (
-          "Enable"
-        )}
+      <Button type="submit" disabled={loading}>
+        {loading ? <Spinner /> : twoFactorEnabled ? "Disable" : "Enable"}
       </Button>
     </form>
   );
@@ -134,31 +151,51 @@ function VerifyToptForm({
   twoFactorData: TwoFactorData;
   setSuccessfullyEnabled: Dispatch<SetStateAction<boolean>>;
 }) {
-  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  const queryClient = useQueryClient();
   const trpc = useTRPC();
 
-  const verifyToptMutation = useMutation(
-    trpc.user.verifyTopt.mutationOptions({
-      onError: (error) => {
-        toast.error(error.message || "Failed to verify code");
-      },
-      onSuccess: () => {
-        setSuccessfullyEnabled(true);
-        router.refresh();
-      },
-    }),
-  );
-
-  const form = useForm<z.infer<typeof verifyToptSchema>>({
-    resolver: zodResolver(verifyToptSchema),
+  const form = useForm<z.infer<typeof verifyTotpSchema>>({
+    resolver: zodResolver(verifyTotpSchema),
     defaultValues: { code: "", trustDevice: true },
   });
 
+  const onSubmit = async (data: z.infer<typeof verifyTotpSchema>) => {
+    try {
+      // Call the authClient's forgetPassword method, passing the email and a redirect URL.
+      await authClient.twoFactor.verifyTotp(
+        {
+          code: data.code,
+          trustDevice: data.trustDevice,
+        },
+        {
+          onRequest: () => {
+            setLoading(true);
+          },
+          onResponse: () => {
+            setLoading(false);
+          },
+          onError: (error) => {
+            toast.error(error.error.message || "Failed to verify code");
+          },
+          onSuccess: () => {
+            queryClient.invalidateQueries({
+              queryKey: trpc.user.me.queryKey(),
+            });
+            setSuccessfullyEnabled(true);
+          },
+        },
+      );
+    } catch (error) {
+      // catch the error
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  };
+
   return (
-    <form
-      className="grid gap-4"
-      onSubmit={form.handleSubmit((data) => verifyToptMutation.mutate(data))}
-    >
+    <form className="grid gap-4" onSubmit={form.handleSubmit(onSubmit)}>
       <Controller
         name="code"
         control={form.control}
@@ -191,22 +228,71 @@ function VerifyToptForm({
           </Field>
         )}
       />
-      <Button
-        type="submit"
-        disabled={verifyToptMutation.isPending}
-        className="w-full"
-      >
-        {verifyToptMutation.isPending ? <Spinner /> : "Submit"}
+      <Button type="submit" disabled={loading} className="w-full">
+        {loading ? <Spinner /> : "Submit"}
       </Button>
     </form>
   );
 }
 
 export function TwoFactor() {
-  const [twoFactorData, setTwoFactorData] = useState<TwoFactorData>();
+  const [twoFactorData, setTwoFactorData] = useState<TwoFactorData | null>(
+    null,
+  );
   const [successfullyEnabled, setSuccessfullyEnabled] = useState(false);
 
-  const { data: user } = useUserQuery();
+  const downloadBackupCodes = () => {
+    if (!twoFactorData?.backupCodes?.length) {
+      toast.error("No backup codes available");
+      return;
+    }
+
+    try {
+      const codes = twoFactorData.backupCodes.join("\n");
+      const blob = new Blob([codes], {
+        type: "text/plain;charset=utf-8",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const timestamp = new Date().toISOString().split("T")[0];
+
+      link.href = url;
+      link.download = `acme-2fa-backup-codes-${timestamp}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success("Backup codes downloaded");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to download backup codes");
+    }
+  };
+
+  const copyBackupCodes = async () => {
+    if (!twoFactorData?.backupCodes?.length) {
+      toast.error("No backup codes available");
+      return;
+    }
+
+    if (!navigator?.clipboard?.writeText) {
+      toast.error("Clipboard not available");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(twoFactorData.backupCodes.join("\n"));
+      toast.success("Backup codes copied");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to copy backup codes");
+    }
+  };
+
+  const trpc = useTRPC();
+
+  const { data: user } = useQuery(trpc.user.me.queryOptions());
 
   return (
     <Card>
@@ -216,8 +302,8 @@ export function TwoFactor() {
           Enable or disable 2FA to add an extra layer of security.
         </CardDescription>
         <CardAction>
-          <Badge variant={user.twoFactorEnabled ? "default" : "secondary"}>
-            {user.twoFactorEnabled ? "Enabled" : "Disabled"}
+          <Badge variant={user?.twoFactorEnabled ? "default" : "secondary"}>
+            {user?.twoFactorEnabled ? "Enabled" : "Disabled"}
           </Badge>
         </CardAction>
       </CardHeader>
@@ -225,7 +311,7 @@ export function TwoFactor() {
       <CardContent>
         {!twoFactorData && !successfullyEnabled && (
           <TwoFactorAuthForm
-            twoFactorEnabled={user.twoFactorEnabled ?? false}
+            twoFactorEnabled={user?.twoFactorEnabled ?? false}
             setTwoFactorData={setTwoFactorData}
           />
         )}
@@ -252,7 +338,9 @@ export function TwoFactor() {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => setTwoFactorData(undefined)}
+                onClick={() => {
+                  downloadBackupCodes();
+                }}
               >
                 <DownloadIcon />
                 Download
@@ -260,7 +348,9 @@ export function TwoFactor() {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => setTwoFactorData(undefined)}
+                onClick={() => {
+                  void copyBackupCodes();
+                }}
               >
                 <CopyIcon />
                 Copy
@@ -268,7 +358,10 @@ export function TwoFactor() {
               <Button
                 variant="default"
                 className="w-full"
-                onClick={() => setTwoFactorData(undefined)}
+                onClick={() => {
+                  setTwoFactorData(null);
+                  setSuccessfullyEnabled(false);
+                }}
               >
                 Done
               </Button>
