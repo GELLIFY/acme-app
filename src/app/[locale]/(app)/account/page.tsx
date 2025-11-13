@@ -3,14 +3,10 @@ import type { Metadata } from "next";
 import { ChangeEmail } from "@/components/auth/account/change-email";
 import { DeleteAccount } from "@/components/auth/account/delete-account";
 import { DisplayName } from "@/components/auth/account/display-name";
+import { SessionManagement } from "@/components/auth/account/session-managment";
+import { UpdatePassword } from "@/components/auth/account/update-password";
 import { UserAvatar } from "@/components/auth/account/user-avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { getQueryClient, trpc } from "@/shared/helpers/trpc/server";
 
 export const metadata: Metadata = {
@@ -22,76 +18,45 @@ export default async function AccountPage() {
   queryClient.prefetchQuery(trpc.user.me.queryOptions());
 
   return (
-    <Tabs
-      defaultValue="tab-1"
-      orientation="vertical"
-      className="w-full flex-row"
-    >
-      <TabsList className="flex-col justify-start h-fit sticky top-[81px]">
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span>
-                <TabsTrigger value="tab-1" className="p-3">
-                  <UserIcon size={16} aria-hidden="true" />
-                </TabsTrigger>
-              </span>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="px-2 py-1 text-xs">
-              Account
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span>
-                <TabsTrigger value="tab-2" className="p-3">
-                  <span className="relative">
-                    <LockIcon size={16} aria-hidden="true" />
-                  </span>
-                </TabsTrigger>
-              </span>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="px-2 py-1 text-xs">
-              Security
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span>
-                <TabsTrigger value="tab-3" className="p-3">
-                  <KeyIcon size={16} aria-hidden="true" />
-                </TabsTrigger>
-              </span>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="px-2 py-1 text-xs">
-              Api Keys
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+    <Tabs className="space-y-2" defaultValue="profile">
+      <TabsList className="grid w-full grid-cols-5">
+        <TabsTrigger value="profile">
+          <UserIcon size={16} aria-hidden="true" />
+          <span className="max-sm:hidden">Profile</span>
+        </TabsTrigger>
+        <TabsTrigger value="security">
+          <LockIcon size={16} aria-hidden="true" />
+          <span className="max-sm:hidden">Security</span>
+        </TabsTrigger>
+        <TabsTrigger value="tab-3">
+          <KeyIcon size={16} aria-hidden="true" />
+          <span className="max-sm:hidden">Api Keys</span>
+        </TabsTrigger>
+        <TabsTrigger value="danger">
+          <LockIcon size={16} aria-hidden="true" />
+          <span className="max-sm:hidden">Danger</span>
+        </TabsTrigger>
       </TabsList>
-      <div className="grow rounded-md  text-start">
-        <TabsContent value="tab-1">
-          <div className="pl-2 text-muted-foreground space-y-4">
-            <UserAvatar />
-            <DisplayName />
-            <ChangeEmail />
-          </div>
-        </TabsContent>
-        <TabsContent value="tab-2">
-          <div className="pl-2 text-muted-foreground space-y-4">
-            <DeleteAccount />
-          </div>
-        </TabsContent>
-        <TabsContent value="tab-3">
-          <p className="pl-2 text-muted-foreground space-y-4">
-            Content for Tab 3
-          </p>
-        </TabsContent>
-      </div>
+
+      <TabsContent value="profile">
+        <div className="text-muted-foreground space-y-4">
+          <UserAvatar />
+          <DisplayName />
+          <ChangeEmail />
+        </div>
+      </TabsContent>
+      <TabsContent value="security">
+        <div className="text-muted-foreground space-y-4">
+          <UpdatePassword />
+          <SessionManagement />
+        </div>
+      </TabsContent>
+      <TabsContent value="tab-3">
+        <p className="text-muted-foreground space-y-4">Content for Tab 3</p>
+      </TabsContent>
+      <TabsContent value="danger">
+        <DeleteAccount />
+      </TabsContent>
     </Tabs>
   );
 }

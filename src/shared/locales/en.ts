@@ -36,6 +36,12 @@ export default {
   "account.email.description":
     "Enter the email address you want to use to log in.",
   "account.email.message": "Please enter a valid email address.",
+  "account.session": "Sessions",
+  "account.session.description":
+    "Manage your active sessions and revoke access.",
+  "account.session.current": "Current session",
+  "account.session.revoke": "Revoke",
+  "account.session.logout": "Sign Out",
   "account.delete": "Delete account",
   "account.delete.description":
     "Permanently remove your Personal Account and all of its contents. This action is not reversible, so please continue with caution.",

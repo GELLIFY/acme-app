@@ -1,9 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2Icon } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
-import * as z from "zod";
+import { toast } from "sonner";
+import type * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,28 +16,45 @@ import {
 } from "@/components/ui/card";
 import { Field, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { useUserMutation, useUserQuery } from "@/hooks/use-user";
+import { Spinner } from "@/components/ui/spinner";
+import { useUserQuery } from "@/hooks/use-user";
+import { useTRPC } from "@/shared/helpers/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
-
-const formSchema = z.object({
-  email: z.email(),
-});
+import { changeEmailSchema } from "@/shared/validators/user.schema";
 
 export function ChangeEmail() {
   const t = useScopedI18n("account");
 
-  const { data: user } = useUserQuery();
-  const updateUserMutation = useUserMutation();
+  const queryClient = useQueryClient();
+  const trpc = useTRPC();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const { data: user } = useUserQuery();
+
+  const changeEmailMutation = useMutation(
+    trpc.user.changeEmail.mutationOptions({
+      onError: (error) => {
+        console.error(error);
+        toast.error(error.message);
+      },
+      onSuccess: () => {
+        toast.success("Email changed");
+
+        queryClient.invalidateQueries({
+          queryKey: trpc.user.me.queryKey(),
+        });
+      },
+    }),
+  );
+
+  const form = useForm<z.infer<typeof changeEmailSchema>>({
+    resolver: zodResolver(changeEmailSchema),
     defaultValues: {
       email: user?.email ?? undefined,
     },
   });
 
   const onSubmit = form.handleSubmit((data) => {
-    updateUserMutation.mutate({
+    changeEmailMutation.mutate({
       email: data.email,
     });
   });
@@ -71,12 +89,8 @@ export function ChangeEmail() {
 
         <CardFooter className="border-t text-muted-foreground text-sm justify-between">
           <div>{t("email.message")}</div>
-          <Button type="submit" disabled={updateUserMutation.isPending}>
-            {updateUserMutation.isPending ? (
-              <Loader2Icon size={16} className="animate-spin" />
-            ) : (
-              <p> {t("save")} </p>
-            )}
+          <Button type="submit" disabled={changeEmailMutation.isPending}>
+            {changeEmailMutation.isPending ? <Spinner /> : <p> {t("save")} </p>}
           </Button>
         </CardFooter>
       </Card>

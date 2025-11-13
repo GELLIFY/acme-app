@@ -15,8 +15,18 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-    async sendResetPassword(_data, _request) {
-      // Send an email to the user with a link to reset their password
+    sendResetPassword: async ({ url }) => {
+      // TODO: send email here
+      console.log(`Click the link to reset your password: ${url}`);
+    },
+    onPasswordReset: async ({ user }) => {
+      // your logic here
+      console.log(`Password for user ${user.email} has been reset.`);
+    },
+  },
+  user: {
+    changeEmail: {
+      enabled: true,
     },
   },
   plugins: [openAPI({ disableDefaultReference: true }), nextCookies()],

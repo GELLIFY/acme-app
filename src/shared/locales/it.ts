@@ -37,6 +37,12 @@ export default {
   "account.email.description":
     "Inserisci l'indirizzo email che vuoi usare per accedere.",
   "account.email.message": "Per favore inserisci un indirizzo email valido.",
+  "account.session": "Sessioni",
+  "account.session.description":
+    "Gestisci le tue sessioni attive e revoca l'accesso.",
+  "account.session.current": "Session corrente",
+  "account.session.revoke": "Revoca",
+  "account.session.logout": "Esci",
   "account.delete": "Elimina account",
   "account.delete.description":
     "Rimuovi definitivamente il tuo account personale e tutti i suoi contenuti. Questa azione non è reversibile, quindi procedi con cautela.",
