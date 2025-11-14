@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { PasskeyButton } from "@/components/auth/passkey-button";
 import { SignInForm } from "@/components/auth/sign-in-form";
 import { TermsPrivacyLinks } from "@/components/auth/terms privacy-links";
 import {
@@ -37,8 +38,9 @@ export default async function SignIn() {
             {t("signin.subtitle")}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <SignInForm />
+          <PasskeyButton />
         </CardContent>
         <CardFooter className="flex justify-center">
           <span className="text-sm text-muted-foreground">

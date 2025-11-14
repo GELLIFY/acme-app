@@ -63,19 +63,3 @@ export async function deleteUser(headers: Headers) {
 
   return data;
 }
-
-export async function listSessions(headers: Headers, sessionId: string) {
-  const data = await auth.api.listSessions({
-    headers,
-  });
-
-  // enrich list with current session
-  const result = data.map((session) => {
-    return {
-      ...session,
-      current: session.id === sessionId,
-    };
-  });
-
-  return result;
-}

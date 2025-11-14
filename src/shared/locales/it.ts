@@ -76,6 +76,30 @@ export default {
           "Scansiona questo codice QR con la tua app di autenticazione e inserisci il codice qui sotto:",
         verify: "Verifica",
       },
+
+      passkey: {
+        title: "Passkeys",
+        description:
+          "Gestisci le tue passkey per un'autenticazione sicura e senza password.",
+        info: "Scopri di più sulle passkey",
+        new_btn: "Nuova Passkey",
+        new_title: "Aggiungi Nuova Passkey",
+        new_description:
+          "Crea una nuova passkey per un'autenticazione sicura e senza password.",
+        new_submit: "Aggiungi Passkey",
+        created: "Creata il {value}",
+        delete_title: "Sei assolutamente sicuro?",
+        delete_decription:
+          "Questa azione non può essere annullata. Questo eliminerà definitivamente la tua passkey.",
+        delete_cancel: "Annulla",
+        delete_confirm: "Elimina Passkey",
+
+        empty: {
+          title: "Nessuna Passkey",
+          description:
+            "Non hai ancora creato nessuna passkey. Inizia creando la tua prima passkey.",
+        },
+      },
     },
   },
 

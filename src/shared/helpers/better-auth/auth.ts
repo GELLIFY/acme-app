@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { openAPI, twoFactor } from "better-auth/plugins";
+import { passkey } from "better-auth/plugins/passkey";
 import { db } from "@/server/db";
 
 export const auth = betterAuth({
@@ -24,6 +25,13 @@ export const auth = betterAuth({
       console.log(`Password for user ${user.email} has been reset.`);
     },
   },
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60, // 5 min
+    },
+    freshAge: 60 * 60 * 24, // 1 day (default)
+  },
   user: {
     changeEmail: {
       enabled: true,
@@ -37,6 +45,7 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    passkey(),
     twoFactor(),
     openAPI({ disableDefaultReference: true }),
     nextCookies(),
