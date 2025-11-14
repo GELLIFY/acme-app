@@ -24,6 +24,12 @@ export default {
   "auth.reset.back": "Back to login",
 
   // account
+  "account.profile": "Profile",
+  "account.security": "Security",
+  "account.sessions": "Sessions",
+  "account.danger": "Danger",
+
+  // account profile
   "account.save": "Save",
   "account.avatar": "Avatar",
   "account.avatar.description":
@@ -42,6 +48,21 @@ export default {
   "account.session.current": "Current session",
   "account.session.revoke": "Revoke",
   "account.session.logout": "Sign Out",
+
+  // account security
+  "account.security.two_factor": "Two-Factor Authentication",
+  "account.security.description":
+    "Enable or disable 2FA to add an extra layer of security.",
+  "account.security.enabled": "Enabled",
+  "account.security.disabled": "Disabled",
+  "account.security.enable": "Enable 2FA",
+  "account.security.disable": "Disable 2FA",
+  "account.security.code_fld": "Code",
+  "account.security.code_msg":
+    "Scan this QR code with your authenticator app and enter the code below:",
+  "account.security.verify": "Verify",
+
+  // account danger
   "account.delete": "Delete account",
   "account.delete.description":
     "Permanently remove your Personal Account and all of its contents. This action is not reversible, so please continue with caution.",

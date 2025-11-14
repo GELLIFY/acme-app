@@ -34,6 +34,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/shared/helpers/better-auth/auth-client";
 import { useTRPC } from "@/shared/helpers/trpc/client";
+import { useScopedI18n } from "@/shared/locales/client";
 import {
   twoFactorSchema,
   verifyTotpSchema,
@@ -53,6 +54,7 @@ function TwoFactorAuthForm({
 }) {
   const [loading, setLoading] = useState(false);
 
+  const t = useScopedI18n("account.security");
   const queryClient = useQueryClient();
   const trpc = useTRPC();
 
@@ -138,7 +140,7 @@ function TwoFactorAuthForm({
         )}
       />
       <Button type="submit" disabled={loading}>
-        {loading ? <Spinner /> : twoFactorEnabled ? "Disable" : "Enable"}
+        {loading ? <Spinner /> : twoFactorEnabled ? t("disable") : t("enable")}
       </Button>
     </form>
   );
@@ -153,6 +155,7 @@ function VerifyToptForm({
 }) {
   const [loading, setLoading] = useState(false);
 
+  const t = useScopedI18n("account.security");
   const queryClient = useQueryClient();
   const trpc = useTRPC();
 
@@ -201,11 +204,8 @@ function VerifyToptForm({
         control={form.control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="code">Code</FieldLabel>
-            <FieldDescription>
-              Scan this QR code with your authenticator app and enter the code
-              below:
-            </FieldDescription>
+            <FieldLabel htmlFor="code">{t("code_fld")}</FieldLabel>
+            <FieldDescription>{t("code_msg")}</FieldDescription>
             <QRCode
               size={216}
               style={{ height: "auto", maxWidth: "100%", width: "100%" }}
@@ -229,7 +229,7 @@ function VerifyToptForm({
         )}
       />
       <Button type="submit" disabled={loading} className="w-full">
-        {loading ? <Spinner /> : "Submit"}
+        {loading ? <Spinner /> : t("verify")}
       </Button>
     </form>
   );
@@ -240,6 +240,8 @@ export function TwoFactor() {
     null,
   );
   const [successfullyEnabled, setSuccessfullyEnabled] = useState(false);
+
+  const t = useScopedI18n("account.security");
 
   const downloadBackupCodes = () => {
     if (!twoFactorData?.backupCodes?.length) {
@@ -297,13 +299,11 @@ export function TwoFactor() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Two-Factor Authentication</CardTitle>
-        <CardDescription>
-          Enable or disable 2FA to add an extra layer of security.
-        </CardDescription>
+        <CardTitle>{t("two_factor")}</CardTitle>
+        <CardDescription>{t("description")}</CardDescription>
         <CardAction>
           <Badge variant={user?.twoFactorEnabled ? "default" : "secondary"}>
-            {user?.twoFactorEnabled ? "Enabled" : "Disabled"}
+            {user?.twoFactorEnabled ? t("enabled") : t("disabled")}
           </Badge>
         </CardAction>
       </CardHeader>
