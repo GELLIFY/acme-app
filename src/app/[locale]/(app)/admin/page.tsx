@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { Suspense } from "react";
-import { UsersDataTable } from "@/components/auth/admin/users-data-table";
-import { UsersDataTableSkeleton } from "@/components/auth/admin/users-data-table-skeleton";
+import { DataTable } from "@/components/auth/admin/data-table";
 import { auth } from "@/shared/helpers/better-auth/auth";
-import { HydrateClient } from "@/shared/helpers/trpc/server";
 
 export const metadata: Metadata = {
   title: "Admin | Acme",
@@ -28,26 +25,17 @@ export default async function AdminPage() {
   });
 
   return (
-    <HydrateClient>
-      <main className="container mx-auto p-4 space-y-4">
-        <header className="flex flex-col gap-1">
-          <h2 className="text-2xl font-semibold tracking-tight">
-            Welcome back!
-          </h2>
-          <p className="text-muted-foreground">
-            Manage user accounts, roles, and permissions
-          </p>
-        </header>
+    <main className="container mx-auto p-4">
+      <header className="flex flex-col gap-1">
+        <h2 className="text-2xl font-semibold tracking-tight">Users</h2>
+      </header>
 
-        <div className="flex justify-between items-center">
-          {/* <TagsSearchFilter />
+      <div className="flex justify-between items-center">
+        {/* <TagsSearchFilter />
         <TagsActions /> */}
-        </div>
+      </div>
 
-        <Suspense fallback={<UsersDataTableSkeleton />}>
-          <UsersDataTable users={users.users} />
-        </Suspense>
-      </main>
-    </HydrateClient>
+      <DataTable data={users.users} />
+    </main>
   );
 }
