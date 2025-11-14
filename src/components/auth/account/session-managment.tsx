@@ -1,6 +1,5 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Session } from "better-auth";
 import { LaptopIcon, SmartphoneIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -22,16 +21,16 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import { authClient } from "@/shared/helpers/better-auth/auth-client";
-import { useTRPC } from "@/shared/helpers/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 
-export function SessionManagement() {
+export function SessionManagement({
+  sessions,
+  currentSession,
+}: {
+  sessions: Session[];
+  currentSession: Session;
+}) {
   const t = useScopedI18n("account");
-
-  const queryClient = useQueryClient();
-  const trpc = useTRPC();
-
-  const { data: sessions } = useQuery(trpc.user.listSession.queryOptions());
 
   function revokeSession(session: Session) {
     return authClient.revokeSession(
@@ -45,9 +44,6 @@ export function SessionManagement() {
         },
         onSuccess: () => {
           toast.success("Session revoked");
-          queryClient.invalidateQueries({
-            queryKey: trpc.user.listSession.queryKey(),
-          });
         },
       },
     );
@@ -76,7 +72,9 @@ export function SessionManagement() {
               </ItemMedia>
               <ItemContent>
                 <ItemTitle>
-                  {!session.current ? session.ipAddress : t("session.current")}
+                  {session.id === currentSession.id
+                    ? session.ipAddress
+                    : t("session.current")}
                 </ItemTitle>
                 <ItemDescription>{`${userAgentInfo?.browser.name}, ${userAgentInfo?.os.name}`}</ItemDescription>
               </ItemContent>
@@ -86,7 +84,9 @@ export function SessionManagement() {
                   size="sm"
                   onClick={() => revokeSession(session)}
                 >
-                  {session.current ? t("session.logout") : t("session.revoke")}
+                  {session.id === currentSession.id
+                    ? t("session.logout")
+                    : t("session.revoke")}
                 </Button>
               </ItemActions>
             </Item>

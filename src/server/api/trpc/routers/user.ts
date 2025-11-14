@@ -2,7 +2,6 @@ import {
   changeEmail,
   changePassword,
   deleteUser,
-  listSessions,
   updateUserInformation,
 } from "@/server/services/user-service";
 import {
@@ -38,11 +37,4 @@ export const userRouter = createTRPCRouter({
   delete: protectedProcedure.mutation(async ({ ctx: { headers } }) => {
     return await deleteUser(headers);
   }),
-
-  // Session management
-  listSession: protectedProcedure.query(
-    async ({ ctx: { headers, session } }) => {
-      return await listSessions(headers, session.session.id);
-    },
-  ),
 });
