@@ -54,7 +54,7 @@ function TwoFactorAuthForm({
 }) {
   const [loading, setLoading] = useState(false);
 
-  const t = useScopedI18n("account.security");
+  const t = useScopedI18n("account.security.two_factor");
   const queryClient = useQueryClient();
   const trpc = useTRPC();
 
@@ -155,7 +155,7 @@ function VerifyToptForm({
 }) {
   const [loading, setLoading] = useState(false);
 
-  const t = useScopedI18n("account.security");
+  const t = useScopedI18n("account.security.two_factor");
   const queryClient = useQueryClient();
   const trpc = useTRPC();
 
@@ -241,7 +241,7 @@ export function TwoFactor() {
   );
   const [successfullyEnabled, setSuccessfullyEnabled] = useState(false);
 
-  const t = useScopedI18n("account.security");
+  const t = useScopedI18n("account.security.two_factor");
 
   const downloadBackupCodes = () => {
     if (!twoFactorData?.backupCodes?.length) {
@@ -299,7 +299,7 @@ export function TwoFactor() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("two_factor")}</CardTitle>
+        <CardTitle>{t("title")}</CardTitle>
         <CardDescription>{t("description")}</CardDescription>
         <CardAction>
           <Badge variant={user?.twoFactorEnabled ? "default" : "secondary"}>

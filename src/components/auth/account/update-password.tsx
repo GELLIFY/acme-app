@@ -27,9 +27,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/shared/helpers/trpc/client";
+import { useScopedI18n } from "@/shared/locales/client";
 import { changePasswordSchema } from "@/shared/validators/user.schema";
 
 export function UpdatePassword() {
+  const t = useScopedI18n("account.security.change_password");
   const router = useRouter();
   const trpc = useTRPC();
 
@@ -63,10 +65,8 @@ export function UpdatePassword() {
     <form onSubmit={onSubmit} className="grid gap-4">
       <Card>
         <CardHeader>
-          <CardTitle>Change Password</CardTitle>
-          <CardDescription>
-            Update your password for improved security.
-          </CardDescription>
+          <CardTitle>{t("title")}</CardTitle>
+          <CardDescription>{t("description")}</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -78,7 +78,7 @@ export function UpdatePassword() {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="current_password">
-                      Current Password
+                      {t("current_password_fld")}
                     </FieldLabel>
                     <Input
                       {...field}
@@ -98,7 +98,9 @@ export function UpdatePassword() {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="new_password">New Password</FieldLabel>
+                    <FieldLabel htmlFor="new_password">
+                      {t("new_password_fld")}
+                    </FieldLabel>
                     <Input
                       {...field}
                       id="new_password"
@@ -106,9 +108,7 @@ export function UpdatePassword() {
                       type="password"
                       autoComplete="new-password"
                     />
-                    <FieldDescription>
-                      Must be at least 8 characters long.
-                    </FieldDescription>
+                    <FieldDescription>{t("new_password_msg")}</FieldDescription>
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
                     )}
@@ -132,9 +132,7 @@ export function UpdatePassword() {
                         field.onChange(checked);
                       }}
                     />
-                    <FieldLabel htmlFor="revoke">
-                      Log out other sessions
-                    </FieldLabel>
+                    <FieldLabel htmlFor="revoke">{t("revoke_fld")}</FieldLabel>
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
                     )}
@@ -145,9 +143,9 @@ export function UpdatePassword() {
           </FieldSet>
         </CardContent>
         <CardFooter className="border-t text-muted-foreground text-sm justify-between">
-          <div>New password should be different</div>
+          <div>{t("message")}</div>
           <Button type="submit" disabled={changePasswordMutation.isPending}>
-            {changePasswordMutation.isPending ? <Spinner /> : "Salva"}
+            {changePasswordMutation.isPending ? <Spinner /> : t("submit")}
           </Button>
         </CardFooter>
       </Card>

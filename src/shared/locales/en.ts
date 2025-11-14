@@ -50,17 +50,33 @@ export default {
   "account.session.logout": "Sign Out",
 
   // account security
-  "account.security.two_factor": "Two-Factor Authentication",
-  "account.security.description":
-    "Enable or disable 2FA to add an extra layer of security.",
-  "account.security.enabled": "Enabled",
-  "account.security.disabled": "Disabled",
-  "account.security.enable": "Enable 2FA",
-  "account.security.disable": "Disable 2FA",
-  "account.security.code_fld": "Code",
-  "account.security.code_msg":
-    "Scan this QR code with your authenticator app and enter the code below:",
-  "account.security.verify": "Verify",
+  account: {
+    security: {
+      change_password: {
+        title: "Change Password",
+        description: "Update your password for improved security.",
+        message: "New password should be different",
+        current_password_fld: "Current Password",
+        new_password_fld: "New Password",
+        new_password_msg: "Must be at least 8 characters long.",
+        revoke_fld: "Log out other sessions",
+        submit: "Save",
+      },
+
+      two_factor: {
+        title: "Two-Factor Authentication",
+        description: "Enable or disable 2FA to add an extra layer of security.",
+        enabled: "Enabled",
+        disabled: "Disabled",
+        enable: "Enable 2FA",
+        disable: "Disable 2FA",
+        code_fld: "Code",
+        code_msg:
+          "Scan this QR code with your authenticator app and enter the code below:",
+        verify: "Verify",
+      },
+    },
+  },
 
   // account danger
   "account.delete": "Delete account",

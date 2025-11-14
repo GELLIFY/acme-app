@@ -50,18 +50,34 @@ export default {
   "account.session.revoke": "Revoca",
   "account.session.logout": "Esci",
 
-  // account security
-  "account.security.two_factor": "Autenticazione a due fattori",
-  "account.security.description":
-    "Abilita o disabilita la 2FA per aggiungere un ulteriore livello di sicurezza.",
-  "account.security.enabled": "Abilitata",
-  "account.security.disabled": "Disabilitata",
-  "account.security.enable": "Abilita 2FA",
-  "account.security.disable": "Disabilita 2FA",
-  "account.security.code_fld": "Codice",
-  "account.security.code_msg":
-    "Scansiona questo codice QR con la tua app di autenticazione e inserisci il codice qui sotto:",
-  "account.security.verify": "Verifica",
+  account: {
+    security: {
+      change_password: {
+        title: "Cambia password",
+        description: "Aggiorna la tua password per una maggiore sicurezza.",
+        message: "La nuova password deve essere diversa",
+        current_password_fld: "Password attuale",
+        new_password_fld: "Nuova password",
+        new_password_msg: "Deve essere lunga almeno 8 caratteri.",
+        revoke_fld: "Disconnetti le altre sessioni",
+        submit: "Salva",
+      },
+
+      two_factor: {
+        title: "Autenticazione a due fattori",
+        description:
+          "Abilita o disabilita la 2FA per aggiungere un ulteriore livello di sicurezza.",
+        enabled: "Abilitata",
+        disabled: "Disabilitata",
+        enable: "Abilita 2FA",
+        disable: "Disabilita 2FA",
+        code_fld: "Codice",
+        code_msg:
+          "Scansiona questo codice QR con la tua app di autenticazione e inserisci il codice qui sotto:",
+        verify: "Verifica",
+      },
+    },
+  },
 
   // account danger
   "account.delete": "Elimina account",
