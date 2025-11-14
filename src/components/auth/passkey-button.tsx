@@ -11,6 +11,13 @@ export function PasskeyButton() {
   const { refetch } = authClient.useSession();
 
   useEffect(() => {
+    if (
+      !PublicKeyCredential.isConditionalMediationAvailable ||
+      !PublicKeyCredential.isConditionalMediationAvailable()
+    ) {
+      return;
+    }
+
     authClient.signIn.passkey(
       { autoFill: true },
       {

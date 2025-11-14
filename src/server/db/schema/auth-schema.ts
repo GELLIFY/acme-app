@@ -1,12 +1,16 @@
 import { index } from "drizzle-orm/pg-core";
-import { timestamps } from "../utils";
 import { createTable } from "./_table";
 
 export const user = createTable(
   "user",
   (d) => ({
     id: d.uuid().defaultRandom().primaryKey(),
-    ...timestamps,
+    createdAt: d.timestamp("created_at").defaultNow().notNull(),
+    updatedAt: d
+      .timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
 
     name: d.text("name").notNull(),
     email: d.text("email").notNull().unique(),
@@ -21,7 +25,11 @@ export const session = createTable(
   "session",
   (d) => ({
     id: d.uuid().defaultRandom().primaryKey(),
-    ...timestamps,
+    createdAt: d.timestamp("created_at").defaultNow().notNull(),
+    updatedAt: d
+      .timestamp("updated_at")
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
 
     expiresAt: d.timestamp("expires_at").notNull(),
     token: d.text("token").notNull().unique(),
@@ -43,7 +51,11 @@ export const account = createTable(
   "account",
   (d) => ({
     id: d.uuid().defaultRandom().primaryKey(),
-    ...timestamps,
+    createdAt: d.timestamp("created_at").defaultNow().notNull(),
+    updatedAt: d
+      .timestamp("updated_at")
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
 
     accountId: d.text("account_id").notNull(),
     providerId: d.text("provider_id").notNull(),
@@ -67,7 +79,12 @@ export const verification = createTable(
   "verification",
   (d) => ({
     id: d.uuid().defaultRandom().primaryKey(),
-    ...timestamps,
+    createdAt: d.timestamp("created_at").defaultNow().notNull(),
+    updatedAt: d
+      .timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
 
     identifier: d.text("identifier").notNull(),
     value: d.text("value").notNull(),

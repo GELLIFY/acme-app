@@ -5,7 +5,7 @@ import { Loader2Icon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -65,16 +65,6 @@ export const SignInForm = () => {
     }
   };
 
-  useEffect(() => {
-    if (
-      !PublicKeyCredential.isConditionalMediationAvailable ||
-      !PublicKeyCredential.isConditionalMediationAvailable()
-    ) {
-      return;
-    }
-    void authClient.signIn.passkey({ autoFill: true });
-  }, []);
-
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
       <FieldGroup>
@@ -87,9 +77,10 @@ export const SignInForm = () => {
               <Input
                 {...field}
                 id="email"
+                type="email"
                 aria-invalid={fieldState.invalid}
                 placeholder="m@example.com"
-                autoComplete="username webauthn"
+                autoComplete="email webauthn"
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>

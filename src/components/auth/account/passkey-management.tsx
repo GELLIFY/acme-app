@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Passkey } from "better-auth/plugins/passkey";
-import { ArrowUpRightIcon, FingerprintIcon } from "lucide-react";
+import { ArrowUpRightIcon, FingerprintIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -54,9 +54,9 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
-import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/shared/helpers/better-auth/auth-client";
+import { useScopedI18n } from "@/shared/locales/client";
 
 const passkeySchema = z.object({
   name: z.string().min(1),
@@ -66,8 +66,8 @@ const passkeySchema = z.object({
 export function PasskeyManagement({ passkeys }: { passkeys: Passkey[] }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [value, setValue] = useState("");
 
+  const t = useScopedI18n("account.security.passkey");
   const router = useRouter();
 
   const form = useForm<z.infer<typeof passkeySchema>>({
@@ -119,10 +119,8 @@ export function PasskeyManagement({ passkeys }: { passkeys: Passkey[] }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Passkeys</CardTitle>
-        <CardDescription>
-          Manage your passkeys for secure, passwordless authentication.
-        </CardDescription>
+        <CardTitle>{t("title")}</CardTitle>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent>
         {passkeys.length === 0 ? (
@@ -131,11 +129,8 @@ export function PasskeyManagement({ passkeys }: { passkeys: Passkey[] }) {
               <EmptyMedia variant="icon">
                 <FingerprintIcon />
               </EmptyMedia>
-              <EmptyTitle>No Passkeys Yet</EmptyTitle>
-              <EmptyDescription>
-                You haven&apos;t created any passkeys yet. Get started by
-                creating your first passkey.
-              </EmptyDescription>
+              <EmptyTitle>{t("empty.title")}</EmptyTitle>
+              <EmptyDescription>{t("empty.description")}</EmptyDescription>
             </EmptyHeader>
           </Empty>
         ) : (
@@ -147,51 +142,39 @@ export function PasskeyManagement({ passkeys }: { passkeys: Passkey[] }) {
               <ItemContent>
                 <ItemTitle>{passkey.name}</ItemTitle>
                 <ItemDescription>
-                  {" "}
-                  Created {new Date(passkey.createdAt).toLocaleDateString()}
+                  {t("created", {
+                    value: new Date(passkey.createdAt).toLocaleDateString(),
+                  })}
                 </ItemDescription>
               </ItemContent>
               <ItemActions>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button
-                      variant="destructive"
-                      className="text-muted hover:bg-destructive"
-                    >
-                      Delete
+                    <Button variant="destructive" size="icon">
+                      <TrashIcon />
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        Sei assolutamente sicuro?
-                      </AlertDialogTitle>
+                      <AlertDialogTitle>{t("delete_title")}</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Questa azione non può essere annullata. Questo eliminerà
-                        definitivamente la tua passkey.,
+                        {t("delete_decription")}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
 
-                    <div className="mt-2 flex flex-col gap-2">
-                      <Label htmlFor="confirm-delete">
-                        Type <span className="font-medium">DELETE</span> to
-                        confirm.
-                      </Label>
-                      <Input
-                        id="confirm-delete"
-                        value={value}
-                        onChange={(e) => setValue(e.target.value)}
-                      />
-                    </div>
-
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Annulla</AlertDialogCancel>
-                      <AlertDialogAction
+                      <AlertDialogCancel>
+                        {t("delete_cancel")}
+                      </AlertDialogCancel>
+                      <Button
+                        variant="destructive"
                         onClick={() => handleDeletePasskey(passkey.id)}
-                        disabled={value !== "DELETE"}
+                        asChild
                       >
-                        {loading ? <Spinner /> : "Continua"}
-                      </AlertDialogAction>
+                        <AlertDialogAction>
+                          {loading ? <Spinner /> : t("delete_confirm")}
+                        </AlertDialogAction>
+                      </Button>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
@@ -202,7 +185,7 @@ export function PasskeyManagement({ passkeys }: { passkeys: Passkey[] }) {
       </CardContent>
       <CardFooter className="border-t text-muted-foreground text-sm justify-between">
         <Link href="#" className="flex gap-2 items-center">
-          Learn more about passkeys <ArrowUpRightIcon className="size-4" />
+          {t("info")} <ArrowUpRightIcon className="size-4" />
         </Link>
         <Dialog
           open={isDialogOpen}
@@ -212,14 +195,12 @@ export function PasskeyManagement({ passkeys }: { passkeys: Passkey[] }) {
           }}
         >
           <DialogTrigger asChild>
-            <Button>New Passkey</Button>
+            <Button>{t("new_btn")}</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Add New Passkey</DialogTitle>
-              <DialogDescription>
-                Create a new passkey for secure, passwordless authentication.
-              </DialogDescription>
+              <DialogTitle>{t("new_title")}</DialogTitle>
+              <DialogDescription>{t("new_description")}</DialogDescription>
             </DialogHeader>
 
             <form
@@ -231,7 +212,7 @@ export function PasskeyManagement({ passkeys }: { passkeys: Passkey[] }) {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <Input {...field} />
+                    <Input {...field} placeholder="ex. Desktop, iPhone..." />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
                     )}
@@ -240,7 +221,7 @@ export function PasskeyManagement({ passkeys }: { passkeys: Passkey[] }) {
               />
 
               <Button type="submit" disabled={loading} className="w-full">
-                {loading ? <Spinner /> : "Add"}
+                {loading ? <Spinner /> : t("new_submit")}
               </Button>
             </form>
           </DialogContent>

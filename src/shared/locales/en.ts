@@ -75,6 +75,30 @@ export default {
           "Scan this QR code with your authenticator app and enter the code below:",
         verify: "Verify",
       },
+
+      passkey: {
+        title: "Passkeys",
+        description:
+          "Manage your passkeys for secure, passwordless authentication.",
+        info: "Learn more about passkeys",
+        new_btn: "New Passkey",
+        new_title: "Add New Passkey",
+        new_description:
+          "Create a new passkey for secure, passwordless authentication.",
+        new_submit: "Add Passkey",
+        created: "Created {value}",
+        delete_title: "Are you absolutely sure?",
+        delete_decription:
+          "This action cannot be undone. This will permanently delete your passkey.",
+        delete_cancel: "Cancel",
+        delete_confirm: "Delete Passkey",
+
+        empty: {
+          title: "No Passkeys Yet",
+          description:
+            "You haven'&apos;'t created any passkeys yet. Get started by creating your first passkey.",
+        },
+      },
     },
   },
 
