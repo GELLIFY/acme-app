@@ -24,6 +24,12 @@ export default {
   "auth.reset.back": "Torna al login",
 
   // account
+  "account.profile": "Profilo",
+  "account.security": "Sicurezza",
+  "account.sessions": "Sessioni",
+  "account.danger": "Pericolo",
+
+  // account profile
   "account.save": "Salva",
   "account.avatar": "Avatar",
   "account.avatar.description":
@@ -43,6 +49,37 @@ export default {
   "account.session.current": "Session corrente",
   "account.session.revoke": "Revoca",
   "account.session.logout": "Esci",
+
+  account: {
+    security: {
+      change_password: {
+        title: "Cambia password",
+        description: "Aggiorna la tua password per una maggiore sicurezza.",
+        message: "La nuova password deve essere diversa",
+        current_password_fld: "Password attuale",
+        new_password_fld: "Nuova password",
+        new_password_msg: "Deve essere lunga almeno 8 caratteri.",
+        revoke_fld: "Disconnetti le altre sessioni",
+        submit: "Salva",
+      },
+
+      two_factor: {
+        title: "Autenticazione a due fattori",
+        description:
+          "Abilita o disabilita la 2FA per aggiungere un ulteriore livello di sicurezza.",
+        enabled: "Abilitata",
+        disabled: "Disabilitata",
+        enable: "Abilita 2FA",
+        disable: "Disabilita 2FA",
+        code_fld: "Codice",
+        code_msg:
+          "Scansiona questo codice QR con la tua app di autenticazione e inserisci il codice qui sotto:",
+        verify: "Verifica",
+      },
+    },
+  },
+
+  // account danger
   "account.delete": "Elimina account",
   "account.delete.description":
     "Rimuovi definitivamente il tuo account personale e tutti i suoi contenuti. Questa azione non è reversibile, quindi procedi con cautela.",

@@ -13,6 +13,7 @@ const AUTH_ROUTES = [
   "/sign-up",
   "/forgot-password",
   "/reset-password",
+  "/2fa",
 ];
 
 const PUBLIC_ROUTES = ["/", "/privacy", "/terms", ...AUTH_ROUTES];
@@ -47,10 +48,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // 2. If authenticated, proceed with other checks
-  if (sessionCookie && AUTH_ROUTES.includes(newUrl.pathname)) {
-    const url = new URL("/", request.url);
-
-    return NextResponse.redirect(url);
+  if (sessionCookie) {
   }
 
   // If all checks pass, return the original or updated response

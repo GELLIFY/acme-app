@@ -34,3 +34,18 @@ export const changePasswordSchema = z
     message: "Passwords cannot match",
     path: ["newPassword"],
   });
+
+export const twoFactorSchema = z.object({
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters long" }) // checks for character length
+    .max(20, { message: "Password must be at most 20 characters long" }),
+  issuer: z.string().optional(),
+});
+
+export const verifyTotpSchema = z.object({
+  code: z.string().min(6, {
+    message: "Your one-time password must be 6 characters.",
+  }),
+  trustDevice: z.boolean(),
+});

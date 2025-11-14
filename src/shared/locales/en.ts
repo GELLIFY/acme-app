@@ -24,6 +24,12 @@ export default {
   "auth.reset.back": "Back to login",
 
   // account
+  "account.profile": "Profile",
+  "account.security": "Security",
+  "account.sessions": "Sessions",
+  "account.danger": "Danger",
+
+  // account profile
   "account.save": "Save",
   "account.avatar": "Avatar",
   "account.avatar.description":
@@ -42,6 +48,37 @@ export default {
   "account.session.current": "Current session",
   "account.session.revoke": "Revoke",
   "account.session.logout": "Sign Out",
+
+  // account security
+  account: {
+    security: {
+      change_password: {
+        title: "Change Password",
+        description: "Update your password for improved security.",
+        message: "New password should be different",
+        current_password_fld: "Current Password",
+        new_password_fld: "New Password",
+        new_password_msg: "Must be at least 8 characters long.",
+        revoke_fld: "Log out other sessions",
+        submit: "Save",
+      },
+
+      two_factor: {
+        title: "Two-Factor Authentication",
+        description: "Enable or disable 2FA to add an extra layer of security.",
+        enabled: "Enabled",
+        disabled: "Disabled",
+        enable: "Enable 2FA",
+        disable: "Disable 2FA",
+        code_fld: "Code",
+        code_msg:
+          "Scan this QR code with your authenticator app and enter the code below:",
+        verify: "Verify",
+      },
+    },
+  },
+
+  // account danger
   "account.delete": "Delete account",
   "account.delete.description":
     "Permanently remove your Personal Account and all of its contents. This action is not reversible, so please continue with caution.",

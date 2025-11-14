@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { openAPI } from "better-auth/plugins";
+import { openAPI, twoFactor } from "better-auth/plugins";
 import { db } from "@/server/db";
 
 export const auth = betterAuth({
@@ -28,6 +28,17 @@ export const auth = betterAuth({
     changeEmail: {
       enabled: true,
     },
+    deleteUser: {
+      enabled: true,
+      sendDeleteAccountVerification: async ({ user, url }) => {
+        // TODO: send email here
+        console.log(`Delete ${user.email} by visiting ${url}.`);
+      },
+    },
   },
-  plugins: [openAPI({ disableDefaultReference: true }), nextCookies()],
+  plugins: [
+    twoFactor(),
+    openAPI({ disableDefaultReference: true }),
+    nextCookies(),
+  ],
 });

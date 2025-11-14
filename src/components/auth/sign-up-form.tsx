@@ -86,7 +86,7 @@ export const SignUpForm = () => {
             toast.error(ctx.error.message);
           },
           onSuccess: () => {
-            router.push("/dashboard");
+            router.push("/");
           },
         },
       );
