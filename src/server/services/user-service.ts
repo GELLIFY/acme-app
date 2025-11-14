@@ -51,6 +51,7 @@ export async function changePassword(
   return data;
 }
 
+// Delete user
 export async function deleteUser(headers: Headers) {
   // Delete user
   const data = await auth.api.deleteUser({

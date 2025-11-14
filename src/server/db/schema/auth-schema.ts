@@ -17,6 +17,10 @@ export const user = createTable(
     emailVerified: d.boolean("email_verified").default(false).notNull(),
     image: d.text("image"),
     twoFactorEnabled: d.boolean("two_factor_enabled").default(false),
+    role: d.text("role"),
+    banned: d.boolean("banned").default(false),
+    banReason: d.text("ban_reason"),
+    banExpires: d.timestamp("ban_expires"),
   }),
   (t) => [index("user_email_idx").on(t.email)],
 );
@@ -35,6 +39,7 @@ export const session = createTable(
     token: d.text("token").notNull().unique(),
     ipAddress: d.text("ip_address"),
     userAgent: d.text("user_agent"),
+    impersonatedBy: d.text("impersonated_by"),
 
     userId: d
       .uuid("user_id")

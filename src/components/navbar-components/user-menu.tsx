@@ -1,7 +1,6 @@
 "use client";
 
-import type { User } from "better-auth";
-import { BadgeCheckIcon, LogOutIcon } from "lucide-react";
+import { LogOutIcon, ShieldUserIcon, UserIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,6 +14,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/shared/helpers/better-auth/auth-client";
+
+type User = typeof authClient.$Infer.Session.user;
 
 export function UserMenu({ user }: { user: User }) {
   const router = useRouter();
@@ -49,9 +50,18 @@ export function UserMenu({ user }: { user: User }) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
+          {user.role === "admin" && (
+            <DropdownMenuItem asChild>
+              <Link href="/admin">
+                <ShieldUserIcon />
+                Admin
+              </Link>
+            </DropdownMenuItem>
+          )}
+
           <DropdownMenuItem asChild>
             <Link href="/account">
-              <BadgeCheckIcon />
+              <UserIcon />
               Account
             </Link>
           </DropdownMenuItem>
