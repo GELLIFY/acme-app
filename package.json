@@ -21,7 +21,7 @@
     "format": "biome format --write .",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "bun test",
     "start": "node .next/standalone/server.js"
   },
