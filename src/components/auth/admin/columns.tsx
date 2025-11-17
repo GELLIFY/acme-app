@@ -1,5 +1,6 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import type { UserWithRole } from "better-auth/plugins";
+import { format } from "date-fns";
 import {
   ArrowUpDown,
   BadgeCheck,
@@ -40,6 +41,9 @@ import { authClient } from "@/shared/helpers/better-auth/auth-client";
 export const columns: ColumnDef<UserWithRole>[] = [
   {
     id: "select",
+    meta: {
+      className: "w-9 max-w-9 min-w-9 px-3",
+    },
     header: ({ table }) => (
       <Checkbox
         checked={
@@ -61,7 +65,7 @@ export const columns: ColumnDef<UserWithRole>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "id",
+    accessorKey: "name",
     header: "User",
     cell: ({ row }) => {
       const user = row.original;
@@ -105,7 +109,9 @@ export const columns: ColumnDef<UserWithRole>[] = [
     cell: ({ row }) => {
       const createdAt = new Date(row.getValue("createdAt"));
 
-      return <div className="lowercase">{createdAt.toLocaleDateString()}</div>;
+      return (
+        <div className="lowercase">{format(createdAt, "MMM dd, yyyy")}</div>
+      );
     },
   },
   {
@@ -118,6 +124,9 @@ export const columns: ColumnDef<UserWithRole>[] = [
   {
     id: "actions",
     enableHiding: false,
+    meta: {
+      className: "w-14 max-w-14 min-w-14",
+    },
     cell: ({ row }) => {
       const user = row.original;
 
