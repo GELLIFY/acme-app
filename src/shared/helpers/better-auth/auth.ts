@@ -4,6 +4,7 @@ import { nextCookies } from "better-auth/next-js";
 import { admin, openAPI, twoFactor } from "better-auth/plugins";
 import { passkey } from "better-auth/plugins/passkey";
 import { db } from "@/server/db";
+import { ac, adminRole, userRole } from "./permissions";
 
 export const auth = betterAuth({
   advanced: {
@@ -45,7 +46,13 @@ export const auth = betterAuth({
     },
   },
   plugins: [
-    admin(),
+    admin({
+      ac,
+      roles: {
+        admin: adminRole,
+        user: userRole,
+      },
+    }),
     passkey(),
     twoFactor(),
     openAPI({ disableDefaultReference: true }),
