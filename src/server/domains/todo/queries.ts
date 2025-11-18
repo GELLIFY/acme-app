@@ -3,7 +3,7 @@
 import { and, desc, eq, ilike } from "drizzle-orm";
 
 import type { DBClient } from "@/server/db";
-import { todo_table } from "@/server/db/schema/todos";
+import { todoTable } from "@/server/db/schema/todos";
 
 type GetTodosRequest = {
   text?: string | null;
@@ -15,22 +15,22 @@ export async function getTodosQuery(db: DBClient, filters: GetTodosRequest) {
   const where = [eq(1, 1)];
 
   if (filters?.text) {
-    where.push(ilike(todo_table.text, filters.text));
+    where.push(ilike(todoTable.text, filters.text));
   }
 
   if (filters?.completed) {
-    where.push(eq(todo_table.completed, filters.completed));
+    where.push(eq(todoTable.completed, filters.completed));
   }
 
   return await db
     .select({
-      id: todo_table.id,
-      text: todo_table.text,
-      completed: todo_table.completed,
+      id: todoTable.id,
+      text: todoTable.text,
+      completed: todoTable.completed,
     })
-    .from(todo_table)
+    .from(todoTable)
     .where(and(...where))
-    .orderBy(desc(todo_table.createdAt))
+    .orderBy(desc(todoTable.createdAt))
     .limit(10);
 }
 
@@ -44,12 +44,12 @@ export async function getTodoByIdQuery(
 ) {
   const [result] = await db
     .select({
-      id: todo_table.id,
-      text: todo_table.text,
-      completed: todo_table.completed,
+      id: todoTable.id,
+      text: todoTable.text,
+      completed: todoTable.completed,
     })
-    .from(todo_table)
-    .where(eq(todo_table.id, params.id))
+    .from(todoTable)
+    .where(eq(todoTable.id, params.id))
     .limit(1);
 
   return result;

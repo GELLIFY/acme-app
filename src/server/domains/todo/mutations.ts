@@ -3,7 +3,7 @@
 import { eq } from "drizzle-orm";
 
 import type { DBClient } from "@/server/db";
-import { todo_table } from "@/server/db/schema/todos";
+import { todoTable } from "@/server/db/schema/todos";
 
 type UpsertTodoParams = {
   id?: string;
@@ -18,10 +18,10 @@ export async function upsertTodoMutation(
   const { id, ...rest } = params;
 
   const [todo] = await db
-    .insert(todo_table)
+    .insert(todoTable)
     .values({ id, ...rest })
     .onConflictDoUpdate({
-      target: todo_table.id,
+      target: todoTable.id,
       set: {
         text: rest.text,
         completed: rest.completed,
@@ -45,12 +45,12 @@ export async function deleteTodoMutation(
   params: DeleteTodoParams,
 ) {
   const [result] = await db
-    .delete(todo_table)
-    .where(eq(todo_table.id, params.id))
+    .delete(todoTable)
+    .where(eq(todoTable.id, params.id))
     .returning({
-      id: todo_table.id,
-      text: todo_table.text,
-      completed: todo_table.completed,
+      id: todoTable.id,
+      text: todoTable.text,
+      completed: todoTable.completed,
     });
 
   return result;
