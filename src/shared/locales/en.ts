@@ -72,7 +72,7 @@ export default {
         disable: "Disable 2FA",
         code_fld: "Code",
         code_msg:
-          "Scan this QR code with your authenticator app and enter the code below:",
+          "Scan this QR code with your authenticator app and enter the code below",
         verify: "Verify",
       },
 
