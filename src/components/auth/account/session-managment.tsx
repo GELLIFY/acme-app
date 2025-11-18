@@ -2,6 +2,7 @@
 
 import type { Session } from "better-auth";
 import { LaptopIcon, SmartphoneIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { UAParser } from "ua-parser-js";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ export function SessionManagement({
   currentSession: Session;
 }) {
   const t = useScopedI18n("account");
+  const router = useRouter();
 
   function revokeSession(session: Session) {
     return authClient.revokeSession(
@@ -44,6 +46,7 @@ export function SessionManagement({
         },
         onSuccess: () => {
           toast.success("Session revoked");
+          router.refresh();
         },
       },
     );
