@@ -9,7 +9,7 @@ import { withDatabase } from "./middleware/db";
 export type Context = {
   Variables: {
     db: typeof db;
-    session: Awaited<ReturnType<typeof auth.api.getSession>>;
+    session: NonNullable<Awaited<ReturnType<typeof auth.api.getSession>>>;
   };
 };
 

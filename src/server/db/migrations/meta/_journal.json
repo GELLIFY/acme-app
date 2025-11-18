@@ -43,6 +43,13 @@
       "when": 1763129651596,
       "tag": "0005_flashy_jane_foster",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1763481774319,
+      "tag": "0006_nifty_nico_minoru",
+      "breakpoints": true
     }
   ]
 }

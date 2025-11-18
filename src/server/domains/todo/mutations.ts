@@ -1,6 +1,6 @@
 "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import type { DBClient } from "@/server/db";
 import { todoTable } from "@/server/db/schema/todos";
@@ -9,6 +9,7 @@ type UpsertTodoParams = {
   id?: string;
   text: string;
   completed?: boolean;
+  userId: string;
 };
 
 export async function upsertTodoMutation(
@@ -17,6 +18,7 @@ export async function upsertTodoMutation(
 ) {
   const { id, ...rest } = params;
 
+  // FIXME: right now we could potentially update the todo of another user
   const [todo] = await db
     .insert(todoTable)
     .values({ id, ...rest })
@@ -38,6 +40,7 @@ export async function upsertTodoMutation(
 
 type DeleteTodoParams = {
   id: string;
+  userId: string;
 };
 
 export async function deleteTodoMutation(
@@ -46,7 +49,9 @@ export async function deleteTodoMutation(
 ) {
   const [result] = await db
     .delete(todoTable)
-    .where(eq(todoTable.id, params.id))
+    .where(
+      and(eq(todoTable.id, params.id), eq(todoTable.userId, params.userId)),
+    )
     .returning({
       id: todoTable.id,
       text: todoTable.text,

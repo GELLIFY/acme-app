@@ -8,11 +8,11 @@ import { todoTable } from "@/server/db/schema/todos";
 type GetTodosRequest = {
   text?: string | null;
   completed?: boolean | null;
+  userId: string;
 };
 
 export async function getTodosQuery(db: DBClient, filters: GetTodosRequest) {
-  // @ts-expect-error placeholder condition incase we don't have any filters
-  const where = [eq(1, 1)];
+  const where = [eq(todoTable.userId, filters.userId)];
 
   if (filters?.text) {
     where.push(ilike(todoTable.text, filters.text));
@@ -36,6 +36,7 @@ export async function getTodosQuery(db: DBClient, filters: GetTodosRequest) {
 
 type GetTodoByIdRequest = {
   id: string;
+  userId: string;
 };
 
 export async function getTodoByIdQuery(
@@ -49,7 +50,9 @@ export async function getTodoByIdQuery(
       completed: todoTable.completed,
     })
     .from(todoTable)
-    .where(eq(todoTable.id, params.id))
+    .where(
+      and(eq(todoTable.id, params.id), eq(todoTable.userId, params.userId)),
+    )
     .limit(1);
 
   return result;
