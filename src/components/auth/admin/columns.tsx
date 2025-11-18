@@ -27,7 +27,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,31 +42,6 @@ import { authClient } from "@/shared/helpers/better-auth/auth-client";
 import { ROLES, type Role } from "@/shared/helpers/better-auth/permissions";
 
 export const columns: ColumnDef<UserWithRole>[] = [
-  {
-    id: "select",
-    meta: {
-      className: "w-9 max-w-9 min-w-9 px-3",
-    },
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
   {
     accessorKey: "name",
     header: "User",
@@ -266,6 +240,8 @@ export const columns: ColumnDef<UserWithRole>[] = [
 
             {data?.session.userId !== user.id && (
               <>
+                <DropdownMenuSeparator />
+
                 <DropdownMenuItem
                   onClick={() => handleImpersonateUser(user.id)}
                 >
