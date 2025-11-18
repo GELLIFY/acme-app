@@ -105,3 +105,26 @@ export const protectedProcedure = t.procedure.use(async (opts) => {
     },
   });
 });
+
+/**
+ * Private (authenticated) procedure
+ *
+ * Use this when you need to guarantee that a user querying is authorized.
+ */
+export const adminProcedure = t.procedure.use(async (opts) => {
+  const { session } = opts.ctx;
+
+  if (!session) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  if (session.user.role !== "admin") {
+    throw new TRPCError({ code: "FORBIDDEN" });
+  }
+
+  return opts.next({
+    ctx: {
+      session,
+    },
+  });
+});

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2Icon, XIcon } from "lucide-react";
+import { XIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -14,6 +14,7 @@ import { useScopedI18n } from "@/shared/locales/client";
 import { Button } from "../ui/button";
 import { Field, FieldError, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
+import { Spinner } from "../ui/spinner";
 
 const formSchema = z
   .object({
@@ -247,11 +248,7 @@ export const SignUpForm = () => {
       />
 
       <Button type="submit" className="w-full mt-2" disabled={loading}>
-        {loading ? (
-          <Loader2Icon size={16} className="animate-spin" />
-        ) : (
-          t("submit")
-        )}
+        {loading ? <Spinner /> : t("submit")}
       </Button>
     </form>
   );

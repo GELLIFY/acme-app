@@ -28,7 +28,6 @@ import { Input } from "@/components/ui/input";
 import {
   InputOTP,
   InputOTPGroup,
-  InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { Spinner } from "@/components/ui/spinner";
@@ -204,21 +203,22 @@ function VerifyToptForm({
         control={form.control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="code">{t("code_fld")}</FieldLabel>
+            <FieldLabel htmlFor="code" className="sr-only">
+              {t("code_fld")}
+            </FieldLabel>
+            <div className="bg-white p-6 border-dashed border rounded-lg">
+              <QRCode
+                size={216}
+                style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                value={twoFactorData.totpURI}
+              />
+            </div>
             <FieldDescription>{t("code_msg")}</FieldDescription>
-            <QRCode
-              size={216}
-              style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-              value={twoFactorData.totpURI}
-            />
             <InputOTP maxLength={6} {...field}>
-              <InputOTPGroup>
+              <InputOTPGroup className="grid grid-cols-6 gap-4 *:data-[slot=input-otp-slot]:h-14 *:data-[slot=input-otp-slot]:w-full  *:data-[slot=input-otp-slot]:rounded-md *:data-[slot=input-otp-slot]:border *:data-[slot=input-otp-slot]:text-xl">
                 <InputOTPSlot index={0} />
                 <InputOTPSlot index={1} />
                 <InputOTPSlot index={2} />
-              </InputOTPGroup>
-              <InputOTPSeparator />
-              <InputOTPGroup>
                 <InputOTPSlot index={3} />
                 <InputOTPSlot index={4} />
                 <InputOTPSlot index={5} />
@@ -300,7 +300,9 @@ export function TwoFactor() {
     <Card>
       <CardHeader>
         <CardTitle>{t("title")}</CardTitle>
-        <CardDescription>{t("description")}</CardDescription>
+        <CardDescription className="col-span-2">
+          {t("description")}
+        </CardDescription>
         <CardAction>
           <Badge variant={user?.twoFactorEnabled ? "default" : "secondary"}>
             {user?.twoFactorEnabled ? t("enabled") : t("disabled")}

@@ -1,9 +1,10 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { openAPI, twoFactor } from "better-auth/plugins";
+import { admin, openAPI, twoFactor } from "better-auth/plugins";
 import { passkey } from "better-auth/plugins/passkey";
 import { db } from "@/server/db";
+import { ac, adminRole, userRole } from "./permissions";
 
 export const auth = betterAuth({
   advanced: {
@@ -26,11 +27,11 @@ export const auth = betterAuth({
     },
   },
   session: {
-    cookieCache: {
-      enabled: true,
-      maxAge: 5 * 60, // 5 min
-    },
-    freshAge: 60 * 60 * 24, // 1 day (default)
+    // TODO: re-enable when cookie chunking is released v1.4
+    // cookieCache: {
+    //   enabled: true,
+    //   maxAge: 5 * 60, // 5 min
+    // },
   },
   user: {
     changeEmail: {
@@ -45,6 +46,13 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    admin({
+      ac,
+      roles: {
+        admin: adminRole,
+        user: userRole,
+      },
+    }),
     passkey(),
     twoFactor(),
     openAPI({ disableDefaultReference: true }),

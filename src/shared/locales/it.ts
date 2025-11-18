@@ -73,7 +73,7 @@ export default {
         disable: "Disabilita 2FA",
         code_fld: "Codice",
         code_msg:
-          "Scansiona questo codice QR con la tua app di autenticazione e inserisci il codice qui sotto:",
+          "Scansiona questo codice QR con la tua app di autenticazione e inserisci il codice qui sotto",
         verify: "Verifica",
       },
 
