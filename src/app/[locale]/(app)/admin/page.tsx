@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { CreateUserDialog } from "@/components/auth/admin/create-user-dialog";
 import { DataTable } from "@/components/auth/admin/data-table";
 import { Filters } from "@/components/auth/admin/filters";
 import { auth } from "@/shared/helpers/better-auth/auth";
@@ -43,8 +44,9 @@ export default async function AdminPage({
         <h2 className="text-2xl font-semibold tracking-tight">Users</h2>
       </header>
 
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center gap-4">
         <Filters />
+        <CreateUserDialog />
       </div>
 
       <DataTable data={users.users} />
