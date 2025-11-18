@@ -27,11 +27,11 @@ export const auth = betterAuth({
     },
   },
   session: {
-    cookieCache: {
-      enabled: true,
-      maxAge: 5 * 60, // 5 min
-    },
-    freshAge: 60 * 60 * 24, // 1 day (default)
+    // TODO: re-enable when cookie chunking is released v1.4
+    // cookieCache: {
+    //   enabled: true,
+    //   maxAge: 5 * 60, // 5 min
+    // },
   },
   user: {
     changeEmail: {
