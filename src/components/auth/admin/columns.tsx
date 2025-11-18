@@ -26,7 +26,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -36,7 +35,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from "@/components/ui/native-select";
 import { authClient } from "@/shared/helpers/better-auth/auth-client";
+import { ROLES, type Role } from "@/shared/helpers/better-auth/permissions";
 
 export const columns: ColumnDef<UserWithRole>[] = [
   {
@@ -118,7 +122,42 @@ export const columns: ColumnDef<UserWithRole>[] = [
     accessorKey: "role",
     header: "Role",
     cell: ({ row }) => {
-      return <Badge>{row.getValue("role")}</Badge>;
+      const user = row.original;
+
+      const router = useRouter();
+      const { data } = authClient.useSession();
+
+      function handleSetUserRole(newRole: Role) {
+        authClient.admin.setRole(
+          {
+            userId: user.id,
+            role: newRole, // required
+          },
+          {
+            onError: (error) => {
+              toast.error(error.error.message || "Failed to set user role");
+            },
+            onSuccess: () => {
+              toast.success("User role changed");
+              router.refresh();
+            },
+          },
+        );
+      }
+
+      return (
+        <NativeSelect
+          value={user.role}
+          onChange={(e) => handleSetUserRole(e.target.value as Role)}
+          disabled={user.id === data?.user.id}
+        >
+          {Object.values(ROLES).map((role) => (
+            <NativeSelectOption key={role} value={role}>
+              {role}
+            </NativeSelectOption>
+          ))}
+        </NativeSelect>
+      );
     },
   },
   {

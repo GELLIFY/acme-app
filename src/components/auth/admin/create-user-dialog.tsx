@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/native-select";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/shared/helpers/better-auth/auth-client";
+import { ROLES } from "@/shared/helpers/better-auth/permissions";
 
 const formSchema = z.object({
   firstName: z.string().min(1),
@@ -190,9 +191,11 @@ export function CreateUserDialog() {
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="role">Role</FieldLabel>
                 <NativeSelect id="role" {...field}>
-                  <NativeSelectOption>Select role</NativeSelectOption>
-                  <NativeSelectOption value="user">User</NativeSelectOption>
-                  <NativeSelectOption value="admin">Admin</NativeSelectOption>
+                  {Object.values(ROLES).map((role) => (
+                    <NativeSelectOption key={role} value={role}>
+                      {role}
+                    </NativeSelectOption>
+                  ))}
                 </NativeSelect>
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
