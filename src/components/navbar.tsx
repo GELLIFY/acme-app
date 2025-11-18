@@ -2,7 +2,6 @@ import { HomeIcon, LayersIcon } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
 import Logo from "@/components/navbar-components/logo";
-import ThemeToggle from "@/components/navbar-components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -124,7 +123,6 @@ export default async function Navbar() {
         </div>
         {/* Right side */}
         <div className="flex items-center gap-2">
-          <ThemeToggle />
           <LanguageSelector />
           {session?.user ? (
             <UserMenu user={session.user} />

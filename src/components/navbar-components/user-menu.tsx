@@ -1,6 +1,11 @@
 "use client";
 
-import { LogOutIcon, ShieldUserIcon, UserIcon } from "lucide-react";
+import {
+  LogOutIcon,
+  ShieldUserIcon,
+  SunMoonIcon,
+  UserIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/shared/helpers/better-auth/auth-client";
+import { ThemeToggle } from "./theme-toggle";
 
 type User = typeof authClient.$Infer.Session.user;
 
@@ -48,7 +54,9 @@ export function UserMenu({ user }: { user: User }) {
             </div>
           </div>
         </DropdownMenuLabel>
+
         <DropdownMenuSeparator />
+
         <DropdownMenuGroup>
           {user.role === "admin" && (
             <DropdownMenuItem asChild>
@@ -66,6 +74,18 @@ export function UserMenu({ user }: { user: User }) {
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
+
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem className="focus:bg-transparent justify-between [&_svg:not([class*='text-'])]:text-inherit">
+            <div className="flex items-center gap-2">
+              <SunMoonIcon className="text-muted-foreground" />
+              Theme
+            </div>
+            <ThemeToggle />
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={async () => {
