@@ -3,7 +3,7 @@ import { rateLimiter } from "hono-rate-limiter";
 
 import type { db } from "@/server/db";
 import type { auth } from "@/shared/helpers/better-auth/auth";
-// import { withAuth } from "./middleware/auth";
+import { withAuth } from "./middleware/auth";
 import { withDatabase } from "./middleware/db";
 
 export type Context = {
@@ -26,7 +26,7 @@ export const publicMiddleware: MiddlewareHandler[] = [withDatabase];
  */
 export const protectedMiddleware: MiddlewareHandler[] = [
   withDatabase,
-  // withAuth,
+  withAuth,
   rateLimiter({
     windowMs: 10 * 60 * 1000, // 10 minutes
     limit: 100,
