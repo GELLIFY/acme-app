@@ -15,7 +15,7 @@ import {
   upsertTodoSchema,
 } from "@/shared/validators/todo.schema";
 import type { Context } from "../init";
-import { withRequiredPermissions } from "../middleware/permission";
+import { withRequiredPermissions } from "../middleware/auth";
 
 const app = new OpenAPIHono<Context>();
 
