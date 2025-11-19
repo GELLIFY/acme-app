@@ -45,11 +45,32 @@ routers.doc("/openapi", {
       description: "Production API",
     },
   ],
-  security: [
-    {
-      token: [],
-    },
-  ],
+  security: [{ cookieAuth: [] }, { bearerAuth: [] }, { apiKeyAuth: [] }],
+});
+
+// Register security scheme
+routers.openAPIRegistry.registerComponent("securitySchemes", "cookieAuth", {
+  type: "apiKey",
+  in: "cookie",
+  name: "better-auth.session_token",
+  description:
+    "Authentication via a session token stored in the 'better-auth.session_token' cookie.",
+});
+
+routers.openAPIRegistry.registerComponent("securitySchemes", "bearerAuth", {
+  type: "http",
+  in: "header",
+  scheme: "bearer",
+  description:
+    "Authentication using a Bearer token in the Authorization header. Example: 'Authorization: Bearer <token>'",
+});
+
+routers.openAPIRegistry.registerComponent("securitySchemes", "apiKeyAuth", {
+  type: "apiKey",
+  in: "header",
+  name: "X-API-KEY",
+  description:
+    "Authentication using the X-API-KEY header. Example: 'X-API-KEY: <your-api-key>'",
 });
 
 // Mount publicly accessible routes first
