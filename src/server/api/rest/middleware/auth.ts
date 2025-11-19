@@ -23,8 +23,7 @@ export const withAuth: MiddlewareHandler = async (c, next) => {
     }
 
     // Set session on context
-    c.set("user", session.user);
-    c.set("session", session.session);
+    c.set("session", session);
     return next();
   }
 
@@ -67,7 +66,6 @@ export const withAuth: MiddlewareHandler = async (c, next) => {
   }
 
   // Set session on context
-  c.set("user", session.user);
-  c.set("session", session.session);
+  c.set("session", session);
   return next();
 };

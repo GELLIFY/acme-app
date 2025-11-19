@@ -1,7 +1,8 @@
-import type { Session } from "better-auth";
 import type { MiddlewareHandler } from "hono";
 import { auth } from "@/shared/helpers/better-auth/auth";
 import type { PermissionRequest } from "@/shared/helpers/better-auth/permissions";
+
+type Session = typeof auth.$Infer.Session;
 
 export const withRequiredPermissions = <TPermissions extends PermissionRequest>(
   requiredPermissions: TPermissions,
@@ -11,7 +12,7 @@ export const withRequiredPermissions = <TPermissions extends PermissionRequest>(
 
     const data = await auth.api.userHasPermission({
       body: {
-        userId: session.userId,
+        userId: session.user.id,
         permissions: requiredPermissions,
       },
     });

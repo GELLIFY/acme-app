@@ -77,7 +77,11 @@ app.openapi(
         },
       },
     },
-    // middleware: [withRequiredScope("todo.read")],
+    middleware: [
+      withRequiredPermissions({
+        todo: ["list"],
+      }),
+    ],
   }),
   async (c) => {
     const session = c.get("session");
@@ -116,7 +120,11 @@ app.openapi(
         },
       },
     },
-    // middleware: [withRequiredScope("todo.write")],
+    middleware: [
+      withRequiredPermissions({
+        todo: ["create"],
+      }),
+    ],
   }),
   async (c) => {
     const session = c.get("session");
@@ -156,7 +164,11 @@ app.openapi(
         },
       },
     },
-    // middleware: [withRequiredScope("todo.write")],
+    middleware: [
+      withRequiredPermissions({
+        todo: ["update"],
+      }),
+    ],
   }),
   async (c) => {
     const session = c.get("session");
@@ -190,7 +202,11 @@ app.openapi(
         },
       },
     },
-    // middleware: [withRequiredScope("todo.write")],
+    middleware: [
+      withRequiredPermissions({
+        todo: ["delete"],
+      }),
+    ],
   }),
   async (c) => {
     const session = c.get("session");
