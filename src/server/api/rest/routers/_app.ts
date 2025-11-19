@@ -4,6 +4,7 @@ import { cors } from "hono/cors";
 import { secureHeaders } from "hono/secure-headers";
 
 import { checkHealth } from "@/server/services/health-service";
+import { getBaseUrl } from "@/shared/helpers/get-url";
 import { protectedMiddleware } from "../init";
 import { todosRouter } from "./todos";
 
@@ -40,7 +41,7 @@ routers.doc("/openapi", {
   },
   servers: [
     {
-      url: "http://localhost:3000/api/rest/",
+      url: `${getBaseUrl()}/api/rest/`,
       description: "Production API",
     },
   ],
