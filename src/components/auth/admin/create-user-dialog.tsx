@@ -33,7 +33,7 @@ const formSchema = z.object({
   lastName: z.string().min(1),
   email: z.email(),
   password: z.string().min(8).max(32),
-  role: z.enum(["user", "admin"]), // TODO: array of roles
+  role: z.enum(ROLES),
 });
 
 export function CreateUserDialog() {
@@ -54,7 +54,6 @@ export function CreateUserDialog() {
   });
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    console.log(data);
     try {
       const { data: _, error } = await authClient.admin.createUser(
         {
@@ -104,9 +103,6 @@ export function CreateUserDialog() {
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-          <code>
-            <pre> {JSON.stringify(form.formState.errors, null, 2)}</pre>
-          </code>
           <div className="grid grid-cols-2 gap-4">
             <Controller
               name="firstName"
