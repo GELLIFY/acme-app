@@ -64,17 +64,38 @@ export default {
       },
 
       two_factor: {
-        title: "Autenticazione a due fattori",
+        title: "Autenticazione a 2 fattori",
         description:
-          "Abilita o disabilita la 2FA per aggiungere un ulteriore livello di sicurezza.",
-        enabled: "Abilitata",
-        disabled: "Disabilitata",
+          "Gestisci l’autenticazione a due fattori per proteggere ulteriormente il tuo account.",
+        info: "Scopri di più sulla 2FA",
         enable: "Abilita 2FA",
         disable: "Disabilita 2FA",
-        code_fld: "Codice",
+        code_fld: "Codice di verifica",
+        qr_msg:
+          "Scansiona questo codice QR con la tua app di autenticazione e inserisci il codice di verifica qui sotto",
         code_msg:
-          "Scansiona questo codice QR con la tua app di autenticazione e inserisci il codice qui sotto",
+          "Inserisci il codice a 6 cifre dalla tua app di autenticazione.",
         verify: "Verifica",
+        backup_msg:
+          "Salva questi codici di backup in un luogo sicuro. Puoi usarli per accedere al tuo account.",
+        download: "Scarica",
+        copy: "Copia",
+        done: "Fine",
+        status: {
+          enabled_title: "Abilitata",
+          disabled_title: "Disabilitata",
+          enabled_description:
+            "L'autenticazione a due fattori è attualmente abilitata per il tuo account.",
+          disabled_description:
+            "L'autenticazione a due fattori è attualmente disabilitata per il tuo account.",
+        },
+        access: {
+          title: "Autenticazione a 2 fattori",
+          description:
+            "Inserisci un codice a 6 cifre dalla tua app di autenticazione, oppure usa un codice di backup se non puoi accedere all'app.",
+          app_tab: "App Autenticazione",
+          backup_tab: "Codici di Backup",
+        },
       },
 
       passkey: {

@@ -183,8 +183,12 @@ export function PasskeyManagement({ passkeys }: { passkeys: Passkey[] }) {
           ))
         )}
       </CardContent>
-      <CardFooter className="border-t text-muted-foreground text-sm justify-between">
-        <Link href="#" className="flex gap-2 items-center">
+      <CardFooter className="border-t text-muted-foreground text-sm justify-between gap-4">
+        <Link
+          href="#"
+          className="gap-2 items-center"
+          style={{ display: "ruby" }}
+        >
           {t("info")} <ArrowUpRightIcon className="size-4" />
         </Link>
         <Dialog

@@ -2,22 +2,43 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CopyIcon, DownloadIcon } from "lucide-react";
+import {
+  ArrowUpRightIcon,
+  CopyIcon,
+  DownloadIcon,
+  ShieldAlertIcon,
+  ShieldCheckIcon,
+} from "lucide-react";
+import Link from "next/link";
 import { type Dispatch, type SetStateAction, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import QRCode from "react-qr-code";
 import { toast } from "sonner";
 import type * as z from "zod";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import {
   Field,
   FieldDescription,
@@ -47,9 +68,11 @@ type TwoFactorData = {
 function TwoFactorAuthForm({
   twoFactorEnabled,
   setTwoFactorData,
+  onSuccessfullyDisabled,
 }: {
   twoFactorEnabled: boolean;
   setTwoFactorData: Dispatch<SetStateAction<TwoFactorData | null>>;
+  onSuccessfullyDisabled: () => void;
 }) {
   const [loading, setLoading] = useState(false);
 
@@ -81,6 +104,7 @@ function TwoFactorAuthForm({
           toast.error(error.error.message || "Failed to disable 2FA");
         },
         onSuccess: () => {
+          onSuccessfullyDisabled();
           queryClient.invalidateQueries({
             queryKey: trpc.user.me.queryKey(),
           });
@@ -132,7 +156,7 @@ function TwoFactorAuthForm({
               id="password"
               aria-invalid={fieldState.invalid}
               type="password"
-              autoComplete="password"
+              autoComplete="current-password"
             />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
@@ -203,19 +227,13 @@ function VerifyToptForm({
         control={form.control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="code" className="sr-only">
-              {t("code_fld")}
-            </FieldLabel>
-            <div className="bg-white p-6 border-dashed border rounded-lg">
-              <QRCode
-                size={216}
-                style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                value={twoFactorData.totpURI}
-              />
-            </div>
             <FieldDescription>{t("code_msg")}</FieldDescription>
-            <InputOTP maxLength={6} {...field}>
-              <InputOTPGroup className="grid w-full grid-cols-6 gap-4 *:data-[slot=input-otp-slot]:h-14 *:data-[slot=input-otp-slot]:w-full *:data-[slot=input-otp-slot]:rounded-md *:data-[slot=input-otp-slot]:border *:data-[slot=input-otp-slot]:text-xl">
+            <div className="my-4 bg-white p-6 border-dashed border rounded-lg flex justify-center">
+              <QRCode size={128} value={twoFactorData.totpURI} />
+            </div>
+            <FieldLabel htmlFor="code">{t("code_fld")}</FieldLabel>
+            <InputOTP maxLength={6} {...field} id="code" autoFocus>
+              <InputOTPGroup className="grid w-full grid-cols-6 gap-4 *:data-[slot=input-otp-slot]:aspect-square *:data-[slot=input-otp-slot]:size-full *:data-[slot=input-otp-slot]:rounded-md *:data-[slot=input-otp-slot]:border *:data-[slot=input-otp-slot]:text-xl">
                 <InputOTPSlot index={0} />
                 <InputOTPSlot index={1} />
                 <InputOTPSlot index={2} />
@@ -236,6 +254,7 @@ function VerifyToptForm({
 }
 
 export function TwoFactor() {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [twoFactorData, setTwoFactorData] = useState<TwoFactorData | null>(
     null,
   );
@@ -300,77 +319,115 @@ export function TwoFactor() {
     <Card>
       <CardHeader>
         <CardTitle>{t("title")}</CardTitle>
-        <CardDescription className="col-span-2">
-          {t("description")}
-        </CardDescription>
-        <CardAction>
-          <Badge variant={user?.twoFactorEnabled ? "default" : "secondary"}>
-            {user?.twoFactorEnabled ? t("enabled") : t("disabled")}
-          </Badge>
-        </CardAction>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
 
       <CardContent>
-        {!twoFactorData && !successfullyEnabled && (
-          <TwoFactorAuthForm
-            twoFactorEnabled={user?.twoFactorEnabled ?? false}
-            setTwoFactorData={setTwoFactorData}
-          />
-        )}
-        {twoFactorData && !successfullyEnabled && (
-          <VerifyToptForm
-            twoFactorData={twoFactorData}
-            setSuccessfullyEnabled={setSuccessfullyEnabled}
-          />
-        )}
-        {successfullyEnabled && (
-          <>
-            <p className="text-sm text-muted-foreground mb-2">
-              Save these backup codes in a safe place. You can use them to
-              access your account.
-            </p>
-            <div className="grid grid-cols-2 gap-2 mb-4">
-              {twoFactorData?.backupCodes.map((code, index) => (
-                <div key={index} className="font-mono text-sm">
-                  {code}
-                </div>
-              ))}
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => {
-                  downloadBackupCodes();
-                }}
-              >
-                <DownloadIcon />
-                Download
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => {
-                  void copyBackupCodes();
-                }}
-              >
-                <CopyIcon />
-                Copy
-              </Button>
-              <Button
-                variant="default"
-                className="w-full"
-                onClick={() => {
-                  setTwoFactorData(null);
-                  setSuccessfullyEnabled(false);
-                }}
-              >
-                Done
-              </Button>
-            </div>
-          </>
-        )}
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              {user?.twoFactorEnabled ? (
+                <ShieldCheckIcon />
+              ) : (
+                <ShieldAlertIcon />
+              )}
+            </EmptyMedia>
+            <EmptyTitle>
+              {user?.twoFactorEnabled
+                ? t("status.enabled_title")
+                : t("status.disabled_title")}
+            </EmptyTitle>
+            <EmptyDescription>
+              {user?.twoFactorEnabled
+                ? t("status.enabled_description")
+                : t("status.disabled_description")}
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       </CardContent>
+      <CardFooter className="border-t text-muted-foreground text-sm justify-between gap-4">
+        <Link
+          href="#"
+          className="gap-2 items-center"
+          style={{ display: "ruby" }}
+        >
+          {t("info")} <ArrowUpRightIcon className="size-4" />
+        </Link>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              {user?.twoFactorEnabled ? t("disable") : t("enable")}
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="text-left">Set up 2FA</DialogTitle>
+              <DialogDescription></DialogDescription>
+            </DialogHeader>
+
+            {!twoFactorData && !successfullyEnabled && (
+              <TwoFactorAuthForm
+                twoFactorEnabled={user?.twoFactorEnabled ?? false}
+                setTwoFactorData={setTwoFactorData}
+                onSuccessfullyDisabled={() => setIsDialogOpen(false)}
+              />
+            )}
+            {twoFactorData && !successfullyEnabled && (
+              <VerifyToptForm
+                twoFactorData={twoFactorData}
+                setSuccessfullyEnabled={setSuccessfullyEnabled}
+              />
+            )}
+            {successfullyEnabled && (
+              <>
+                <p className="text-sm text-muted-foreground">
+                  {t("backup_msg")}
+                </p>
+                <div className="grid grid-cols-2 gap-2 my-4">
+                  {twoFactorData?.backupCodes.map((code, index) => (
+                    <div key={index} className="font-mono text-sm">
+                      {code}
+                    </div>
+                  ))}
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => {
+                      downloadBackupCodes();
+                    }}
+                  >
+                    <DownloadIcon />
+                    {t("download")}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => {
+                      void copyBackupCodes();
+                    }}
+                  >
+                    <CopyIcon />
+                    {t("copy")}
+                  </Button>
+                  <Button
+                    variant="default"
+                    className="w-full"
+                    onClick={() => {
+                      setTwoFactorData(null);
+                      setSuccessfullyEnabled(false);
+                      setIsDialogOpen(false);
+                    }}
+                  >
+                    {t("done")}
+                  </Button>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
+      </CardFooter>
     </Card>
   );
 }

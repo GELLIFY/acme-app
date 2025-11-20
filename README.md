@@ -46,8 +46,5 @@ Have a look around the [docs↗](https://gellify.dev), as well as the docs of th
 
 ## Notes 2025-10-23
 
-- [ ] forgot/reset password flow
 - [ ] resend email integration
-- [ ] link todos to user
-
 - [ ] apiKey plugin for REST apis
