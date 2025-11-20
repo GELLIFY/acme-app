@@ -1,14 +1,15 @@
 "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import type { DBClient } from "@/server/db";
-import { todo_table } from "@/server/db/schema/todos";
+import { todoTable } from "@/server/db/schema/todos";
 
 type UpsertTodoParams = {
   id?: string;
   text: string;
   completed?: boolean;
+  userId: string;
 };
 
 export async function upsertTodoMutation(
@@ -17,11 +18,12 @@ export async function upsertTodoMutation(
 ) {
   const { id, ...rest } = params;
 
+  // FIXME: right now we could potentially update the todo of another user
   const [todo] = await db
-    .insert(todo_table)
+    .insert(todoTable)
     .values({ id, ...rest })
     .onConflictDoUpdate({
-      target: todo_table.id,
+      target: todoTable.id,
       set: {
         text: rest.text,
         completed: rest.completed,
@@ -38,6 +40,7 @@ export async function upsertTodoMutation(
 
 type DeleteTodoParams = {
   id: string;
+  userId: string;
 };
 
 export async function deleteTodoMutation(
@@ -45,12 +48,14 @@ export async function deleteTodoMutation(
   params: DeleteTodoParams,
 ) {
   const [result] = await db
-    .delete(todo_table)
-    .where(eq(todo_table.id, params.id))
+    .delete(todoTable)
+    .where(
+      and(eq(todoTable.id, params.id), eq(todoTable.userId, params.userId)),
+    )
     .returning({
-      id: todo_table.id,
-      text: todo_table.text,
-      completed: todo_table.completed,
+      id: todoTable.id,
+      text: todoTable.text,
+      completed: todoTable.completed,
     });
 
   return result;

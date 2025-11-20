@@ -53,13 +53,11 @@ export async function changePassword(
 
 // Delete user
 export async function deleteUser(headers: Headers) {
-  // Delete user
   const data = await auth.api.deleteUser({
+    headers,
     body: {
       callbackURL: "/sign-in",
     },
-    // This endpoint requires session cookies.
-    headers,
   });
 
   return data;

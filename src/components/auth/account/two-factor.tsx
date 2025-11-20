@@ -215,7 +215,7 @@ function VerifyToptForm({
             </div>
             <FieldDescription>{t("code_msg")}</FieldDescription>
             <InputOTP maxLength={6} {...field}>
-              <InputOTPGroup className="grid grid-cols-6 gap-4 *:data-[slot=input-otp-slot]:h-14 *:data-[slot=input-otp-slot]:w-full  *:data-[slot=input-otp-slot]:rounded-md *:data-[slot=input-otp-slot]:border *:data-[slot=input-otp-slot]:text-xl">
+              <InputOTPGroup className="grid w-full grid-cols-6 gap-4 *:data-[slot=input-otp-slot]:h-14 *:data-[slot=input-otp-slot]:w-full *:data-[slot=input-otp-slot]:rounded-md *:data-[slot=input-otp-slot]:border *:data-[slot=input-otp-slot]:text-xl">
                 <InputOTPSlot index={0} />
                 <InputOTPSlot index={1} />
                 <InputOTPSlot index={2} />

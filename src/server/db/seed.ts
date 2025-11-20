@@ -4,11 +4,11 @@ import { reset, seed } from "drizzle-seed";
 
 import { db } from ".";
 import { schema } from "./schema";
-import { todo_table } from "./schema/todos";
+import { todoTable } from "./schema/todos";
 
 async function main() {
   await reset(db, schema);
-  await seed(db, { todo_table }).refine((f) => ({
+  await seed(db, { todo_table: todoTable }).refine((f) => ({
     todo_table: {
       columns: {
         text: f.loremIpsum(),

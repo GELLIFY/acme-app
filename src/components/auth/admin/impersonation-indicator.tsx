@@ -17,8 +17,8 @@ export function ImpersonationIndicator() {
         onClick={() =>
           authClient.admin.stopImpersonating(undefined, {
             onSuccess: () => {
-              router.push("/admin");
               refetch();
+              router.push("/admin");
             },
           })
         }

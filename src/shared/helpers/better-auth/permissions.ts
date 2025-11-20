@@ -6,20 +6,45 @@ import {
 } from "better-auth/plugins/admin/access";
 
 /**
- * For more informations on Access Control
+ * A statement is a set of resource name and relative actions
+ * We can expand the default statements and add our custom ones
+ *
+ * For more informations on Access Control read the doc
  * @ref https://www.better-auth.com/docs/plugins/admin#access-control
  */
+export const ac = createAccessControl({
+  ...defaultStatements,
+  todo: ["create", "list", "update", "delete"],
+});
 
-export const ac = createAccessControl(defaultStatements);
+// Here we define rosources and actions for the user role
+export const userRole = ac.newRole({
+  todo: ["create", "list", "update", "delete"],
+  ...userAc.statements,
+});
 
-export const userRole = ac.newRole(userAc.statements);
+// Here we define rosources and actions for the admin role
+export const adminRole = ac.newRole({
+  todo: ["create", "list", "update", "delete"],
+  ...adminAc.statements,
+});
 
-export const adminRole = ac.newRole(adminAc.statements);
+// ... add custom roles if needed
 
-// Custom types
+/**
+ * Custom utility types
+ */
 export const ROLES = {
   ADMIN: "admin",
   USER: "user",
 } as const;
 
 export type Role = (typeof ROLES)[keyof typeof ROLES];
+
+type AccessControlStatements = typeof ac.statements;
+
+export type PermissionRequest = {
+  [Resource in keyof AccessControlStatements]?: AccessControlStatements[Resource] extends readonly (infer Actions)[]
+    ? Actions[]
+    : never;
+};

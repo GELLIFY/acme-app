@@ -15,6 +15,7 @@ import {
   upsertTodoSchema,
 } from "@/shared/validators/todo.schema";
 import type { Context } from "../init";
+import { withRequiredPermissions } from "../middleware/auth";
 
 const app = new OpenAPIHono<Context>();
 
@@ -39,12 +40,17 @@ app.openapi(
         },
       },
     },
-    // middleware: [withRequiredScope("todos.read")],
+    middleware: [
+      withRequiredPermissions({
+        todo: ["list"],
+      }),
+    ],
   }),
   async (c) => {
+    const session = c.get("session");
     const filters = c.req.valid("query");
 
-    const result = await getTodos(db, filters);
+    const result = await getTodos(db, filters, session.user.id);
 
     return c.json(validateResponse({ data: result }, todosResponseSchema));
   },
@@ -71,12 +77,17 @@ app.openapi(
         },
       },
     },
-    // middleware: [withRequiredScope("todo.read")],
+    middleware: [
+      withRequiredPermissions({
+        todo: ["list"],
+      }),
+    ],
   }),
   async (c) => {
+    const session = c.get("session");
     const id = c.req.valid("param").id;
 
-    const result = await getTodoById(db, { id });
+    const result = await getTodoById(db, { id }, session.user.id);
 
     return c.json(validateResponse(result, todoResponseSchema));
   },
@@ -109,12 +120,17 @@ app.openapi(
         },
       },
     },
-    // middleware: [withRequiredScope("todo.write")],
+    middleware: [
+      withRequiredPermissions({
+        todo: ["create"],
+      }),
+    ],
   }),
   async (c) => {
+    const session = c.get("session");
     const body = c.req.valid("json");
 
-    const result = await upsertTodo(db, { ...body });
+    const result = await upsertTodo(db, { ...body }, session.user.id);
 
     return c.json(validateResponse(result, todoResponseSchema));
   },
@@ -148,13 +164,18 @@ app.openapi(
         },
       },
     },
-    // middleware: [withRequiredScope("todo.write")],
+    middleware: [
+      withRequiredPermissions({
+        todo: ["update"],
+      }),
+    ],
   }),
   async (c) => {
+    const session = c.get("session");
     const { id } = c.req.valid("param");
     const params = c.req.valid("json");
 
-    const result = await upsertTodo(db, { id, ...params });
+    const result = await upsertTodo(db, { id, ...params }, session.user.id);
 
     return c.json(validateResponse(result, todoResponseSchema));
   },
@@ -181,12 +202,17 @@ app.openapi(
         },
       },
     },
-    // middleware: [withRequiredScope("todo.write")],
+    middleware: [
+      withRequiredPermissions({
+        todo: ["delete"],
+      }),
+    ],
   }),
   async (c) => {
+    const session = c.get("session");
     const id = c.req.valid("param").id;
 
-    const result = await deleteTodo(db, { id });
+    const result = await deleteTodo(db, { id }, session.user.id);
 
     return c.json(validateResponse(result, todoResponseSchema));
   },

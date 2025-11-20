@@ -1,5 +1,4 @@
 import { index } from "drizzle-orm/pg-core";
-import type { Role } from "@/shared/helpers/better-auth/permissions";
 import { createTable } from "./_table";
 
 export const user = createTable(
@@ -18,7 +17,7 @@ export const user = createTable(
     emailVerified: d.boolean("email_verified").default(false).notNull(),
     image: d.text("image"),
     twoFactorEnabled: d.boolean("two_factor_enabled").default(false),
-    role: d.text("role").$type<Role[]>(),
+    role: d.text("role"),
     banned: d.boolean("banned").default(false),
     banReason: d.text("ban_reason"),
     banExpires: d.timestamp("ban_expires"),
