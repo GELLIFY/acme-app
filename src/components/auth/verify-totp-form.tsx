@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { APIError } from "better-auth";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -42,9 +43,10 @@ export function VerifyTotpForm() {
         },
       });
     } catch (error) {
-      // catch the error
-      console.log(error);
-      toast.error("Something went wrong");
+      if (error instanceof APIError) {
+        console.log(error.message, error.status);
+        toast.error(error.message);
+      }
     }
   };
 

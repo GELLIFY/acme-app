@@ -42,7 +42,7 @@ export function SessionManagement({
       {
         onError: (error) => {
           console.error(error);
-          toast.success("Error revoking session");
+          toast.error("Error revoking session");
         },
         onSuccess: () => {
           toast.success("Session revoked");

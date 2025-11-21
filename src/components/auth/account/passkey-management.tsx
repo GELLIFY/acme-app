@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { APIError } from "better-auth";
 import type { Passkey } from "better-auth/plugins/passkey";
 import { ArrowUpRightIcon, FingerprintIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
@@ -96,8 +97,10 @@ export function PasskeyManagement({ passkeys }: { passkeys: Passkey[] }) {
         },
       });
     } catch (error) {
-      console.log(error);
-      toast.error("Something went wrong");
+      if (error instanceof APIError) {
+        console.log(error.message, error.status);
+        toast.error(error.message);
+      }
     }
   }
 

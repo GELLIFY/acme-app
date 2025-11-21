@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { APIError } from "better-auth";
 import {
   ArrowUpRightIcon,
   CopyIcon,
@@ -214,9 +215,10 @@ function VerifyToptForm({
         },
       );
     } catch (error) {
-      // catch the error
-      console.log(error);
-      toast.error("Something went wrong");
+      if (error instanceof APIError) {
+        console.log(error.message, error.status);
+        toast.error(error.message);
+      }
     }
   };
 

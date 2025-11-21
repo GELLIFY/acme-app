@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { APIError } from "better-auth";
 import { XIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -92,9 +93,10 @@ export const SignUpForm = () => {
         },
       );
     } catch (error) {
-      // catch the error
-      console.log(error);
-      toast.error("Something went wrong");
+      if (error instanceof APIError) {
+        console.log(error.message, error.status);
+        toast.error(error.message);
+      }
     }
   };
 

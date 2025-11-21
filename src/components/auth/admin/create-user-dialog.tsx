@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { APIError } from "better-auth";
 import { PlusIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -82,8 +83,10 @@ export function CreateUserDialog() {
       router.refresh();
       toast.success("User created");
     } catch (error) {
-      console.log(error);
-      toast.error("Something went wrong");
+      if (error instanceof APIError) {
+        console.log(error.message, error.status);
+        toast.error(error.message);
+      }
     }
   };
 
