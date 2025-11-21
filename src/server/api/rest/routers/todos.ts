@@ -1,5 +1,4 @@
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
-import { db } from "@/server/db";
 import {
   deleteTodo,
   getTodoById,
@@ -47,6 +46,7 @@ app.openapi(
     ],
   }),
   async (c) => {
+    const db = c.get("db");
     const session = c.get("session");
     const filters = c.req.valid("query");
 
@@ -84,6 +84,7 @@ app.openapi(
     ],
   }),
   async (c) => {
+    const db = c.get("db");
     const session = c.get("session");
     const id = c.req.valid("param").id;
 
@@ -127,6 +128,7 @@ app.openapi(
     ],
   }),
   async (c) => {
+    const db = c.get("db");
     const session = c.get("session");
     const body = c.req.valid("json");
 
@@ -171,6 +173,7 @@ app.openapi(
     ],
   }),
   async (c) => {
+    const db = c.get("db");
     const session = c.get("session");
     const { id } = c.req.valid("param");
     const params = c.req.valid("json");
@@ -209,6 +212,7 @@ app.openapi(
     ],
   }),
   async (c) => {
+    const db = c.get("db");
     const session = c.get("session");
     const id = c.req.valid("param").id;
 
