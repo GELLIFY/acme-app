@@ -41,44 +41,79 @@ export const withAuth: MiddlewareHandler<Context> = async (c, next) => {
   // 2. Handle authentication with Bearer token
   const authHeader = c.req.header("Authorization");
 
-  if (!authHeader) {
-    throw new HTTPException(401, { message: "Authorization header required" });
+  if (authHeader) {
+    const [scheme, token] = authHeader.split(" ");
+
+    if (scheme !== "Bearer") {
+      throw new HTTPException(401, { message: "Invalid authorization scheme" });
+    }
+
+    if (!token) {
+      throw new HTTPException(401, { message: "Token required" });
+    }
+
+    const db = c.get("db");
+
+    // TODO: cache this somewhere
+    const [session] = await db
+      .select()
+      .from(sessionTable)
+      .leftJoin(user, eq(user.id, sessionTable.userId))
+      .where(
+        and(
+          eq(sessionTable.token, token),
+          gt(sessionTable.expiresAt, new Date()),
+        ),
+      )
+      .limit(1);
+
+    if (!session || !session.user) {
+      throw new HTTPException(401, {
+        message: "Invalid or expired access token",
+      });
+    }
+
+    // Set session on context
+    c.set("session", { ...session, user: session.user! });
+    return next();
   }
 
-  const [scheme, token] = authHeader.split(" ");
+  // 3. Handle authentication with api-key
+  const apiKeyHeader = c.req.header("X-API-KEY");
 
-  if (scheme !== "Bearer") {
-    throw new HTTPException(401, { message: "Invalid authorization scheme" });
-  }
-
-  if (!token) {
-    throw new HTTPException(401, { message: "Token required" });
-  }
-
-  const db = c.get("db");
-
-  // TODO: cache this somewhere
-  const [session] = await db
-    .select()
-    .from(sessionTable)
-    .leftJoin(user, eq(user.id, sessionTable.userId))
-    .where(
-      and(
-        eq(sessionTable.token, token),
-        gt(sessionTable.expiresAt, new Date()),
-      ),
-    )
-    .limit(1);
-
-  if (!session || !session.user) {
-    throw new HTTPException(401, {
-      message: "Invalid or expired access token",
+  if (apiKeyHeader) {
+    const data = await auth.api.verifyApiKey({
+      body: { key: apiKeyHeader },
     });
+
+    if (!data.valid || data.error) {
+      throw new HTTPException(401, {
+        message: data.error?.message ?? "Invalid api-key",
+      });
+    }
+
+    // FIXME: This is generally not recommended, as it can lead to security issues if not used carefully.
+    // A leaked api key can be used to impersonate a user.
+    // @ref https://www.better-auth.com/docs/plugins/api-key#sessions-from-api-keys
+    const session = await auth.api.getSession({
+      headers: new Headers({
+        "x-api-key": apiKeyHeader,
+      }),
+    });
+
+    if (!session) {
+      throw new HTTPException(401, {
+        message: "Invalid or expired api-key",
+      });
+    }
+
+    // Set session on context
+    c.set("session", session);
+    return next();
   }
 
-  // Set session on context
-  c.set("session", { ...session, user: session.user! });
-  return next();
+  // 4. When none of the above request is not authorized
+  throw new HTTPException(401, { message: "UNAUTHORIZED" });
 };
 
 /**

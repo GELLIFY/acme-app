@@ -61,7 +61,7 @@ export const auth = betterAuth({
         user: userRole,
       },
     }),
-    apiKey(),
+    apiKey({ enableSessionForAPIKeys: true }),
     passkey(),
     twoFactor(),
     openAPI({ disableDefaultReference: true }),
