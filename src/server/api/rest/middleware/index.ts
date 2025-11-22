@@ -22,7 +22,7 @@ export const protectedMiddleware: MiddlewareHandler<Context>[] = [
     windowMs: 10 * 60 * 1000, // 10 minutes
     limit: 100,
     keyGenerator: (c) => {
-      return c.get("session").user.id;
+      return c.get("userId");
     },
     statusCode: 429,
     message: "Rate limit exceeded",

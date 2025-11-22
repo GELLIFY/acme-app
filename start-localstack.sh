@@ -8,7 +8,7 @@ docker-compose up -d --wait db neon-proxy
 
 # db
 pnpm db:push
-pnpm db:seed
+# pnpm db:seed
 
 # run
 #pnpm run dev

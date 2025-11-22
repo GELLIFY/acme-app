@@ -2,6 +2,7 @@ import { KeyIcon, LockIcon, TriangleAlertIcon, UserIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { ApiKeyManagement } from "@/components/auth/account/api-key-management";
 import { ChangeEmail } from "@/components/auth/account/change-email";
 import { DeleteAccount } from "@/components/auth/account/delete-account";
 import { DisplayName } from "@/components/auth/account/display-name";
@@ -28,9 +29,10 @@ export default async function AccountPage() {
   const queryClient = getQueryClient();
   queryClient.prefetchQuery(trpc.user.me.queryOptions());
 
-  const [sessions, passkeys] = await Promise.all([
+  const [sessions, passkeys, apiKeys] = await Promise.all([
     auth.api.listSessions({ headers: await headers() }),
     auth.api.listPasskeys({ headers: await headers() }),
+    auth.api.listApiKeys({ headers: await headers() }),
   ]);
 
   return (
@@ -44,9 +46,9 @@ export default async function AccountPage() {
           <LockIcon size={16} aria-hidden="true" />
           <span className="max-sm:hidden">{t("security")}</span>
         </TabsTrigger>
-        <TabsTrigger value="sessions">
+        <TabsTrigger value="api_keys">
           <KeyIcon size={16} aria-hidden="true" />
-          <span className="max-sm:hidden">{t("sessions")}</span>
+          <span className="max-sm:hidden">{t("api_keys")}</span>
         </TabsTrigger>
         <TabsTrigger value="danger">
           <TriangleAlertIcon size={16} aria-hidden="true" />
@@ -66,13 +68,14 @@ export default async function AccountPage() {
           <UpdatePassword />
           <TwoFactor />
           <PasskeyManagement passkeys={passkeys} />
+          <SessionManagement
+            sessions={sessions}
+            currentSession={session.session}
+          />
         </div>
       </TabsContent>
-      <TabsContent value="sessions">
-        <SessionManagement
-          sessions={sessions}
-          currentSession={session.session}
-        />
+      <TabsContent value="api_keys">
+        <ApiKeyManagement apiKeys={apiKeys} />
       </TabsContent>
       <TabsContent value="danger">
         <DeleteAccount />

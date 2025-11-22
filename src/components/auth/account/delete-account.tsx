@@ -1,7 +1,6 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -25,6 +24,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 import { useTRPC } from "@/shared/helpers/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 
@@ -91,7 +91,7 @@ export function DeleteAccount() {
                 disabled={value !== "DELETE"}
               >
                 {deleteUserMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Spinner />
                 ) : (
                   t("delete.confirm_continue")
                 )}

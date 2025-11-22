@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { APIError } from "better-auth";
-import { Loader2Icon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
@@ -15,6 +14,7 @@ import { useScopedI18n } from "@/shared/locales/client";
 import { Button } from "../ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
+import { Spinner } from "../ui/spinner";
 
 const formSchema = z.object({
   email: z.email(),
@@ -116,11 +116,7 @@ export const SignInForm = () => {
         />
 
         <Button type="submit" className="w-full mt-2" disabled={loading}>
-          {loading ? (
-            <Loader2Icon size={16} className="animate-spin" />
-          ) : (
-            <p> {t("submit")} </p>
-          )}
+          {loading ? <Spinner /> : <p> {t("submit")} </p>}
         </Button>
       </FieldGroup>
     </form>
