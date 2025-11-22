@@ -31,29 +31,30 @@ export const ForgotPasswordForm = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      // Call the authClient's forgetPassword method, passing the email and a redirect URL.
-      await authClient.forgetPassword(
+      const { data, error } = await authClient.requestPasswordReset(
         {
           email: values.email, // Email to which the reset password link should be sent.
           redirectTo: "/reset-password", // URL to redirect the user after resetting the password.
         },
         {
-          // Lifecycle hooks to handle different stages of the request.
           onResponse: () => {
             setLoading(false);
           },
           onRequest: () => {
             setLoading(true);
           },
-          onSuccess: () => {
-            toast.success("Reset password link has been sent");
-          },
-          onError: (ctx) => {
-            console.error(ctx.error.message);
-            toast.error(ctx.error.message);
-          },
         },
       );
+
+      if (error) {
+        console.error(error.message);
+        toast.error(error.message);
+        return;
+      }
+
+      if (data.status) {
+        toast.success(data.message);
+      }
     } catch (error) {
       if (error instanceof APIError) {
         console.log(error.message, error.status);
