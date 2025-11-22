@@ -135,7 +135,10 @@ export default {
         "Please copy your API key and store it in a safe place. For security reasons we cannot show it again.",
       done_btn: "Done",
 
-      expires: {
+      created: "Created {date}",
+      expires: "Expires {distance}",
+
+      expirations: {
         NO_EXPIRATION: "No Expiration",
         ONE_DAY: "1 day",
         SEVEN_DAYS: "7 days",

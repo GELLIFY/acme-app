@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { APIError } from "better-auth";
-import { formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { KeyIcon, TrashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type Dispatch, type SetStateAction, useState } from "react";
@@ -88,7 +88,13 @@ const apiKeySchema = z.object({
   expiresIn: z.number().optional(),
 });
 
-function CopyApiKey({ data }: { data: ApiKeyData }) {
+function CopyApiKey({
+  data,
+  onComplete,
+}: {
+  data: ApiKeyData;
+  onComplete: () => void;
+}) {
   const t = useScopedI18n("account.api_keys");
 
   return (
@@ -101,7 +107,7 @@ function CopyApiKey({ data }: { data: ApiKeyData }) {
         </div>
         <FieldDescription>{t("key_msg")}</FieldDescription>
       </div>
-      <Button type="button" className="w-full">
+      <Button type="button" className="w-full" onClick={onComplete}>
         {t("done_btn")}
       </Button>
     </div>
@@ -189,7 +195,7 @@ function ApiKeyForm({
               >
                 {Object.entries(EXPIRES_OPTIONS).map(([key, value]) => (
                   <NativeSelectOption key={key} value={value}>
-                    {t(`expires.${key as keyof typeof EXPIRES_OPTIONS}`)}
+                    {t(`expirations.${key as keyof typeof EXPIRES_OPTIONS}`)}
                   </NativeSelectOption>
                 ))}
               </NativeSelect>
@@ -237,7 +243,7 @@ export function ApiKeyManagement({ apiKeys }: { apiKeys: ApiKey[] }) {
       }
 
       if (data.success) {
-        toast.success("Session revoked");
+        toast.success("Api Key deleted");
         router.refresh();
       }
     } catch (error) {
@@ -273,10 +279,22 @@ export function ApiKeyManagement({ apiKeys }: { apiKeys: ApiKey[] }) {
               </ItemMedia>
               <ItemContent>
                 <ItemTitle>{apiKey.name}</ItemTitle>
-                <ItemDescription>
-                  {apiKey.expiresAt
-                    ? formatDistanceToNow(apiKey.expiresAt, { addSuffix: true })
-                    : t("expires.NO_EXPIRATION")}
+                <ItemDescription className="gap-1 flex">
+                  <span>
+                    {t("created", {
+                      date: format(apiKey.createdAt, "dd/MM/yy"),
+                    })}
+                  </span>
+                  <span>-</span>
+                  <span>
+                    {apiKey.expiresAt
+                      ? t("expires", {
+                          distance: formatDistanceToNow(apiKey.expiresAt, {
+                            addSuffix: true,
+                          }),
+                        })
+                      : t("expirations.NO_EXPIRATION")}
+                  </span>
                 </ItemDescription>
               </ItemContent>
               <ItemActions>
@@ -329,7 +347,12 @@ export function ApiKeyManagement({ apiKeys }: { apiKeys: ApiKey[] }) {
             </DialogHeader>
 
             {!apiKeyData && <ApiKeyForm setApiKeyData={setApiKeyData} />}
-            {apiKeyData && <CopyApiKey data={apiKeyData} />}
+            {apiKeyData && (
+              <CopyApiKey
+                data={apiKeyData}
+                onComplete={() => setIsDialogOpen(false)}
+              />
+            )}
           </DialogContent>
         </Dialog>
       </CardFooter>

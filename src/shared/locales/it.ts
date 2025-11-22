@@ -139,7 +139,10 @@ export default {
         "Per favore copia la tua chiave API e conservala in un luogo sicuro. Per motivi di sicurezza non potremo mostrarla di nuovo.",
       done_btn: "Fatto",
 
-      expires: {
+      created: "Creata il {date}",
+      expires: "Scade {distance}",
+
+      expirations: {
         NO_EXPIRATION: "Nessuna scadenza",
         ONE_DAY: "1 giorno",
         SEVEN_DAYS: "7 giorni",
