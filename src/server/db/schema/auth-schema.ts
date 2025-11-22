@@ -1,10 +1,11 @@
+import { relations, sql } from "drizzle-orm";
 import { index } from "drizzle-orm/pg-core";
 import { createTable } from "./_table";
 
 export const user = createTable(
   "user",
   (d) => ({
-    id: d.uuid().defaultRandom().primaryKey(),
+    id: d.uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
     createdAt: d.timestamp("created_at").defaultNow().notNull(),
     updatedAt: d
       .timestamp("updated_at")
@@ -28,23 +29,23 @@ export const user = createTable(
 export const session = createTable(
   "session",
   (d) => ({
-    id: d.uuid().defaultRandom().primaryKey(),
+    id: d.uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
     createdAt: d.timestamp("created_at").defaultNow().notNull(),
     updatedAt: d
       .timestamp("updated_at")
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
 
+    userId: d
+      .uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+
     expiresAt: d.timestamp("expires_at").notNull(),
     token: d.text("token").notNull().unique(),
     ipAddress: d.text("ip_address"),
     userAgent: d.text("user_agent"),
     impersonatedBy: d.text("impersonated_by"),
-
-    userId: d
-      .uuid("user_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
   }),
   (t) => [
     index("session_user_id_idx").on(t.userId),
@@ -55,12 +56,17 @@ export const session = createTable(
 export const account = createTable(
   "account",
   (d) => ({
-    id: d.uuid().defaultRandom().primaryKey(),
+    id: d.uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
     createdAt: d.timestamp("created_at").defaultNow().notNull(),
     updatedAt: d
       .timestamp("updated_at")
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
+
+    userId: d
+      .uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
 
     accountId: d.text("account_id").notNull(),
     providerId: d.text("provider_id").notNull(),
@@ -71,11 +77,6 @@ export const account = createTable(
     refreshTokenExpiresAt: d.timestamp("refresh_token_expires_at"),
     scope: d.text("scope"),
     password: d.text("password"),
-
-    userId: d
-      .uuid("user_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
   }),
   (t) => [index("account_user_id_idx").on(t.userId)],
 );
@@ -83,7 +84,7 @@ export const account = createTable(
 export const verification = createTable(
   "verification",
   (d) => ({
-    id: d.uuid().defaultRandom().primaryKey(),
+    id: d.uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
     createdAt: d.timestamp("created_at").defaultNow().notNull(),
     updatedAt: d
       .timestamp("updated_at")
@@ -101,8 +102,13 @@ export const verification = createTable(
 export const passkey = createTable(
   "passkey",
   (d) => ({
-    id: d.uuid().defaultRandom().primaryKey(),
+    id: d.uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
     createdAt: d.timestamp("created_at"),
+
+    userId: d
+      .uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
 
     name: d.text("name"),
     publicKey: d.text("public_key").notNull(),
@@ -112,25 +118,63 @@ export const passkey = createTable(
     backedUp: d.boolean("backed_up").notNull(),
     transports: d.text("transports"),
     aaguid: d.text("aaguid"),
-
-    userId: d
-      .uuid("user_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
   }),
-  (t) => [index("passkey_user_id_idx").on(t.userId)],
+  (t) => [
+    index("passkey_user_id_idx").on(t.userId),
+    index("passkey_credential_id_idx").on(t.credentialID),
+  ],
 );
 
 export const twoFactor = createTable(
   "two_factor",
   (d) => ({
-    id: d.uuid().defaultRandom().primaryKey(),
-    secret: d.text("secret").notNull(),
-    backupCodes: d.text("backup_codes").notNull(),
+    id: d.uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
+
     userId: d
       .uuid("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
+
+    secret: d.text("secret").notNull(),
+    backupCodes: d.text("backup_codes").notNull(),
   }),
-  (t) => [index("two_factor_secret_idx").on(t.secret)],
+  (t) => [
+    index("two_factor_secret_idx").on(t.secret),
+    index("twoFactor_user_id_idx").on(t.userId),
+  ],
 );
+
+export const userRelations = relations(user, ({ many }) => ({
+  sessions: many(session),
+  accounts: many(account),
+  passkeys: many(passkey),
+  twoFactors: many(twoFactor),
+}));
+
+export const sessionRelations = relations(session, ({ one }) => ({
+  user: one(user, {
+    fields: [session.userId],
+    references: [user.id],
+  }),
+}));
+
+export const accountRelations = relations(account, ({ one }) => ({
+  user: one(user, {
+    fields: [account.userId],
+    references: [user.id],
+  }),
+}));
+
+export const passkeyRelations = relations(passkey, ({ one }) => ({
+  user: one(user, {
+    fields: [passkey.userId],
+    references: [user.id],
+  }),
+}));
+
+export const twoFactorRelations = relations(twoFactor, ({ one }) => ({
+  user: one(user, {
+    fields: [twoFactor.userId],
+    references: [user.id],
+  }),
+}));

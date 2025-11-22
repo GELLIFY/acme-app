@@ -1,8 +1,8 @@
 "use client";
 
+import type { Passkey } from "@better-auth/passkey";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { APIError } from "better-auth";
-import type { Passkey } from "better-auth/plugins/passkey";
 import { ArrowUpRightIcon, FingerprintIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

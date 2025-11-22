@@ -2,7 +2,6 @@ import { and, eq, gt } from "drizzle-orm";
 import type { MiddlewareHandler } from "hono";
 import { getCookie } from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
-import type { DBClient } from "@/server/db";
 import { session as sessionTable, user } from "@/server/db/schema/auth-schema";
 import { auth } from "@/shared/helpers/better-auth/auth";
 import type { PermissionRequest } from "@/shared/helpers/better-auth/permissions";
@@ -56,7 +55,7 @@ export const withAuth: MiddlewareHandler<Context> = async (c, next) => {
     throw new HTTPException(401, { message: "Token required" });
   }
 
-  const db = c.get("db") as DBClient;
+  const db = c.get("db");
 
   // TODO: cache this somewhere
   const [session] = await db
