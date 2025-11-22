@@ -1,15 +1,18 @@
-import { betterAuth } from "better-auth";
+import { passkey } from "@better-auth/passkey";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
 import { admin, apiKey, openAPI, twoFactor } from "better-auth/plugins";
-import { passkey } from "better-auth/plugins/passkey";
 import { db } from "@/server/db";
 import { ac, adminRole, userRole } from "./permissions";
 
 export const auth = betterAuth({
+  experimental: {
+    joins: true,
+  },
   advanced: {
     database: {
-      generateId: false,
+      generateId: "uuid",
     },
   },
   database: drizzleAdapter(db, {
@@ -26,16 +29,21 @@ export const auth = betterAuth({
       console.log(`Password for user ${user.email} has been reset.`);
     },
   },
-  session: {
-    // TODO: re-enable when cookie chunking is released v1.4
-    // cookieCache: {
-    //   enabled: true,
-    //   maxAge: 5 * 60, // 5 min
-    // },
-  },
+  // session: {
+  //   cookieCache: {
+  //     enabled: true,
+  //     maxAge: 5 * 60, // 5 min
+  //   },
+  // },
   user: {
     changeEmail: {
       enabled: true,
+      sendChangeEmailConfirmation: async ({ newEmail, url }) => {
+        // TODO: send email here
+        console.log(
+          `Click the link to approve the change to ${newEmail}: ${url}`,
+        );
+      },
     },
     deleteUser: {
       enabled: true,
