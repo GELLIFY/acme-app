@@ -2,6 +2,9 @@ name: CI
 
 on:
   workflow_call:
+    secrets:
+      SONAR_TOKEN:
+        required: true
 
 jobs:
   lint:
