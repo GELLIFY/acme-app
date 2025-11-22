@@ -52,7 +52,7 @@ app.doc("/openapi", {
       description: "Production API",
     },
   ],
-  security: [{ cookieAuth: [] }, { bearerAuth: [] }, { apiKeyAuth: [] }],
+  security: [{ cookieAuth: [] }, { apiKeyAuth: [] }],
 });
 
 // Register security scheme
