@@ -98,6 +98,39 @@ export const verification = createTable(
   (t) => [index("verification_identifier_idx").on(t.identifier)],
 );
 
+export const apikey = createTable(
+  "apikey",
+  (d) => ({
+    id: d.uuid().defaultRandom().primaryKey(),
+    createdAt: d.timestamp("created_at").notNull(),
+    updatedAt: d.timestamp("updated_at").notNull(),
+
+    userId: d
+      .uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+
+    name: d.text("name"),
+    start: d.text("start"),
+    prefix: d.text("prefix"),
+    key: d.text("key").notNull(),
+    refillInterval: d.integer("refill_interval"),
+    refillAmount: d.integer("refill_amount"),
+    lastRefillAt: d.timestamp("last_refill_at"),
+    enabled: d.boolean("enabled").default(true),
+    rateLimitEnabled: d.boolean("rate_limit_enabled").default(true),
+    rateLimitTimeWindow: d.integer("rate_limit_time_window").default(86400000),
+    rateLimitMax: d.integer("rate_limit_max").default(10),
+    requestCount: d.integer("request_count").default(0),
+    remaining: d.integer("remaining"),
+    lastRequest: d.timestamp("last_request"),
+    expiresAt: d.timestamp("expires_at"),
+    permissions: d.text("permissions"),
+    metadata: d.text("metadata"),
+  }),
+  (t) => [index("api_key_user_id_idx").on(t.userId)],
+);
+
 export const passkey = createTable(
   "passkey",
   (d) => ({

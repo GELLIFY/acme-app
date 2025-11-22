@@ -1,5 +1,6 @@
 import {
   adminClient,
+  apiKeyClient,
   inferAdditionalFields,
   passkeyClient,
   twoFactorClient,
@@ -19,6 +20,7 @@ export const authClient = createAuthClient({
         user: userRole,
       },
     }),
+    apiKeyClient(),
     passkeyClient(),
     twoFactorClient(),
     inferAdditionalFields<typeof auth>(),

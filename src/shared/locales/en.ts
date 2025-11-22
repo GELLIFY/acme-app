@@ -26,7 +26,7 @@ export default {
   // account
   "account.profile": "Profile",
   "account.security": "Security",
-  "account.sessions": "Sessions",
+  "account.api_keys": "API Keys",
   "account.danger": "Danger",
 
   // account profile
@@ -118,6 +118,46 @@ export default {
           description:
             "You haven'&apos;'t created any passkeys yet. Get started by creating your first passkey.",
         },
+      },
+    },
+    api_keys: {
+      title: "API Keys",
+      description: "Manage your API keys for secure access.",
+      message: "Generate API keys to access your account programmatically.",
+      dialog_title: "API Key",
+      dialog_description:
+        "Please enter a unique name for your API key to distinguish it from others.",
+      name_fld: "Nome",
+      expires_fld: "Scade",
+      create_btn: "Create Key",
+      key_lbl: "API Key",
+      key_msg:
+        "Please copy your API key and store it in a safe place. For security reasons we cannot show it again.",
+      done_btn: "Done",
+
+      expires: {
+        NO_EXPIRATION: "No Expiration",
+        ONE_DAY: "1 day",
+        SEVEN_DAYS: "7 days",
+        ONE_MONTH: "1 month",
+        TWO_MONTHS: "2 months",
+        THREE_MONTHS: "3 months",
+        SIX_MONTHS: "6 months",
+        ONE_YEAR: "1 year",
+      },
+
+      empty: {
+        title: "No Api Key Yet",
+        description:
+          "You haven'&apos;'t created any api key yet. Get started by creating your first api key.",
+      },
+
+      delete: {
+        title: "Are you absolutely sure?",
+        description:
+          "This action cannot be undone. This will permanently delete your API key.",
+        cancel_btn: "Cancel",
+        submit_btn: "Continue",
       },
     },
   },

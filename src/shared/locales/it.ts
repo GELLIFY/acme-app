@@ -26,7 +26,7 @@ export default {
   // account
   "account.profile": "Profilo",
   "account.security": "Sicurezza",
-  "account.sessions": "Sessioni",
+  "account.api_keys": "Chiavi API",
   "account.danger": "Pericolo",
 
   // account profile
@@ -120,6 +120,48 @@ export default {
           description:
             "Non hai ancora creato nessuna passkey. Inizia creando la tua prima passkey.",
         },
+      },
+    },
+
+    api_keys: {
+      title: "Chiavi API",
+      description: "Gestisci le tue chiavi API per un accesso sicuro.",
+      message:
+        "Genera chiavi API per accedere programmativamente al tuo account.",
+      dialog_title: "Chiave API",
+      dialog_description:
+        "Per favore inserisci un nome univoco per la tua chiave API per distinguerla dalle altre.",
+      name_fld: "Nome",
+      expires_fld: "Scade",
+      create_btn: "Crea Chiave",
+      key_lbl: "Chiave API",
+      key_msg:
+        "Per favore copia la tua chiave API e conservala in un luogo sicuro. Per motivi di sicurezza non potremo mostrarla di nuovo.",
+      done_btn: "Fatto",
+
+      expires: {
+        NO_EXPIRATION: "Nessuna scadenza",
+        ONE_DAY: "1 giorno",
+        SEVEN_DAYS: "7 giorni",
+        ONE_MONTH: "1 mese",
+        TWO_MONTHS: "2 mesi",
+        THREE_MONTHS: "3 mesi",
+        SIX_MONTHS: "6 mesi",
+        ONE_YEAR: "1 anno",
+      },
+
+      empty: {
+        title: "Nessuna chiave API",
+        description:
+          "Non hai ancora creato nessuna api key. Inizia creando la tua prima api key.",
+      },
+
+      delete: {
+        title: "Sei assolutamente sicuro?",
+        description:
+          "Questa azione non può essere annullata. Questo eliminerà definitivamente la tua chiave API.",
+        cancel_btn: "Annulla",
+        submit_btn: "Continua",
       },
     },
   },

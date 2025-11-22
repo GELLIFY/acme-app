@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { admin, openAPI, twoFactor } from "better-auth/plugins";
+import { admin, apiKey, openAPI, twoFactor } from "better-auth/plugins";
 import { passkey } from "better-auth/plugins/passkey";
 import { db } from "@/server/db";
 import { ac, adminRole, userRole } from "./permissions";
@@ -53,6 +53,7 @@ export const auth = betterAuth({
         user: userRole,
       },
     }),
+    apiKey(),
     passkey(),
     twoFactor(),
     openAPI({ disableDefaultReference: true }),
