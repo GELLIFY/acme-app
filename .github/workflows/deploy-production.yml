@@ -12,6 +12,7 @@ jobs:
   code_quality:
     name: Code quality
     uses: ./.github/workflows/ci.yml
+    secrets: inherit
 
   run_migrations:
     name: Run Migrations
