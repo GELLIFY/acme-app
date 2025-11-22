@@ -140,6 +140,10 @@ function ApiKeyForm({
           expiresIn: values.expiresIn
             ? 60 * 60 * 24 * values.expiresIn
             : undefined,
+          // TODO: add permissions
+          // permissions: {
+          //   todo: ["create"],
+          // },
         },
         {
           onRequest: () => {
