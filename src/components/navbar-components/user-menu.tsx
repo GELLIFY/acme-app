@@ -29,7 +29,7 @@ export function UserMenu({ user }: { user: User }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="w-auto">
-        <Avatar className="h-8 w-8 ">
+        <Avatar className="h-8 w-8">
           <AvatarImage src={user.image ?? ""} alt={`avatar of ${user.name}`} />
           <AvatarFallback>{"ME"}</AvatarFallback>
         </Avatar>

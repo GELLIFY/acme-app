@@ -64,7 +64,6 @@ export function SessionManagement({
             ? UAParser(session.userAgent)
             : null;
 
-          console.log(userAgentInfo, session.userAgent);
           return (
             <Item variant="outline" key={session.id}>
               <ItemMedia variant="icon">

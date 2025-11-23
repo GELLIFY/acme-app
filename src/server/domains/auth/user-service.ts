@@ -25,7 +25,6 @@ export async function changeEmail(
   headers: Headers,
   params: z.infer<typeof changeEmailSchema>,
 ) {
-  // Change email if needed
   const data = await auth.api.changeEmail({
     headers,
     body: {
@@ -40,7 +39,6 @@ export async function changePassword(
   headers: Headers,
   params: z.infer<typeof changePasswordSchema>,
 ) {
-  // Change email if needed
   const data = await auth.api.changePassword({
     headers,
     body: {
