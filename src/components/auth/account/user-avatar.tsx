@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2, UserCircleIcon } from "lucide-react";
+import { UserCircleIcon } from "lucide-react";
 import { useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { useUserQuery } from "@/hooks/use-user";
 import { convertImageToBase64 } from "@/shared/helpers/image";
 import { useTRPC } from "@/shared/helpers/trpc/client";
@@ -52,7 +53,7 @@ export function UserAvatar() {
             }}
           >
             {isLoading ? (
-              <Loader2 className="size-4 animate-spin" />
+              <Spinner />
             ) : (
               <>
                 <AvatarImage

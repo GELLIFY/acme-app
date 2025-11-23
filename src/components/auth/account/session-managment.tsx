@@ -64,6 +64,7 @@ export function SessionManagement({
             ? UAParser(session.userAgent)
             : null;
 
+          console.log(userAgentInfo, session.userAgent);
           return (
             <Item variant="outline" key={session.id}>
               <ItemMedia variant="icon">
@@ -75,11 +76,15 @@ export function SessionManagement({
               </ItemMedia>
               <ItemContent>
                 <ItemTitle>
-                  {session.id === currentSession.id
+                  {session.id !== currentSession.id
                     ? session.ipAddress
                     : t("session.current")}
                 </ItemTitle>
-                <ItemDescription>{`${userAgentInfo?.browser.name}, ${userAgentInfo?.os.name}`}</ItemDescription>
+                <ItemDescription>
+                  {userAgentInfo?.browser.name
+                    ? `${userAgentInfo.browser.name}, ${userAgentInfo.os.name}`
+                    : userAgentInfo?.ua}
+                </ItemDescription>
               </ItemContent>
               <ItemActions>
                 <Button

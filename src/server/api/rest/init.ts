@@ -3,14 +3,15 @@ import { Scalar } from "@scalar/hono-api-reference";
 import { cors } from "hono/cors";
 import { secureHeaders } from "hono/secure-headers";
 import type { db } from "@/server/db";
-import type { auth } from "@/shared/helpers/better-auth/auth";
+import type { Permissions } from "@/shared/helpers/better-auth/permissions";
 import { getBaseUrl } from "@/shared/helpers/get-url";
 import { routers } from "./routers/_app";
 
 export type Context = {
   Variables: {
     db: typeof db;
-    session: typeof auth.$Infer.Session;
+    permissions: Permissions;
+    userId: string;
   };
 };
 
@@ -51,7 +52,7 @@ app.doc("/openapi", {
       description: "Production API",
     },
   ],
-  security: [{ cookieAuth: [] }, { bearerAuth: [] }, { apiKeyAuth: [] }],
+  security: [{ cookieAuth: [] }, { apiKeyAuth: [] }],
 });
 
 // Register security scheme
@@ -63,20 +64,12 @@ app.openAPIRegistry.registerComponent("securitySchemes", "cookieAuth", {
     "Authentication via a session token stored in the 'better-auth.session_token' cookie.",
 });
 
-app.openAPIRegistry.registerComponent("securitySchemes", "bearerAuth", {
-  type: "http",
-  in: "header",
-  scheme: "bearer",
-  description:
-    "Authentication using a Bearer token in the Authorization header. Example: 'Authorization: Bearer <token>'",
-});
-
 app.openAPIRegistry.registerComponent("securitySchemes", "apiKeyAuth", {
   type: "apiKey",
   in: "header",
-  name: "X-API-KEY",
+  name: "x-api-key",
   description:
-    "Authentication using the X-API-KEY header. Example: 'X-API-KEY: <your-api-key>'",
+    "Authentication using the x-api-key header. Example: 'x-api-key: <your-api-key>'",
 });
 
 app.get(

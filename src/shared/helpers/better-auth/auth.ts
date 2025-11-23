@@ -2,9 +2,15 @@ import { passkey } from "@better-auth/passkey";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
-import { admin, openAPI, twoFactor } from "better-auth/plugins";
+import {
+  admin,
+  apiKey,
+  openAPI,
+  type Statements,
+  twoFactor,
+} from "better-auth/plugins";
 import { db } from "@/server/db";
-import { ac, adminRole, userRole } from "./permissions";
+import { ac, adminRole, formatPermissions, userRole } from "./permissions";
 
 export const auth = betterAuth({
   experimental: {
@@ -59,6 +65,24 @@ export const auth = betterAuth({
       roles: {
         admin: adminRole,
         user: userRole,
+      },
+    }),
+    apiKey({
+      permissions: {
+        defaultPermissions: async (userId) => {
+          // Fetch user role or other data to determine permissions
+          const permissions: Statements = {
+            todo: ["create"],
+          };
+
+          console.log(
+            `Creating API Key for user ${userId} with permissions: ${formatPermissions(permissions)}`,
+          );
+
+          return {
+            ...permissions,
+          };
+        },
       },
     }),
     passkey(),

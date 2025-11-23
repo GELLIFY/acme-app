@@ -1,13 +1,16 @@
-import { and, eq, gt } from "drizzle-orm";
+import { role } from "better-auth/plugins/access";
 import type { MiddlewareHandler } from "hono";
 import { getCookie } from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
-import { session as sessionTable, user } from "@/server/db/schema/auth-schema";
 import { auth } from "@/shared/helpers/better-auth/auth";
-import type { PermissionRequest } from "@/shared/helpers/better-auth/permissions";
+import {
+  expandRoles,
+  formatPermissions,
+  type Permissions,
+  type Role,
+} from "@/shared/helpers/better-auth/permissions";
 import type { Context } from "../init";
 
-/**
 /**
  * Authenticates the request using either a session cookie or a Bearer token.
  *
@@ -34,51 +37,35 @@ export const withAuth: MiddlewareHandler<Context> = async (c, next) => {
     }
 
     // Set session on context
-    c.set("session", session);
+    c.set("userId", session.user.id);
+    c.set("permissions", expandRoles(session.user.role as Role));
     return next();
   }
 
-  // 2. Handle authentication with Bearer token
-  const authHeader = c.req.header("Authorization");
+  // 2. Handle authentication with api-key
+  const apiKey = c.req.header("x-api-key");
 
-  if (!authHeader) {
-    throw new HTTPException(401, { message: "Authorization header required" });
-  }
-
-  const [scheme, token] = authHeader.split(" ");
-
-  if (scheme !== "Bearer") {
-    throw new HTTPException(401, { message: "Invalid authorization scheme" });
-  }
-
-  if (!token) {
-    throw new HTTPException(401, { message: "Token required" });
-  }
-
-  const db = c.get("db");
-
-  // TODO: cache this somewhere
-  const [session] = await db
-    .select()
-    .from(sessionTable)
-    .leftJoin(user, eq(user.id, sessionTable.userId))
-    .where(
-      and(
-        eq(sessionTable.token, token),
-        gt(sessionTable.expiresAt, new Date()),
-      ),
-    )
-    .limit(1);
-
-  if (!session || !session.user) {
-    throw new HTTPException(401, {
-      message: "Invalid or expired access token",
+  if (apiKey) {
+    const data = await auth.api.verifyApiKey({
+      body: {
+        key: apiKey,
+      },
     });
+
+    if (!data.valid || data.error || !data.key) {
+      throw new HTTPException(401, {
+        message: data.error?.message ?? "Invalid or expired api-key",
+      });
+    }
+
+    // Set session on context
+    c.set("userId", data.key.userId);
+    c.set("permissions", data.key.permissions ?? {});
+    return next();
   }
 
-  // Set session on context
-  c.set("session", { ...session, user: session.user! });
-  return next();
+  // 3. No authentication provided
+  throw new HTTPException(401, { message: "Invalid authorization" });
 };
 
 /**
@@ -90,24 +77,30 @@ export const withAuth: MiddlewareHandler<Context> = async (c, next) => {
  * @param {TPermissions} requiredPermissions - List or object describing required permissions.
  * @returns {MiddlewareHandler} Middleware that validates user permissions.
  */
-export const withRequiredPermissions = <TPermissions extends PermissionRequest>(
+export const withRequiredPermissions = <TPermissions extends Permissions>(
   requiredPermissions: TPermissions,
-): MiddlewareHandler => {
+): MiddlewareHandler<Context> => {
   return async (c, next) => {
-    const session = c.get("session") as typeof auth.$Infer.Session;
+    const permissions = c.get("permissions");
 
-    const data = await auth.api.userHasPermission({
-      body: {
-        userId: session.user.id,
-        permissions: requiredPermissions,
-      },
-    });
+    if (!permissions) {
+      return c.json(
+        {
+          error: "Unauthorized",
+          description:
+            "No permissions found for the current user. Authentication is required.",
+        },
+        401,
+      );
+    }
 
-    if (!data.success) {
+    const result = role(permissions).authorize(requiredPermissions);
+
+    if (!result.success) {
       return c.json(
         {
           error: "Forbidden",
-          description: "Insufficient permissions",
+          description: `Insufficient permissions. Required permissions: [${formatPermissions(requiredPermissions)}]. Your permissions: [${formatPermissions(permissions)}]`,
         },
         403,
       );

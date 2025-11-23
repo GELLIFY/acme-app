@@ -47,10 +47,10 @@ app.openapi(
   }),
   async (c) => {
     const db = c.get("db");
-    const session = c.get("session");
+    const userId = c.get("userId");
     const filters = c.req.valid("query");
 
-    const result = await getTodos(db, filters, session.user.id);
+    const result = await getTodos(db, filters, userId);
 
     return c.json(validateResponse({ data: result }, todosResponseSchema));
   },
@@ -85,10 +85,10 @@ app.openapi(
   }),
   async (c) => {
     const db = c.get("db");
-    const session = c.get("session");
+    const userId = c.get("userId");
     const id = c.req.valid("param").id;
 
-    const result = await getTodoById(db, { id }, session.user.id);
+    const result = await getTodoById(db, { id }, userId);
 
     return c.json(validateResponse(result, todoResponseSchema));
   },
@@ -129,10 +129,10 @@ app.openapi(
   }),
   async (c) => {
     const db = c.get("db");
-    const session = c.get("session");
+    const userId = c.get("userId");
     const body = c.req.valid("json");
 
-    const result = await upsertTodo(db, { ...body }, session.user.id);
+    const result = await upsertTodo(db, { ...body }, userId);
 
     return c.json(validateResponse(result, todoResponseSchema));
   },
@@ -174,11 +174,11 @@ app.openapi(
   }),
   async (c) => {
     const db = c.get("db");
-    const session = c.get("session");
+    const userId = c.get("userId");
     const { id } = c.req.valid("param");
     const params = c.req.valid("json");
 
-    const result = await upsertTodo(db, { id, ...params }, session.user.id);
+    const result = await upsertTodo(db, { id, ...params }, userId);
 
     return c.json(validateResponse(result, todoResponseSchema));
   },
@@ -213,10 +213,10 @@ app.openapi(
   }),
   async (c) => {
     const db = c.get("db");
-    const session = c.get("session");
+    const userId = c.get("userId");
     const id = c.req.valid("param").id;
 
-    const result = await deleteTodo(db, { id }, session.user.id);
+    const result = await deleteTodo(db, { id }, userId);
 
     return c.json(validateResponse(result, todoResponseSchema));
   },

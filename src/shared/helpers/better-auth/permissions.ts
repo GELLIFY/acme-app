@@ -41,10 +41,29 @@ export const ROLES = {
 
 export type Role = (typeof ROLES)[keyof typeof ROLES];
 
-type AccessControlStatements = typeof ac.statements;
+export type AccessControlStatements = typeof ac.statements;
 
-export type PermissionRequest = {
+export type Permissions = {
   [Resource in keyof AccessControlStatements]?: AccessControlStatements[Resource] extends readonly (infer Actions)[]
     ? Actions[]
     : never;
 };
+
+export function expandRoles(role: Role): Permissions {
+  switch (role) {
+    case ROLES.ADMIN:
+      return adminRole.statements;
+    case ROLES.USER:
+      return userRole.statements;
+    default:
+      return {};
+  }
+}
+
+export function formatPermissions(permissions: Permissions) {
+  return Object.entries(permissions)
+    .map(([resource, actions]) =>
+      actions.map((action) => `${resource}:${action}`),
+    )
+    .join(", ");
+}
