@@ -140,10 +140,6 @@ function ApiKeyForm({
           expiresIn: values.expiresIn
             ? 60 * 60 * 24 * values.expiresIn
             : undefined,
-          // TODO: add permissions
-          // permissions: {
-          //   todo: ["create"],
-          // },
         },
         {
           onRequest: () => {
@@ -354,7 +350,10 @@ export function ApiKeyManagement({ apiKeys }: { apiKeys: ApiKey[] }) {
             {apiKeyData && (
               <CopyApiKey
                 data={apiKeyData}
-                onComplete={() => setIsDialogOpen(false)}
+                onComplete={() => {
+                  setIsDialogOpen(false);
+                  setApiKeyData(null);
+                }}
               />
             )}
           </DialogContent>

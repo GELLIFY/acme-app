@@ -82,13 +82,28 @@ export const withRequiredPermissions = <TPermissions extends Permissions>(
   return async (c, next) => {
     const permissions = c.get("permissions");
 
+    if (!permissions) {
+      return c.json(
+        {
+          error: "Unauthorized",
+          description:
+            "No permissions found for the current user. Authentication is required.",
+        },
+        401,
+      );
+    }
+
     const result = role(permissions).authorize(requiredPermissions);
 
     if (!result.success) {
       return c.json(
         {
           error: "Forbidden",
-          description: "Insufficient permissions",
+          description: `
+            Insufficient permissions.\n
+            Required permissions: ${JSON.stringify(requiredPermissions, null, 2)}.\n
+            Your permissions: ${JSON.stringify(permissions, null, 2)}
+          `,
         },
         403,
       );
