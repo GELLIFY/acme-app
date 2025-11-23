@@ -5,6 +5,7 @@ import { nextCookies } from "better-auth/next-js";
 import {
   admin,
   apiKey,
+  lastLoginMethod,
   openAPI,
   type Statements,
   twoFactor,
@@ -85,6 +86,7 @@ export const auth = betterAuth({
         },
       },
     }),
+    lastLoginMethod(),
     passkey(),
     twoFactor(),
     openAPI({ disableDefaultReference: true }),
