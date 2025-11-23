@@ -5,7 +5,7 @@ import { APIError } from "better-auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
-import { useState } from "react";
+import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -22,7 +22,7 @@ const formSchema = z.object({
 });
 
 export const SignInForm = () => {
-  const [loading, setLoading] = useState(false);
+  const [loading, startTransition] = useTransition();
   const [returnTo] = useQueryState("return_to");
 
   const router = useRouter();
@@ -36,35 +36,29 @@ export const SignInForm = () => {
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    try {
-      // Call the authClient's forgetPassword method, passing the email and a redirect URL.
-      await authClient.signIn.email(
-        {
-          ...data,
-        },
-        {
-          onRequest: () => {
-            setLoading(true);
-          },
-          onResponse: () => {
-            setLoading(false);
-          },
-          onError: (ctx) => {
-            toast.error(ctx.error.message);
-          },
-          onSuccess: (ctx) => {
-            if (ctx.data.twoFactorRedirect) router.push("/2fa");
-            else router.push(returnTo ? `/${returnTo}` : "/");
-          },
-        },
-      );
-    } catch (error) {
-      if (error instanceof APIError) {
-        console.log(error.message, error.status);
-        toast.error(error.message);
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    startTransition(async () => {
+      try {
+        const { data, error } = await authClient.signIn.email({
+          email: values.email,
+          password: values.password,
+        });
+
+        if (error) {
+          console.log(error.message, error.status);
+          toast.error(error.message);
+          return;
+        }
+
+        if ("twoFactorRedirect" in data) router.push("/2fa");
+        else router.push(returnTo ? `/${returnTo}` : "/");
+      } catch (error) {
+        if (error instanceof APIError) {
+          console.log(error.message, error.status);
+          toast.error(error.message);
+        }
       }
-    }
+    });
   };
 
   return (
