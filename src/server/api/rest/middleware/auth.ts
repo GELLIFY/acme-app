@@ -5,6 +5,7 @@ import { HTTPException } from "hono/http-exception";
 import { auth } from "@/shared/helpers/better-auth/auth";
 import {
   expandRoles,
+  formatPermissions,
   type Permissions,
   type Role,
 } from "@/shared/helpers/better-auth/permissions";
@@ -99,11 +100,7 @@ export const withRequiredPermissions = <TPermissions extends Permissions>(
       return c.json(
         {
           error: "Forbidden",
-          description: `
-            Insufficient permissions.\n
-            Required permissions: ${JSON.stringify(requiredPermissions, null, 2)}.\n
-            Your permissions: ${JSON.stringify(permissions, null, 2)}
-          `,
+          description: `Insufficient permissions. Required permissions: [${formatPermissions(requiredPermissions)}]. Your permissions: [${formatPermissions(permissions)}]`,
         },
         403,
       );

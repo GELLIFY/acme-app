@@ -59,3 +59,11 @@ export function expandRoles(role: Role): Permissions {
       return {};
   }
 }
+
+export function formatPermissions(permissions: Permissions) {
+  return Object.entries(permissions)
+    .map(([resource, actions]) =>
+      actions.map((action) => `${resource}:${action}`),
+    )
+    .join(", ");
+}

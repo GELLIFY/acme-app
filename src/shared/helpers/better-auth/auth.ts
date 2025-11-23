@@ -10,7 +10,7 @@ import {
   twoFactor,
 } from "better-auth/plugins";
 import { db } from "@/server/db";
-import { ac, adminRole, userRole } from "./permissions";
+import { ac, adminRole, formatPermissions, userRole } from "./permissions";
 
 export const auth = betterAuth({
   experimental: {
@@ -75,11 +75,9 @@ export const auth = betterAuth({
             todo: ["create"],
           };
 
-          console.log(`
-            Creating API Key
-            permissions: ${JSON.stringify(permissions, null, 2)}
-            user: ${userId}
-          `);
+          console.log(
+            `Creating API Key for user ${userId} with permissions: ${formatPermissions(permissions)}`,
+          );
 
           return {
             ...permissions,
