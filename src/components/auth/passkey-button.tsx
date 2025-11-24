@@ -14,7 +14,7 @@ export function PasskeyButton() {
 
   useEffect(() => {
     if (
-      !window.PublicKeyCredential ||
+      !PublicKeyCredential ||
       !PublicKeyCredential.isConditionalMediationAvailable
     ) {
       return;

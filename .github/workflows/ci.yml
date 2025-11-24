@@ -22,7 +22,7 @@ jobs:
         with:
           version: "2.3.6"
       - name: Run Biome
-        run: biome ci . --reporter=json >> eslint_report.json
+        run: biome ci .
 
   typecheck:
     name: "Typecheck"
@@ -49,6 +49,8 @@ jobs:
           persist-credentials: false
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
       - uses: oven-sh/setup-bun@v2
+        with:
+          version: "1.3.3"
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
       - name: Setup env
