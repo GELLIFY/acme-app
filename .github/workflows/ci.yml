@@ -22,7 +22,7 @@ jobs:
         with:
           version: "2.3.6"
       - name: Run Biome
-        run: biome ci .
+        run: biome ci . --reporter=json >> eslint_report.json
 
   typecheck:
     name: "Typecheck"
