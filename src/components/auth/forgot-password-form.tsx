@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { APIError } from "better-auth";
-import { useState } from "react";
+import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -18,9 +18,9 @@ const formSchema = z.object({
 });
 
 export const ForgotPasswordForm = () => {
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
-  const t = useScopedI18n("auth.forgot");
+  const t = useScopedI18n("auth.forgot_password");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -29,38 +29,30 @@ export const ForgotPasswordForm = () => {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      const { data, error } = await authClient.requestPasswordReset(
-        {
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    startTransition(async () => {
+      try {
+        const { data, error } = await authClient.requestPasswordReset({
           email: values.email, // Email to which the reset password link should be sent.
           redirectTo: "/reset-password", // URL to redirect the user after resetting the password.
-        },
-        {
-          onResponse: () => {
-            setLoading(false);
-          },
-          onRequest: () => {
-            setLoading(true);
-          },
-        },
-      );
+        });
 
-      if (error) {
-        console.error(error.message);
-        toast.error(error.message);
-        return;
-      }
+        if (error) {
+          console.error(error.message);
+          toast.error(error.message);
+          return;
+        }
 
-      if (data.status) {
-        toast.success(data.message);
+        if (data.status) {
+          toast.success(data.message);
+        }
+      } catch (error) {
+        if (error instanceof APIError) {
+          console.log(error.message, error.status);
+          toast.error(error.message);
+        }
       }
-    } catch (error) {
-      if (error instanceof APIError) {
-        console.log(error.message, error.status);
-        toast.error(error.message);
-      }
-    }
+    });
   };
 
   return (
@@ -70,7 +62,7 @@ export const ForgotPasswordForm = () => {
         control={form.control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="email">Email</FieldLabel>
+            <FieldLabel htmlFor="email">{t("email_fld")}</FieldLabel>
             <Input
               {...field}
               id="email"
@@ -81,8 +73,8 @@ export const ForgotPasswordForm = () => {
           </Field>
         )}
       />
-      <Button type="submit" className="w-full mt-2" disabled={loading}>
-        {loading ? <Spinner /> : <p> {t("submit")} </p>}
+      <Button type="submit" className="w-full mt-2" disabled={isPending}>
+        {isPending ? <Spinner /> : t("submit_btn")}
       </Button>
     </form>
   );

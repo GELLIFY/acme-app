@@ -46,7 +46,7 @@ export default async function SignIn() {
           <span className="text-sm text-muted-foreground">
             {t("no_account")}{" "}
             <Link href="/sign-up" className="text-primary underline">
-              {t("signup.submit")}
+              {t("signup.submit_btn")}
             </Link>
           </span>
         </CardFooter>

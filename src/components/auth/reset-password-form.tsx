@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { APIError } from "better-auth";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -31,11 +31,10 @@ const formSchema = z
   });
 
 export const ResetPasswordForm = ({ token }: { token: string }) => {
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const router = useRouter();
-
-  const t = useScopedI18n("auth.reset");
+  const t = useScopedI18n("auth.reset_password");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -45,37 +44,31 @@ export const ResetPasswordForm = ({ token }: { token: string }) => {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      // Call the authClient's reset password method, passing the email and a redirect URL.
-      await authClient.resetPassword(
-        {
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    startTransition(async () => {
+      try {
+        const { data, error } = await authClient.resetPassword({
           newPassword: values.password, // new password given by user
           token,
-        },
-        {
-          onResponse: () => {
-            setLoading(false);
-          },
-          onRequest: () => {
-            setLoading(true);
-          },
-          onSuccess: () => {
-            toast.success("New password has been created");
-            router.replace("/sign-in");
-          },
-          onError: (ctx) => {
-            console.error(ctx.error.message);
-            toast.error(ctx.error.message);
-          },
-        },
-      );
-    } catch (error) {
-      if (error instanceof APIError) {
-        console.log(error.message, error.status);
-        toast.error(error.message);
+        });
+
+        if (error) {
+          console.error(error.message);
+          toast.error(error.message);
+          return;
+        }
+
+        if (data.status) {
+          toast.success("New password has been created");
+          router.replace("/sign-in");
+        }
+      } catch (error) {
+        if (error instanceof APIError) {
+          console.log(error.message, error.status);
+          toast.error(error.message);
+        }
       }
-    }
+    });
   };
 
   return (
@@ -85,7 +78,7 @@ export const ResetPasswordForm = ({ token }: { token: string }) => {
         control={form.control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="password">Password</FieldLabel>
+            <FieldLabel htmlFor="password">{t("password_fld")}</FieldLabel>
             <Input
               {...field}
               id="password"
@@ -104,7 +97,7 @@ export const ResetPasswordForm = ({ token }: { token: string }) => {
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
             <FieldLabel htmlFor="password_confirmation">
-              Confirm Password
+              {t("password_confirmation_fld")}
             </FieldLabel>
             <Input
               {...field}
@@ -118,8 +111,8 @@ export const ResetPasswordForm = ({ token }: { token: string }) => {
           </Field>
         )}
       />
-      <Button type="submit" className="w-full mt-2" disabled={loading}>
-        {loading ? <Spinner /> : t("submit")}
+      <Button type="submit" className="w-full mt-2" disabled={isPending}>
+        {isPending ? <Spinner /> : t("submit_btn")}
       </Button>
     </form>
   );

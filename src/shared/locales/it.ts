@@ -4,51 +4,51 @@ export default {
   "home.doc": "Leggi la documentazione",
 
   // auth
-  "auth.account": "Hai già un account?",
-  "auth.no_account": "Non hai ancora un account?",
-  "auth.signin.title": "Accedi",
-  "auth.signin.subtitle": "Inserisci i dati per accedere al tuo account",
-  "auth.signin.forgot": "Password dimenticata?",
-  "auth.signin.submit": "Accedi",
-  "auth.signup.title": "Registrati",
-  "auth.signup.subtitle": "Inserisci le tue info per creare un account",
-  "auth.signup.submit": "Registrati",
-  "auth.forgot.title": "Password dimenticata",
-  "auth.forgot.subtitle": "Inserisci la tua email per resettare la password",
-  "auth.forgot.submit": "Invia link di reset",
-  "auth.reset.title": "Reset password",
-  "auth.reset.subtitle": "Crea e confera la tua nuova password",
-  "auth.reset.submit": "Resetta password",
-  "auth.reset.error": "Link invalido",
-  "auth.reset.invalid": "Il link usato è invalido o scaduto",
-  "auth.reset.back": "Torna al login",
 
-  // account
-  "account.profile": "Profilo",
-  "account.security": "Sicurezza",
-  "account.api_keys": "Chiavi API",
-  "account.danger": "Pericolo",
+  auth: {
+    already_have_account: "Hai già un account?",
+    no_account: "Non hai ancora un account?",
 
-  // account profile
-  "account.save": "Salva",
-  "account.avatar": "Avatar",
-  "account.avatar.description":
-    "Clicca sull'avatar per caricarne uno personalizzato dai tuoi file.",
-  "account.avatar.message": "Un avatar è opzionale ma fortemente consigliato.",
-  "account.name": "Nome",
-  "account.name.description":
-    "Inserisci il tuo nome completo, oppure un nome visualizzato.",
-  "account.name.message": "Utilizza un massimo di 32 caratteri.",
-  "account.email": "Email",
-  "account.email.description":
-    "Inserisci l'indirizzo email che vuoi usare per accedere.",
-  "account.email.message": "Per favore inserisci un indirizzo email valido.",
-  "account.session": "Sessioni",
-  "account.session.description":
-    "Gestisci le tue sessioni attive e revoca l'accesso.",
-  "account.session.current": "Session corrente",
-  "account.session.revoke": "Revoca",
-  "account.session.logout": "Esci",
+    signup: {
+      title: "Registrati",
+      subtitle: "Inserisci le tue info per creare un account",
+      first_name_fld: "Nome",
+      last_name_fld: "Cognome",
+      email_fld: "Email",
+      password_fld: "Password",
+      password_confirmation_fld: "Conferma password",
+      image_fld: "Immagine di profilo (opzionale)",
+      submit_btn: "Registrati",
+    },
+
+    signin: {
+      title: "Accedi",
+      subtitle: "Inserisci i dati per accedere al tuo account",
+      email_fld: "Email",
+      password_fld: "Password",
+      forgot_link: "Password dimenticata?",
+      submit_btn: "Accedi",
+    },
+
+    forgot_password: {
+      title: "Password dimenticata",
+      subtitle: "Inserisci la tua email per resettare la password",
+      back_btn: "Torna al login",
+      email_fld: "Email",
+      submit_btn: "Invia link di reset",
+    },
+
+    reset_password: {
+      invalid_link_title: "Link invalido",
+      invalid_link_description: "Il link usato è invalido o scaduto",
+      title: "Reset password",
+      subtitle: "Crea e confera la tua nuova password",
+      back_btn: "Torna al login",
+      password_fld: "Password",
+      password_confirmation_fld: "Conferma password",
+      submit_btn: "Resetta password",
+    },
+  },
 
   account: {
     security: {
@@ -173,6 +173,33 @@ export default {
       },
     },
   },
+
+  // account
+  "account.profile": "Profilo",
+  "account.security": "Sicurezza",
+  "account.api_keys": "Chiavi API",
+  "account.danger": "Pericolo",
+
+  // account profile
+  "account.save": "Salva",
+  "account.avatar": "Avatar",
+  "account.avatar.description":
+    "Clicca sull'avatar per caricarne uno personalizzato dai tuoi file.",
+  "account.avatar.message": "Un avatar è opzionale ma fortemente consigliato.",
+  "account.name": "Nome",
+  "account.name.description":
+    "Inserisci il tuo nome completo, oppure un nome visualizzato.",
+  "account.name.message": "Utilizza un massimo di 32 caratteri.",
+  "account.email": "Email",
+  "account.email.description":
+    "Inserisci l'indirizzo email che vuoi usare per accedere.",
+  "account.email.message": "Per favore inserisci un indirizzo email valido.",
+  "account.session": "Sessioni",
+  "account.session.description":
+    "Gestisci le tue sessioni attive e revoca l'accesso.",
+  "account.session.current": "Session corrente",
+  "account.session.revoke": "Revoca",
+  "account.session.logout": "Esci",
 
   // account danger
   "account.delete": "Elimina account",

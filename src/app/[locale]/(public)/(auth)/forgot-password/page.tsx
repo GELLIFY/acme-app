@@ -23,16 +23,14 @@ export default async function ForgotPasswordPage() {
 
   if (session) return redirect("/");
 
-  const t = await getScopedI18n("auth");
+  const t = await getScopedI18n("auth.forgot_password");
 
   return (
     <Card className="max-w-md">
       <CardHeader>
-        <CardTitle className="text-lg md:text-xl">
-          {t("forgot.title")}
-        </CardTitle>
+        <CardTitle className="text-lg md:text-xl">{t("title")}</CardTitle>
         <CardDescription className="text-xs md:text-sm">
-          {t("forgot.subtitle")}
+          {t("subtitle")}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -40,9 +38,8 @@ export default async function ForgotPasswordPage() {
       </CardContent>
       <CardFooter className="flex justify-center">
         <span className="text-sm text-muted-foreground">
-          {t("account")}{" "}
           <Link href="/sign-in" className="text-primary underline">
-            {t("signin.submit")}
+            {t("back_btn")}
           </Link>
         </span>
       </CardFooter>

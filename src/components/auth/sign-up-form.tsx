@@ -5,7 +5,7 @@ import { APIError } from "better-auth";
 import { XIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -50,7 +50,7 @@ const formSchema = z
 
 export const SignUpForm = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const router = useRouter();
   const t = useScopedI18n("auth.signup");
@@ -67,37 +67,32 @@ export const SignUpForm = () => {
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    try {
-      // Call the authClient's forgetPassword method, passing the email and a redirect URL.
-      await authClient.signUp.email(
-        {
-          email: data.email,
-          password: data.password,
-          name: `${data.firstName} ${data.lastName}`,
-          image: data.image ? await convertImageToBase64(data.image) : "",
-        },
-        {
-          onResponse: () => {
-            setLoading(false);
-          },
-          onRequest: () => {
-            setLoading(true);
-          },
-          onError: (ctx) => {
-            toast.error(ctx.error.message);
-          },
-          onSuccess: () => {
-            router.push("/");
-          },
-        },
-      );
-    } catch (error) {
-      if (error instanceof APIError) {
-        console.log(error.message, error.status);
-        toast.error(error.message);
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    startTransition(async () => {
+      try {
+        const { data, error } = await authClient.signUp.email({
+          email: values.email,
+          password: values.password,
+          name: `${values.firstName} ${values.lastName}`,
+          image: values.image ? await convertImageToBase64(values.image) : "",
+        });
+
+        if (error) {
+          console.log(error.message, error.status);
+          toast.error(error.message);
+          return;
+        }
+
+        if (data) {
+          router.push("/");
+        }
+      } catch (error) {
+        if (error instanceof APIError) {
+          console.log(error.message, error.status);
+          toast.error(error.message);
+        }
       }
-    }
+    });
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,7 +114,9 @@ export const SignUpForm = () => {
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="first-name">First name</FieldLabel>
+              <FieldLabel htmlFor="first-name">
+                {t("first_name_fld")}
+              </FieldLabel>
               <Input
                 {...field}
                 id="first-name"
@@ -135,7 +132,7 @@ export const SignUpForm = () => {
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="last-name">Last name</FieldLabel>
+              <FieldLabel htmlFor="last-name">{t("last_name_fld")}</FieldLabel>
               <Input
                 {...field}
                 id="last-name"
@@ -152,7 +149,7 @@ export const SignUpForm = () => {
         control={form.control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="email">Email</FieldLabel>
+            <FieldLabel htmlFor="email">{t("email_fld")}</FieldLabel>
             <Input
               {...field}
               id="email"
@@ -169,13 +166,13 @@ export const SignUpForm = () => {
         control={form.control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="password">Password</FieldLabel>
+            <FieldLabel htmlFor="password">{t("password_fld")}</FieldLabel>
             <Input
               {...field}
               id="password"
               aria-invalid={fieldState.invalid}
               type="password"
-              placeholder="password"
+              placeholder="********"
               autoComplete="new-password"
             />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -188,15 +185,15 @@ export const SignUpForm = () => {
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
             <FieldLabel htmlFor="password_confirmation">
-              Confirm Password
+              {t("password_confirmation_fld")}
             </FieldLabel>
             <Input
               {...field}
               id="password_confirmation"
               aria-invalid={fieldState.invalid}
               type="password"
+              placeholder="********"
               autoComplete="new-password"
-              placeholder="Confirm Password"
             />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
@@ -208,7 +205,7 @@ export const SignUpForm = () => {
         control={form.control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="image">Profile Image (optional)</FieldLabel>
+            <FieldLabel htmlFor="image">{t("image_fld")}</FieldLabel>
             <div className="flex items-end gap-4">
               {imagePreview && (
                 <div className="relative w-9 h-9 rounded-sm overflow-hidden">
@@ -249,8 +246,8 @@ export const SignUpForm = () => {
         )}
       />
 
-      <Button type="submit" className="w-full mt-2" disabled={loading}>
-        {loading ? <Spinner /> : t("submit")}
+      <Button type="submit" className="w-full mt-2" disabled={isPending}>
+        {isPending ? <Spinner /> : t("submit_btn")}
       </Button>
     </form>
   );
