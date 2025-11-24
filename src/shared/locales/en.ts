@@ -94,6 +94,11 @@ export default {
           app_tab: "Autenticator App",
           backup_tab: "Backup Code",
         },
+        backup_code_form: {
+          code_fld: "Backup Code",
+          submit_btn: "Verify",
+          error: "Failed to verify code",
+        },
       },
 
       passkey: {

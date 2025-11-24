@@ -96,6 +96,11 @@ export default {
           app_tab: "App Autenticazione",
           backup_tab: "Codici di Backup",
         },
+        backup_code_form: {
+          code_fld: "Codici di Backup",
+          submit_btn: "Verifica",
+          error: "Verifica del codice non riuscita",
+        },
       },
 
       passkey: {
