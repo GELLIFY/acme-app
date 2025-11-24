@@ -19,10 +19,11 @@ import { Spinner } from "../ui/spinner";
 const formSchema = z.object({
   email: z.email(),
   password: z.string(),
+  rememberMe: z.boolean().optional(),
 });
 
 export const SignInForm = () => {
-  const [loading, startTransition] = useTransition();
+  const [isPending, startTransition] = useTransition();
   const [returnTo] = useQueryState("return_to");
 
   const router = useRouter();
@@ -42,6 +43,7 @@ export const SignInForm = () => {
         const { data, error } = await authClient.signIn.email({
           email: values.email,
           password: values.password,
+          rememberMe: values.rememberMe,
         });
 
         if (error) {
@@ -109,8 +111,8 @@ export const SignInForm = () => {
           )}
         />
 
-        <Button type="submit" className="w-full mt-2" disabled={loading}>
-          {loading ? <Spinner /> : <p> {t("submit")} </p>}
+        <Button type="submit" className="w-full mt-2" disabled={isPending}>
+          {isPending ? <Spinner /> : <p> {t("submit")} </p>}
         </Button>
       </FieldGroup>
     </form>

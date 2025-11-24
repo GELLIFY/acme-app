@@ -47,4 +47,4 @@ Have a look around the [docs↗](https://gellify.dev), as well as the docs of th
 ## Notes 2025-10-23
 
 - [ ] resend email integration
-- [ ] apiKey plugin for REST apis
+- [ ] replace loading with startTransition

@@ -35,7 +35,7 @@ export function BackupCodeForm() {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
     startTranstion(async () => {
       try {
         const { data, error } = await authClient.twoFactor.verifyBackupCode({
