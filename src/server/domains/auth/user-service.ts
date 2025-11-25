@@ -1,7 +1,6 @@
 import type z from "zod";
 import { auth } from "@/shared/helpers/better-auth/auth";
 import type {
-  changeEmailSchema,
   changePasswordSchema,
   updateUserSchema,
 } from "@/shared/validators/user.schema";
@@ -15,20 +14,6 @@ export async function updateUserInformation(
     headers,
     body: {
       ...params,
-    },
-  });
-
-  return data;
-}
-
-export async function changeEmail(
-  headers: Headers,
-  params: z.infer<typeof changeEmailSchema>,
-) {
-  const data = await auth.api.changeEmail({
-    headers,
-    body: {
-      newEmail: params.email,
     },
   });
 

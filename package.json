@@ -65,6 +65,7 @@
     "react-error-boundary": "^6.0.0",
     "react-hook-form": "^7.66.1",
     "react-qr-code": "^2.0.18",
+    "resend": "^6.5.2",
     "sonner": "^2.0.7",
     "superjson": "^2.2.5",
     "tailwind-merge": "^3.4.0",
@@ -77,7 +78,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.3.6",
     "@electric-sql/pglite": "^0.3.14",
-    "@react-email/preview-server": "5.0.4",
+    "@react-email/preview-server": "5.0.5",
     "@tailwindcss/postcss": "^4.1.17",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
@@ -90,7 +91,7 @@
     "@types/ws": "^8.18.1",
     "drizzle-kit": "^0.31.7",
     "postcss": "^8.5.6",
-    "react-email": "5.0.4",
+    "react-email": "5.0.5",
     "tsx": "^4.20.6",
     "typescript": "5.9.3"
   },

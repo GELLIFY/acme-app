@@ -1,10 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import type * as z from "zod";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,49 +18,48 @@ import { Field, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { useUserQuery } from "@/hooks/use-user";
-import { useTRPC } from "@/shared/helpers/trpc/client";
+import { authClient } from "@/shared/helpers/better-auth/auth-client";
 import { useScopedI18n } from "@/shared/locales/client";
-import { changeEmailSchema } from "@/shared/validators/user.schema";
+
+export const formSchema = z.object({
+  email: z.email(),
+});
 
 export function ChangeEmail() {
+  const [isPending, startTransition] = useTransition();
   const t = useScopedI18n("account");
-
-  const queryClient = useQueryClient();
-  const trpc = useTRPC();
 
   const { data: user } = useUserQuery();
 
-  const changeEmailMutation = useMutation(
-    trpc.user.changeEmail.mutationOptions({
-      onError: (error) => {
-        console.error(error);
-        toast.error(error.message);
-      },
-      onSuccess: () => {
-        toast.success("Email changed");
-
-        queryClient.invalidateQueries({
-          queryKey: trpc.user.me.queryKey(),
-        });
-      },
-    }),
-  );
-
-  const form = useForm<z.infer<typeof changeEmailSchema>>({
-    resolver: zodResolver(changeEmailSchema),
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       email: user?.email ?? undefined,
     },
   });
 
-  const onSubmit = form.handleSubmit((data) => {
-    changeEmailMutation.mutate({
-      email: data.email,
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    startTransition(async () => {
+      const { data, error } = await authClient.changeEmail({
+        newEmail: values.email,
+      });
+
+      if (error) {
+        console.error(error);
+        toast.error(error.message || "Error changing email");
+        return;
+      }
+
+      if (data.status) {
+        toast.success(
+          "A verification email has been sent. Please check your inbox to confirm the change.",
+        );
+      }
     });
-  });
+  };
 
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={form.handleSubmit(onSubmit)}>
       <Card>
         <CardHeader>
           <CardTitle>{t("email")}</CardTitle>
@@ -89,8 +88,8 @@ export function ChangeEmail() {
 
         <CardFooter className="border-t text-muted-foreground text-sm justify-between">
           <div>{t("email.message")}</div>
-          <Button type="submit" disabled={changeEmailMutation.isPending}>
-            {changeEmailMutation.isPending ? <Spinner /> : <p> {t("save")} </p>}
+          <Button type="submit" disabled={isPending}>
+            {isPending ? <Spinner /> : t("save")}
           </Button>
         </CardFooter>
       </Card>
