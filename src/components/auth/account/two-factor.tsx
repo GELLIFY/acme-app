@@ -285,8 +285,6 @@ export function TwoFactor() {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-
-      toast.success("Backup codes downloaded");
     } catch (error) {
       console.error(error);
       toast.error("Failed to download backup codes");

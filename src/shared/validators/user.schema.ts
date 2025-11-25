@@ -11,13 +11,6 @@ export const updateUserSchema = z.object({
   }),
 });
 
-export const changeEmailSchema = z.object({
-  email: z.email().openapi({
-    description: "Email address of the user",
-    example: "john.doe@example.com",
-  }),
-});
-
 export const changePasswordSchema = z
   .object({
     currentPassword: z

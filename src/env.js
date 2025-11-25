@@ -13,6 +13,7 @@ export const env = createEnv({
       .default("development"),
 
     BETTER_AUTH_SECRET: z.string().min(1),
+    RESEND_API_KEY: z.string().min(1),
   },
 
   /**

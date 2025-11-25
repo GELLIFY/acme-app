@@ -11,6 +11,12 @@ import {
   twoFactor,
 } from "better-auth/plugins";
 import { db } from "@/server/db";
+import {
+  sendChangeEmailConfirmationEmail,
+  sendDeleteAccountVerificationEmail,
+  sendEmailVerificationEmail,
+  sendResetPasswordEmail,
+} from "@/server/services/email-service";
 import { ac, adminRole, formatPermissions, userRole } from "./permissions";
 
 export const auth = betterAuth({
@@ -23,17 +29,12 @@ export const auth = betterAuth({
     },
   },
   database: drizzleAdapter(db, {
-    provider: "pg", // or "mysql", "sqlite"
+    provider: "pg",
   }),
   emailAndPassword: {
     enabled: true,
-    sendResetPassword: async ({ url }) => {
-      // TODO: send email here
-      console.log(`Click the link to reset your password: ${url}`);
-    },
-    onPasswordReset: async ({ user }) => {
-      // your logic here
-      console.log(`Password for user ${user.email} has been reset.`);
+    sendResetPassword: async ({ url, user }) => {
+      await sendResetPasswordEmail({ url, user });
     },
   },
   // session: {
@@ -45,19 +46,20 @@ export const auth = betterAuth({
   user: {
     changeEmail: {
       enabled: true,
-      sendChangeEmailConfirmation: async ({ newEmail, url }) => {
-        // TODO: send email here
-        console.log(
-          `Click the link to approve the change to ${newEmail}: ${url}`,
-        );
+      sendChangeEmailConfirmation: async ({ newEmail, url, user }) => {
+        await sendChangeEmailConfirmationEmail({ newEmail, url, user });
       },
     },
     deleteUser: {
       enabled: true,
       sendDeleteAccountVerification: async ({ user, url }) => {
-        // TODO: send email here
-        console.log(`Delete ${user.email} by visiting ${url}.`);
+        await sendDeleteAccountVerificationEmail({ user, url });
       },
+    },
+  },
+  emailVerification: {
+    sendVerificationEmail: async ({ user, url }) => {
+      await sendEmailVerificationEmail({ user, url });
     },
   },
   plugins: [

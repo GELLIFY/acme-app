@@ -1,7 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +17,8 @@ import {
 import { Field, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { useUserMutation, useUserQuery } from "@/hooks/use-user";
+import { useUserQuery } from "@/hooks/use-user";
+import { authClient } from "@/shared/helpers/better-auth/auth-client";
 import { useScopedI18n } from "@/shared/locales/client";
 
 const formSchema = z.object({
@@ -23,10 +26,10 @@ const formSchema = z.object({
 });
 
 export function DisplayName() {
+  const [isPending, starTransition] = useTransition();
   const t = useScopedI18n("account");
 
   const { data: user } = useUserQuery();
-  const updateUserMutation = useUserMutation();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -35,9 +38,19 @@ export function DisplayName() {
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    updateUserMutation.mutate({
-      name: data?.name,
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    starTransition(async () => {
+      const { data, error } = await authClient.updateUser({
+        name: values.name,
+      });
+
+      if (error) {
+        console.error(error);
+        toast.error(error.message || "Error updating user");
+        return;
+      }
+
+      if (data.status) toast.success("User updated");
     });
   };
 
@@ -58,7 +71,7 @@ export function DisplayName() {
                 <Input
                   {...field}
                   aria-invalid={fieldState.invalid}
-                  placeholder="m@example.com"
+                  placeholder="Rob"
                 />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
@@ -70,8 +83,8 @@ export function DisplayName() {
 
         <CardFooter className="border-t text-muted-foreground text-sm justify-between">
           <div>{t("name.message")}</div>
-          <Button type="submit" disabled={updateUserMutation.isPending}>
-            {updateUserMutation.isPending ? <Spinner /> : <p> {t("save")} </p>}
+          <Button type="submit" disabled={isPending}>
+            {isPending ? <Spinner /> : t("save")}
           </Button>
         </CardFooter>
       </Card>
