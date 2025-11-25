@@ -50,7 +50,7 @@ jobs:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
       - uses: oven-sh/setup-bun@v2
         with:
-          version: "1.3.3"
+          bun-version: 1.3.3 # or "latest", "canary", <sha> #
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
       - name: Setup env
