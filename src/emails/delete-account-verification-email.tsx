@@ -14,15 +14,15 @@ import {
   Text,
 } from "@react-email/components";
 
-interface ResetPasswordEmailProps {
+type ResetPasswordEmailProps = {
   user?: { name: string };
   url?: string;
-}
+};
 
 export default function DeleteAccountVerificationEmail({
   user,
   url,
-}: ResetPasswordEmailProps) {
+}: Readonly<ResetPasswordEmailProps>) {
   const previewText = `Delete your Acme App account`;
 
   return (

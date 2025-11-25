@@ -14,17 +14,17 @@ import {
   Text,
 } from "@react-email/components";
 
-interface ResetPasswordEmailProps {
+type ResetPasswordEmailProps = {
   user?: { name: string };
   newEmail?: string;
   url?: string;
-}
+};
 
 export default function ChangeEmailConfirmationEmail({
   user,
   newEmail,
   url,
-}: ResetPasswordEmailProps) {
+}: Readonly<ResetPasswordEmailProps>) {
   const previewText = `Change your Acme App email`;
 
   return (

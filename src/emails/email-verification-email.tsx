@@ -14,15 +14,15 @@ import {
   Text,
 } from "@react-email/components";
 
-interface EmailVerificationEmailProps {
+type EmailVerificationEmailProps = {
   user?: { name: string };
   url?: string;
-}
+};
 
 export default function EmailVerificationEmail({
   user,
   url,
-}: EmailVerificationEmailProps) {
+}: Readonly<EmailVerificationEmailProps>) {
   const previewText = `Verify your Acme App email`;
 
   return (

@@ -14,15 +14,15 @@ import {
   Text,
 } from "@react-email/components";
 
-interface ResetPasswordEmailProps {
+type ResetPasswordEmailProps = {
   username?: string;
   resetLink?: string;
-}
+};
 
 export default function ResetPasswordEmail({
   username,
   resetLink,
-}: ResetPasswordEmailProps) {
+}: Readonly<ResetPasswordEmailProps>) {
   const previewText = `Reset your Acme App password`;
 
   return (
