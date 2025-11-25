@@ -46,6 +46,7 @@ export const session = createTable(
     ipAddress: d.text("ip_address"),
     userAgent: d.text("user_agent"),
     impersonatedBy: d.text("impersonated_by"),
+    activeOrganizationId: d.text("active_organization_id"),
   }),
   (t) => [
     index("session_user_id_idx").on(t.userId),
@@ -129,7 +130,73 @@ export const apikey = createTable(
     permissions: d.text("permissions"),
     metadata: d.text("metadata"),
   }),
-  (t) => [index("api_key_user_id_idx").on(t.userId)],
+  (t) => [
+    index("apikey_key_idx").on(t.key),
+    index("apikey_user_id_idx").on(t.userId),
+  ],
+);
+
+export const organization = createTable(
+  "organization",
+  (d) => ({
+    id: d.uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
+    createdAt: d.timestamp("created_at").notNull(),
+
+    name: d.text("name").notNull(),
+    slug: d.text("slug").notNull().unique(),
+    logo: d.text("logo"),
+    metadata: d.text("metadata"),
+  }),
+  (t) => [index("organization_slug_idx").on(t.slug)],
+);
+
+export const member = createTable(
+  "member",
+  (d) => ({
+    id: d.uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
+    createdAt: d.timestamp("created_at").notNull(),
+
+    organizationId: d
+      .uuid("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    userId: d
+      .uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+
+    role: d.text("role").default("member").notNull(),
+  }),
+  (t) => [
+    index("member_organization_id_idx").on(t.organizationId),
+    index("member_user_id_idx").on(t.userId),
+  ],
+);
+
+export const invitation = createTable(
+  "invitation",
+  (d) => ({
+    id: d.uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
+    createdAt: d.timestamp("created_at").defaultNow().notNull(),
+
+    organizationId: d
+      .uuid("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    inviterId: d
+      .uuid("inviter_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+
+    email: d.text("email").notNull(),
+    role: d.text("role"),
+    status: d.text("status").default("pending").notNull(),
+    expiresAt: d.timestamp("expires_at").notNull(),
+  }),
+  (t) => [
+    index("invitation_organization_id_idx").on(t.organizationId),
+    index("invitation_email_idx").on(t.email),
+  ],
 );
 
 export const passkey = createTable(
@@ -182,6 +249,9 @@ export const userRelations = relations(user, ({ many }) => ({
   accounts: many(account),
   passkeys: many(passkey),
   twoFactors: many(twoFactor),
+  apikeys: many(apikey),
+  members: many(member),
+  invitations: many(invitation),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -208,6 +278,40 @@ export const passkeyRelations = relations(passkey, ({ one }) => ({
 export const twoFactorRelations = relations(twoFactor, ({ one }) => ({
   user: one(user, {
     fields: [twoFactor.userId],
+    references: [user.id],
+  }),
+}));
+
+export const apikeyRelations = relations(apikey, ({ one }) => ({
+  user: one(user, {
+    fields: [apikey.userId],
+    references: [user.id],
+  }),
+}));
+
+export const organizationRelations = relations(organization, ({ many }) => ({
+  members: many(member),
+  invitations: many(invitation),
+}));
+
+export const memberRelations = relations(member, ({ one }) => ({
+  organization: one(organization, {
+    fields: [member.organizationId],
+    references: [organization.id],
+  }),
+  user: one(user, {
+    fields: [member.userId],
+    references: [user.id],
+  }),
+}));
+
+export const invitationRelations = relations(invitation, ({ one }) => ({
+  organization: one(organization, {
+    fields: [invitation.organizationId],
+    references: [organization.id],
+  }),
+  user: one(user, {
+    fields: [invitation.inviterId],
     references: [user.id],
   }),
 }));

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  BuildingIcon,
   LogOutIcon,
   ShieldUserIcon,
   SunMoonIcon,
@@ -59,12 +60,20 @@ export function UserMenu({ user }: { user: User }) {
 
         <DropdownMenuGroup>
           {user.role === "admin" && (
-            <DropdownMenuItem asChild>
-              <Link href="/admin">
-                <ShieldUserIcon />
-                Admin
-              </Link>
-            </DropdownMenuItem>
+            <>
+              <DropdownMenuItem asChild>
+                <Link href="/admin">
+                  <ShieldUserIcon />
+                  Admin
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/organization">
+                  <BuildingIcon />
+                  Organizations
+                </Link>
+              </DropdownMenuItem>
+            </>
           )}
 
           <DropdownMenuItem asChild>

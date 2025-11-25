@@ -7,6 +7,7 @@ import {
   apiKey,
   lastLoginMethod,
   openAPI,
+  organization,
   type Statements,
   twoFactor,
 } from "better-auth/plugins";
@@ -88,6 +89,7 @@ export const auth = betterAuth({
         },
       },
     }),
+    organization(),
     lastLoginMethod(),
     passkey(),
     twoFactor(),
