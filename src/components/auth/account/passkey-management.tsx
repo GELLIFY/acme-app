@@ -1,7 +1,8 @@
 "use client";
 
+import type { Passkey } from "@better-auth/passkey";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { Passkey } from "better-auth/plugins/passkey";
+import { APIError } from "better-auth";
 import { ArrowUpRightIcon, FingerprintIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -96,8 +97,10 @@ export function PasskeyManagement({ passkeys }: { passkeys: Passkey[] }) {
         },
       });
     } catch (error) {
-      console.log(error);
-      toast.error("Something went wrong");
+      if (error instanceof APIError) {
+        console.log(error.message, error.status);
+        toast.error(error.message);
+      }
     }
   }
 
@@ -183,8 +186,12 @@ export function PasskeyManagement({ passkeys }: { passkeys: Passkey[] }) {
           ))
         )}
       </CardContent>
-      <CardFooter className="border-t text-muted-foreground text-sm justify-between">
-        <Link href="#" className="flex gap-2 items-center">
+      <CardFooter className="border-t text-muted-foreground text-sm justify-between gap-4">
+        <Link
+          href="#"
+          className="gap-2 items-center"
+          style={{ display: "ruby" }}
+        >
           {t("info")} <ArrowUpRightIcon className="size-4" />
         </Link>
         <Dialog

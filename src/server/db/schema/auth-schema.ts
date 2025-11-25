@@ -1,11 +1,11 @@
+import { relations, sql } from "drizzle-orm";
 import { index } from "drizzle-orm/pg-core";
-import type { Role } from "@/shared/helpers/better-auth/permissions";
 import { createTable } from "./_table";
 
 export const user = createTable(
   "user",
   (d) => ({
-    id: d.uuid().defaultRandom().primaryKey(),
+    id: d.uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
     createdAt: d.timestamp("created_at").defaultNow().notNull(),
     updatedAt: d
       .timestamp("updated_at")
@@ -18,7 +18,7 @@ export const user = createTable(
     emailVerified: d.boolean("email_verified").default(false).notNull(),
     image: d.text("image"),
     twoFactorEnabled: d.boolean("two_factor_enabled").default(false),
-    role: d.text("role").$type<Role[]>(),
+    role: d.text("role"),
     banned: d.boolean("banned").default(false),
     banReason: d.text("ban_reason"),
     banExpires: d.timestamp("ban_expires"),
@@ -29,23 +29,23 @@ export const user = createTable(
 export const session = createTable(
   "session",
   (d) => ({
-    id: d.uuid().defaultRandom().primaryKey(),
+    id: d.uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
     createdAt: d.timestamp("created_at").defaultNow().notNull(),
     updatedAt: d
       .timestamp("updated_at")
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
 
+    userId: d
+      .uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+
     expiresAt: d.timestamp("expires_at").notNull(),
     token: d.text("token").notNull().unique(),
     ipAddress: d.text("ip_address"),
     userAgent: d.text("user_agent"),
     impersonatedBy: d.text("impersonated_by"),
-
-    userId: d
-      .uuid("user_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
   }),
   (t) => [
     index("session_user_id_idx").on(t.userId),
@@ -56,12 +56,17 @@ export const session = createTable(
 export const account = createTable(
   "account",
   (d) => ({
-    id: d.uuid().defaultRandom().primaryKey(),
+    id: d.uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
     createdAt: d.timestamp("created_at").defaultNow().notNull(),
     updatedAt: d
       .timestamp("updated_at")
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
+
+    userId: d
+      .uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
 
     accountId: d.text("account_id").notNull(),
     providerId: d.text("provider_id").notNull(),
@@ -72,11 +77,6 @@ export const account = createTable(
     refreshTokenExpiresAt: d.timestamp("refresh_token_expires_at"),
     scope: d.text("scope"),
     password: d.text("password"),
-
-    userId: d
-      .uuid("user_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
   }),
   (t) => [index("account_user_id_idx").on(t.userId)],
 );
@@ -84,7 +84,7 @@ export const account = createTable(
 export const verification = createTable(
   "verification",
   (d) => ({
-    id: d.uuid().defaultRandom().primaryKey(),
+    id: d.uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
     createdAt: d.timestamp("created_at").defaultNow().notNull(),
     updatedAt: d
       .timestamp("updated_at")
@@ -99,11 +99,49 @@ export const verification = createTable(
   (t) => [index("verification_identifier_idx").on(t.identifier)],
 );
 
+export const apikey = createTable(
+  "apikey",
+  (d) => ({
+    id: d.uuid().defaultRandom().primaryKey(),
+    createdAt: d.timestamp("created_at").notNull(),
+    updatedAt: d.timestamp("updated_at").notNull(),
+
+    userId: d
+      .uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+
+    name: d.text("name"),
+    start: d.text("start"),
+    prefix: d.text("prefix"),
+    key: d.text("key").notNull(),
+    refillInterval: d.integer("refill_interval"),
+    refillAmount: d.integer("refill_amount"),
+    lastRefillAt: d.timestamp("last_refill_at"),
+    enabled: d.boolean("enabled").default(true),
+    rateLimitEnabled: d.boolean("rate_limit_enabled").default(true),
+    rateLimitTimeWindow: d.integer("rate_limit_time_window").default(86400000),
+    rateLimitMax: d.integer("rate_limit_max").default(10),
+    requestCount: d.integer("request_count").default(0),
+    remaining: d.integer("remaining"),
+    lastRequest: d.timestamp("last_request"),
+    expiresAt: d.timestamp("expires_at"),
+    permissions: d.text("permissions"),
+    metadata: d.text("metadata"),
+  }),
+  (t) => [index("api_key_user_id_idx").on(t.userId)],
+);
+
 export const passkey = createTable(
   "passkey",
   (d) => ({
-    id: d.uuid().defaultRandom().primaryKey(),
+    id: d.uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
     createdAt: d.timestamp("created_at"),
+
+    userId: d
+      .uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
 
     name: d.text("name"),
     publicKey: d.text("public_key").notNull(),
@@ -113,25 +151,63 @@ export const passkey = createTable(
     backedUp: d.boolean("backed_up").notNull(),
     transports: d.text("transports"),
     aaguid: d.text("aaguid"),
-
-    userId: d
-      .uuid("user_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
   }),
-  (t) => [index("passkey_user_id_idx").on(t.userId)],
+  (t) => [
+    index("passkey_user_id_idx").on(t.userId),
+    index("passkey_credential_id_idx").on(t.credentialID),
+  ],
 );
 
 export const twoFactor = createTable(
   "two_factor",
   (d) => ({
-    id: d.uuid().defaultRandom().primaryKey(),
-    secret: d.text("secret").notNull(),
-    backupCodes: d.text("backup_codes").notNull(),
+    id: d.uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
+
     userId: d
       .uuid("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
+
+    secret: d.text("secret").notNull(),
+    backupCodes: d.text("backup_codes").notNull(),
   }),
-  (t) => [index("two_factor_secret_idx").on(t.secret)],
+  (t) => [
+    index("two_factor_secret_idx").on(t.secret),
+    index("twoFactor_user_id_idx").on(t.userId),
+  ],
 );
+
+export const userRelations = relations(user, ({ many }) => ({
+  sessions: many(session),
+  accounts: many(account),
+  passkeys: many(passkey),
+  twoFactors: many(twoFactor),
+}));
+
+export const sessionRelations = relations(session, ({ one }) => ({
+  user: one(user, {
+    fields: [session.userId],
+    references: [user.id],
+  }),
+}));
+
+export const accountRelations = relations(account, ({ one }) => ({
+  user: one(user, {
+    fields: [account.userId],
+    references: [user.id],
+  }),
+}));
+
+export const passkeyRelations = relations(passkey, ({ one }) => ({
+  user: one(user, {
+    fields: [passkey.userId],
+    references: [user.id],
+  }),
+}));
+
+export const twoFactorRelations = relations(twoFactor, ({ one }) => ({
+  user: one(user, {
+    fields: [twoFactor.userId],
+    references: [user.id],
+  }),
+}));

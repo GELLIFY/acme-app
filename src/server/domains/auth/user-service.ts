@@ -25,7 +25,6 @@ export async function changeEmail(
   headers: Headers,
   params: z.infer<typeof changeEmailSchema>,
 ) {
-  // Change email if needed
   const data = await auth.api.changeEmail({
     headers,
     body: {
@@ -40,7 +39,6 @@ export async function changePassword(
   headers: Headers,
   params: z.infer<typeof changePasswordSchema>,
 ) {
-  // Change email if needed
   const data = await auth.api.changePassword({
     headers,
     body: {
@@ -53,13 +51,11 @@ export async function changePassword(
 
 // Delete user
 export async function deleteUser(headers: Headers) {
-  // Delete user
   const data = await auth.api.deleteUser({
+    headers,
     body: {
       callbackURL: "/sign-in",
     },
-    // This endpoint requires session cookies.
-    headers,
   });
 
   return data;

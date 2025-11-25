@@ -27,7 +27,7 @@ type PageProps = {
 };
 
 export default async function ResetPasswordPage(props: PageProps) {
-  const t = await getScopedI18n("auth");
+  const t = await getScopedI18n("auth.reset_password");
   const searchParams = await props.searchParams;
 
   const loadParams = createLoader(resetPasswordSearchParams);
@@ -38,15 +38,15 @@ export default async function ResetPasswordPage(props: PageProps) {
       <Card className="max-w-md">
         <CardHeader>
           <CardTitle className="text-lg md:text-xl">
-            {t("reset.error")}
+            {t("invalid_link_title")}
           </CardTitle>
           <CardDescription className="text-xs md:text-sm">
-            {t("reset.invalid")}
+            {t("invalid_link_description")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Button type="button" className="w-full mt-2" asChild>
-            <Link href="/sign-in">{t("reset.back")}</Link>
+            <Link href="/sign-in">{t("back_btn")}</Link>
           </Button>
         </CardContent>
       </Card>
@@ -56,9 +56,9 @@ export default async function ResetPasswordPage(props: PageProps) {
   return (
     <Card className="max-w-md">
       <CardHeader>
-        <CardTitle className="text-lg md:text-xl">{t("reset.title")}</CardTitle>
+        <CardTitle className="text-lg md:text-xl">{t("title")}</CardTitle>
         <CardDescription className="text-xs md:text-sm">
-          {t("reset.subtitle")}
+          {t("subtitle")}
         </CardDescription>
       </CardHeader>
       <CardContent>

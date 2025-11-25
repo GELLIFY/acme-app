@@ -3,7 +3,7 @@ import {
   changePassword,
   deleteUser,
   updateUserInformation,
-} from "@/server/services/user-service";
+} from "@/server/domains/auth/user-service";
 import {
   changeEmailSchema,
   changePasswordSchema,

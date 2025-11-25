@@ -42,7 +42,7 @@ export function SessionManagement({
       {
         onError: (error) => {
           console.error(error);
-          toast.success("Error revoking session");
+          toast.error("Error revoking session");
         },
         onSuccess: () => {
           toast.success("Session revoked");
@@ -75,11 +75,15 @@ export function SessionManagement({
               </ItemMedia>
               <ItemContent>
                 <ItemTitle>
-                  {session.id === currentSession.id
+                  {session.id !== currentSession.id
                     ? session.ipAddress
                     : t("session.current")}
                 </ItemTitle>
-                <ItemDescription>{`${userAgentInfo?.browser.name}, ${userAgentInfo?.os.name}`}</ItemDescription>
+                <ItemDescription>
+                  {userAgentInfo?.browser.name
+                    ? `${userAgentInfo.browser.name}, ${userAgentInfo.os.name}`
+                    : userAgentInfo?.ua}
+                </ItemDescription>
               </ItemContent>
               <ItemActions>
                 <Button

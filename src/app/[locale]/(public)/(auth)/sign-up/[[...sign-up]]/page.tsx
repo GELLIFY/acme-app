@@ -42,9 +42,9 @@ export default async function SignUp() {
         </CardContent>
         <CardFooter className="flex justify-center">
           <span className="text-sm text-muted-foreground">
-            {t("account")}{" "}
+            {t("already_have_account")}{" "}
             <Link href="/sign-in" className="text-primary underline">
-              {t("signin.submit")}
+              {t("signin.submit_btn")}
             </Link>
           </span>
         </CardFooter>

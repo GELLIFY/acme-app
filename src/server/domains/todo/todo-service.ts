@@ -14,8 +14,9 @@ import { getTodoByIdQuery, getTodosQuery } from "./queries";
 export async function getTodos(
   db: DBClient,
   filters: z.infer<typeof getTodosSchema>,
+  userId: string,
 ) {
-  const todos = await getTodosQuery(db, filters);
+  const todos = await getTodosQuery(db, { ...filters, userId });
 
   // NOTE: do whatever you want here, map, aggregate filter...
   // result will be cached and typesafety preserved
@@ -25,20 +26,23 @@ export async function getTodos(
 export async function getTodoById(
   db: DBClient,
   filters: z.infer<typeof getTodoByIdSchema>,
+  userId: string,
 ) {
-  return await getTodoByIdQuery(db, filters);
+  return await getTodoByIdQuery(db, { ...filters, userId });
 }
 
 export async function upsertTodo(
   db: DBClient,
   params: z.infer<typeof upsertTodoSchema>,
+  userId: string,
 ) {
-  return await upsertTodoMutation(db, params);
+  return await upsertTodoMutation(db, { ...params, userId });
 }
 
 export async function deleteTodo(
   db: DBClient,
   params: z.infer<typeof getTodoByIdSchema>,
+  userId: string,
 ) {
-  return await deleteTodoMutation(db, params);
+  return await deleteTodoMutation(db, { ...params, userId });
 }

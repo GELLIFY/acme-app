@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2Icon } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import type z from "zod";
 
@@ -13,6 +12,7 @@ import { useTRPC } from "@/shared/helpers/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 import { upsertTodoSchema } from "@/shared/validators/todo.schema";
 import { Field, FieldError } from "../ui/field";
+import { Spinner } from "../ui/spinner";
 
 export function CreateTodoForm() {
   const t = useScopedI18n("todo");
@@ -110,11 +110,7 @@ export function CreateTodoForm() {
         )}
       />
       <Button type="submit" disabled={createMutation.isPending}>
-        {createMutation.isPending ? (
-          <Loader2Icon className="h-4 w-4 animate-spin" />
-        ) : (
-          t("add")
-        )}
+        {createMutation.isPending ? <Spinner /> : t("add")}
       </Button>
     </form>
   );

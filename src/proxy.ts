@@ -5,7 +5,7 @@ import { createI18nMiddleware } from "next-international/middleware";
 const I18nMiddleware = createI18nMiddleware({
   locales: ["en", "it"],
   defaultLocale: "it",
-  urlMappingStrategy: "rewriteDefault",
+  urlMappingStrategy: "rewrite",
 });
 
 const AUTH_ROUTES = [
