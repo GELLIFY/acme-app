@@ -10,10 +10,7 @@ export const todoTable = createTable(
     id: d.uuid().defaultRandom().primaryKey().notNull(),
     ...timestamps,
 
-    userId: d
-      .uuid()
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
+    userId: d.uuid().references(() => user.id, { onDelete: "cascade" }),
 
     text: d.varchar({ length: 256 }).notNull(),
     completed: d.boolean().default(false).notNull(),
