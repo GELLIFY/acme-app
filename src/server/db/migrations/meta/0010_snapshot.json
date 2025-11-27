@@ -1,6 +1,6 @@
 {
-  "id": "021f4472-f8d6-4520-b3b9-8a71e5c862a2",
-  "prevId": "c0233c68-93b3-46ef-a724-9f8782700330",
+  "id": "3e38302e-d99f-4751-b7ad-230dabac7c03",
+  "prevId": "021f4472-f8d6-4520-b3b9-8a71e5c862a2",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -800,7 +800,7 @@
           "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "default": "gen_random_uuid()"
+          "default": "pg_catalog.gen_random_uuid()"
         },
         "created_at": {
           "name": "created_at",
@@ -819,7 +819,7 @@
           "name": "user_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "text": {
           "name": "text",
@@ -836,11 +836,11 @@
         }
       },
       "indexes": {
-        "text_idx": {
-          "name": "text_idx",
+        "user_id_idx": {
+          "name": "user_id_idx",
           "columns": [
             {
-              "expression": "text",
+              "expression": "user_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
