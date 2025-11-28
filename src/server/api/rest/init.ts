@@ -66,21 +66,22 @@ const app = new OpenAPIHono<Context>()
   )
   .route("/", routers);
 
-// TODO: enable Register security scheme
-// app.openAPIRegistry.registerComponent("securitySchemes", "cookieAuth", {
-//   type: "apiKey",
-//   in: "cookie",
-//   name: "better-auth.session_token",
-//   description:
-//     "Authentication via a session token stored in the 'better-auth.session_token' cookie.",
-// });
+// @ts-expect-error override of types between OpenAPIHono and Hono
+app.openAPIRegistry.registerComponent("securitySchemes", "cookieAuth", {
+  type: "apiKey",
+  in: "cookie",
+  name: "better-auth.session_token",
+  description:
+    "Authentication via a session token stored in the 'better-auth.session_token' cookie.",
+});
 
-// app.openAPIRegistry.registerComponent("securitySchemes", "apiKeyAuth", {
-//   type: "apiKey",
-//   in: "header",
-//   name: "x-api-key",
-//   description:
-//     "Authentication using the x-api-key header. Example: 'x-api-key: <your-api-key>'",
-// });
+// @ts-expect-error override of types between OpenAPIHono and Hono
+app.openAPIRegistry.registerComponent("securitySchemes", "apiKeyAuth", {
+  type: "apiKey",
+  in: "header",
+  name: "x-api-key",
+  description:
+    "Authentication using the x-api-key header. Example: 'x-api-key: <your-api-key>'",
+});
 
 export { app as routers };
