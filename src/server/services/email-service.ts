@@ -5,7 +5,7 @@ import EmailVerificationEmail from "@/emails/email-verification-email";
 import ResetPasswordEmail from "@/emails/reset-password-email";
 import { env } from "@/env";
 
-export const resend = new Resend(env.RESEND_API_KEY);
+export const resend = new Resend(env.RESEND_API_KEY || "re_123");
 
 type ResetPasswordEmailParams = {
   user: { email: string };

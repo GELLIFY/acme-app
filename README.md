@@ -47,3 +47,4 @@ Have a look around the [docs↗](https://gellify.dev), as well as the docs of th
 ## Notes 2025-10-23
 
 - [ ] fix 422 example
+- [ ] security schemas
