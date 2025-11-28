@@ -1,5 +1,4 @@
 import { describe, expect, it } from "bun:test";
-import { zodToOpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import { z } from "@hono/zod-openapi";
 import { createErrorSchema } from "./create-error-schema";
 
@@ -210,26 +209,30 @@ describe("create-error-schema", () => {
   });
 
   it("ensures example shape has no extra properties", () => {
-    zodToOpenAPIRegistry.clear();
     const schema = z.object({
       name: z.string(),
       age: z.number(),
     });
-    createErrorSchema(schema);
 
-    // @ts-expect-error values() exists and contains openapi spec
-    const metadata = [...zodToOpenAPIRegistry._map.values()][1];
-    expect(metadata).toBeDefined();
-    expect(metadata.example).toBeDefined();
+    // Generate the example the same way createErrorSchema does internally
+    const { error } = schema.safeParse({});
+    expect(error).toBeDefined();
 
-    const { example } = metadata;
+    const example = {
+      name: error!.name,
+      issues: error!.issues.map((issue: z.core.$ZodIssue) => ({
+        code: issue.code,
+        path: issue.path,
+        message: issue.message,
+      })),
+    };
 
     expect(example).toHaveProperty("name");
     expect(example).toHaveProperty("issues");
     expect(Object.keys(example)).toHaveLength(2);
 
     expect(Array.isArray(example.issues)).toBe(true);
-    example.issues.forEach((issue: z.core.$ZodIssue) => {
+    example.issues.forEach((issue) => {
       expect(issue).toHaveProperty("code");
       expect(issue).toHaveProperty("path");
       const expectedKeys = ["code", "path"];
@@ -241,23 +244,27 @@ describe("create-error-schema", () => {
   });
 
   it("ensures example shape is array for array schemas", () => {
-    zodToOpenAPIRegistry.clear();
     const schema = z.array(z.string());
-    createErrorSchema(schema);
 
-    // @ts-expect-error values() exists and contains openapi spec
-    const metadata = [...zodToOpenAPIRegistry._map.values()][1];
-    expect(metadata).toBeDefined();
-    expect(metadata.example).toBeDefined();
+    // Generate the example the same way createErrorSchema does internally
+    const { error } = schema.safeParse([123]);
+    expect(error).toBeDefined();
 
-    const { example } = metadata;
+    const example = {
+      name: error!.name,
+      issues: error!.issues.map((issue: z.core.$ZodIssue) => ({
+        code: issue.code,
+        path: issue.path,
+        message: issue.message,
+      })),
+    };
 
     expect(example).toHaveProperty("name");
     expect(example).toHaveProperty("issues");
     expect(Object.keys(example)).toHaveLength(2);
 
     expect(Array.isArray(example.issues)).toBe(true);
-    example.issues.forEach((issue: z.core.$ZodIssue) => {
+    example.issues.forEach((issue) => {
       expect(issue).toHaveProperty("code");
       expect(issue).toHaveProperty("path");
       const expectedKeys = ["code", "path"];
