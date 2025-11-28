@@ -30,6 +30,7 @@
     "@better-auth/passkey": "^1.4.1",
     "@happy-dom/global-registrator": "^20.0.10",
     "@hono/zod-openapi": "^1.1.4",
+    "@hono/zod-validator": "^0.7.5",
     "@hookform/resolvers": "^5.2.2",
     "@kubiks/otel-drizzle": "^2.1.0",
     "@neondatabase/serverless": "^1.0.2",

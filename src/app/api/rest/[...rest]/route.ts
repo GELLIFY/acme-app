@@ -3,8 +3,11 @@ import { handle } from "hono/vercel";
 
 import type { Context } from "@/server/api/rest/init";
 import { routers } from "@/server/api/rest/init";
+import configureOpenAPI from "@/server/api/rest/utils/configure-open-api";
 
 const app = new OpenAPIHono<Context>().basePath("/api/rest");
+
+configureOpenAPI(app);
 
 app.route("/", routers);
 
