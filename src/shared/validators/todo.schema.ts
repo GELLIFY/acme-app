@@ -13,7 +13,7 @@ export const getTodosSchema = z.object({
 });
 
 export const getTodoByIdSchema = z.object({
-  id: z.guid().openapi({
+  id: z.uuid().openapi({
     description: "Unique identifier of the todo to retrieve",
     example: "b3b7c1e2-4c2a-4e7a-9c1a-2b7c1e24c2a4",
     param: {
@@ -24,9 +24,8 @@ export const getTodoByIdSchema = z.object({
 });
 
 export const todoResponseSchema = z.object({
-  // TODO: investigate why drizzle generate a guid
-  id: z.guid().openapi({
-    description: "Unique identifier of the customer",
+  id: z.uuid().openapi({
+    description: "Unique identifier of the todo to retrieve",
     example: "b3b7c1e2-4c2a-4e7a-9c1a-2b7c1e24c2a4",
   }),
   text: z.string().openapi({
@@ -39,23 +38,25 @@ export const todoResponseSchema = z.object({
   }),
 });
 
-export const todosResponseSchema = z.object({
-  data: z.array(todoResponseSchema).nullable(),
+export const todosResponseSchema = z.array(todoResponseSchema);
+
+export const createTodoSchema = z.object({
+  text: z.string().min(3).openapi({
+    description: "The new text of the todo.",
+    example: "Update the doc v2",
+  }),
 });
 
-export const upsertTodoSchema = z.object({
-  id: z
-    .guid()
-    .optional()
-    .openapi({
-      description: "The ID of the todo to update.",
-      example: "b3b7c8e2-1f2a-4c3d-9e4f-5a6b7c8d9e0f",
-      param: {
-        in: "path",
-        name: "id",
-      },
-    }),
-  text: z.string().min(3).openapi({
+export const updateTodoSchema = z.object({
+  id: z.uuid().openapi({
+    description: "The ID of the todo to update.",
+    example: "b3b7c8e2-1f2a-4c3d-9e4f-5a6b7c8d9e0f",
+    param: {
+      in: "path",
+      name: "id",
+    },
+  }),
+  text: z.string().min(3).optional().openapi({
     description: "The new text of the todo.",
     example: "Update the doc v2",
   }),

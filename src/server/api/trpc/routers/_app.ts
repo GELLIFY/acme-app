@@ -18,9 +18,9 @@ export const appRouter = createTRPCRouter({
   user: userRouter,
   todo: todoRouter,
   dashboard: dashboardRouter,
-  health: publicProcedure.query(async () => {
+  health: publicProcedure.query(async ({ ctx: { db } }) => {
     try {
-      await checkHealth();
+      await checkHealth(db);
       return { status: "ok" };
     } catch (error) {
       return { status: "error", error };

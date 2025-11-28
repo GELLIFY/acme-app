@@ -2,7 +2,13 @@ import { beforeEach, expect, test } from "bun:test";
 import { randomUUIDv7 } from "bun";
 import { db } from "@/server/db";
 import { user as userTable } from "@/server/db/schema/auth-schema";
-import { deleteTodo, getTodoById, getTodos, upsertTodo } from "./todo-service";
+import {
+  createTodo,
+  deleteTodo,
+  getTodoById,
+  getTodos,
+  updateTodo,
+} from "./todo-service";
 
 const userId = randomUUIDv7();
 
@@ -14,7 +20,7 @@ beforeEach(async () => {
 });
 
 test("create todo", async () => {
-  const todo = await upsertTodo(db, { text: "text" }, userId);
+  const todo = await createTodo(db, { text: "text" }, userId);
 
   expect(todo).toBeDefined();
   expect(todo?.text).toEqual("text");
@@ -27,15 +33,15 @@ test("list todos - empty", async () => {
 });
 
 test("list todos - one user", async () => {
-  await upsertTodo(db, { text: "text" }, userId);
+  await createTodo(db, { text: "text" }, userId);
   const todos = await getTodos(db, {}, userId);
 
   expect(todos.length).toEqual(1);
 });
 
 test("update todo", async () => {
-  const todo = await upsertTodo(db, { text: "text" }, userId);
-  const updatedTodo = await upsertTodo(
+  const todo = await createTodo(db, { text: "text" }, userId);
+  const updatedTodo = await updateTodo(
     db,
     {
       id: todo.id,
@@ -48,7 +54,7 @@ test("update todo", async () => {
 });
 
 test("delete todo", async () => {
-  const todo = await upsertTodo(db, { text: "text" }, userId);
+  const todo = await createTodo(db, { text: "text" }, userId);
   await deleteTodo(db, { id: todo.id }, userId);
   const deletedTodo = await getTodoById(db, { id: todo.id }, userId);
 

@@ -21,7 +21,7 @@ export function TodoList() {
   );
 
   const toggleMutation = useMutation(
-    trpc.todo.upsert.mutationOptions({
+    trpc.todo.update.mutationOptions({
       onSuccess: () => {
         void refetch();
       },

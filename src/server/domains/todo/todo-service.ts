@@ -3,12 +3,17 @@
 import type z from "zod";
 import type { DBClient } from "@/server/db";
 import type {
+  createTodoSchema,
   getTodoByIdSchema,
   getTodosSchema,
-  upsertTodoSchema,
+  updateTodoSchema,
 } from "@/shared/validators/todo.schema";
 import { shuffleTodos } from "./helpers";
-import { deleteTodoMutation, upsertTodoMutation } from "./mutations";
+import {
+  createTodoMutation,
+  deleteTodoMutation,
+  updateTodoMutation,
+} from "./mutations";
 import { getTodoByIdQuery, getTodosQuery } from "./queries";
 
 export async function getTodos(
@@ -31,12 +36,20 @@ export async function getTodoById(
   return await getTodoByIdQuery(db, { ...filters, userId });
 }
 
-export async function upsertTodo(
+export async function createTodo(
   db: DBClient,
-  params: z.infer<typeof upsertTodoSchema>,
+  params: z.infer<typeof createTodoSchema>,
   userId: string,
 ) {
-  return await upsertTodoMutation(db, { ...params, userId });
+  return await createTodoMutation(db, { ...params, userId });
+}
+
+export async function updateTodo(
+  db: DBClient,
+  params: z.infer<typeof updateTodoSchema>,
+  userId: string,
+) {
+  return await updateTodoMutation(db, { ...params, userId });
 }
 
 export async function deleteTodo(

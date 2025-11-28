@@ -48,7 +48,7 @@ if (env.NODE_ENV === "development") {
 const drizzleClientWs = drizzleWs({
   client: new Pool({ connectionString }),
   schema,
-  logger: env.NODE_ENV !== "production",
+  logger: process.env.LOG_LEVEL === "debug",
   casing: "snake_case",
 });
 

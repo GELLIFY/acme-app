@@ -46,4 +46,4 @@ Have a look around the [docs↗](https://gellify.dev), as well as the docs of th
 
 ## Notes 2025-10-23
 
-- [ ] replace loading with startTransition
+- [ ] fix 422 example

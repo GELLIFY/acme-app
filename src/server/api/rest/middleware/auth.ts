@@ -2,6 +2,7 @@ import { role } from "better-auth/plugins/access";
 import type { MiddlewareHandler } from "hono";
 import { getCookie } from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
+import { env } from "@/env";
 import { auth } from "@/shared/helpers/better-auth/auth";
 import {
   expandRoles,
@@ -24,6 +25,13 @@ import type { Context } from "../init";
  * @returns The next middleware invocation if authentication succeeds; otherwise, throws an HTTPException.
  */
 export const withAuth: MiddlewareHandler<Context> = async (c, next) => {
+  // TODO: maybe create a mock session for testing
+  if (env.NODE_ENV === "test") {
+    c.set("userId", "00000000-0000-0000-0000-000000000000");
+    c.set("permissions", expandRoles("user"));
+    return next();
+  }
+
   // 1. Handle authentication with session cookie
   const sessionToken = getCookie(c, "better-auth.session_token");
 

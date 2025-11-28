@@ -3,7 +3,7 @@ import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import { reset } from "drizzle-seed";
-
+import { user } from "@/server/db/schema/auth-schema";
 import { db } from "../server/db";
 import { schema } from "../server/db/schema";
 
@@ -21,17 +21,16 @@ await mock.module("../server/db", () => {
   return { client, db };
 });
 
-// await mock.module("next/router", () => ({
-//   useRouter: mock(() => ({
-//     locale: "it",
-//     defaultLocale: "it",
-//     locales: ["it", "en"],
-//   })),
-// }));
-
 // Apply migrations before each test
 beforeEach(async () => {
   await migrate(db, { migrationsFolder: "src/server/db/migrations" });
+
+  // create a test user
+  await db.insert(user).values({
+    id: "00000000-0000-0000-0000-000000000000",
+    email: "matteo.badini@gellify.com",
+    name: "Matteo Badini",
+  });
 });
 
 // Clean up the database after each test

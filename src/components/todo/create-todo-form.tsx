@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { useTodoFilterParams } from "@/hooks/use-todo-filter-params";
 import { useTRPC } from "@/shared/helpers/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
-import { upsertTodoSchema } from "@/shared/validators/todo.schema";
+import { createTodoSchema } from "@/shared/validators/todo.schema";
 import { Field, FieldError } from "../ui/field";
 import { Spinner } from "../ui/spinner";
 
@@ -20,13 +20,13 @@ export function CreateTodoForm() {
   const { filter } = useTodoFilterParams();
 
   // 1. Define your form.
-  const form = useForm<z.infer<typeof upsertTodoSchema>>({
-    resolver: zodResolver(upsertTodoSchema),
+  const form = useForm<z.infer<typeof createTodoSchema>>({
+    resolver: zodResolver(createTodoSchema),
     defaultValues: { text: "" },
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof upsertTodoSchema>) {
+  function onSubmit(values: z.infer<typeof createTodoSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values);
@@ -37,7 +37,7 @@ export function CreateTodoForm() {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation(
-    trpc.todo.upsert.mutationOptions({
+    trpc.todo.create.mutationOptions({
       onMutate: async (variables) => {
         // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
         await queryClient.cancelQueries({
