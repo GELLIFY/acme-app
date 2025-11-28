@@ -24,6 +24,10 @@ export const getTodoByIdSchema = z.object({
 });
 
 export const todoResponseSchema = z.object({
+  id: z.uuid().openapi({
+    description: "Unique identifier of the todo to retrieve",
+    example: "b3b7c1e2-4c2a-4e7a-9c1a-2b7c1e24c2a4",
+  }),
   text: z.string().openapi({
     description: "The text of the todo.",
     example: "Update the doc",
@@ -34,9 +38,7 @@ export const todoResponseSchema = z.object({
   }),
 });
 
-export const todosResponseSchema = z.object({
-  data: z.array(todoResponseSchema).nullable(),
-});
+export const todosResponseSchema = z.array(todoResponseSchema);
 
 export const createTodoSchema = z.object({
   text: z.string().min(3).openapi({
@@ -54,7 +56,7 @@ export const updateTodoSchema = z.object({
       name: "id",
     },
   }),
-  text: z.string().min(3).openapi({
+  text: z.string().min(3).optional().openapi({
     description: "The new text of the todo.",
     example: "Update the doc v2",
   }),

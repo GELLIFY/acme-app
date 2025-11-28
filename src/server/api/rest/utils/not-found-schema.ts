@@ -11,3 +11,31 @@ export const notFoundSchema = (exampleMessage: string = "Not Found") => {
       },
     });
 };
+
+export const unauthorizedSchema = (defaultError: string = "Unauthorized") => {
+  return z
+    .object({
+      error: z.string(),
+      description: z.string(),
+    })
+    .openapi({
+      example: {
+        error: defaultError,
+        description: "Authentication is required.",
+      },
+    });
+};
+
+export const forbiddenSchema = (defaultError: string = "Forbidden") => {
+  return z
+    .object({
+      error: z.string(),
+      description: z.string(),
+    })
+    .openapi({
+      example: {
+        error: defaultError,
+        description: "Insufficient permissions.",
+      },
+    });
+};

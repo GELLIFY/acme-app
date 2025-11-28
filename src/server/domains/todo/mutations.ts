@@ -59,11 +59,7 @@ export async function deleteTodoMutation(
     .where(
       and(eq(todoTable.id, params.id), eq(todoTable.userId, params.userId)),
     )
-    .returning({
-      id: todoTable.id,
-      text: todoTable.text,
-      completed: todoTable.completed,
-    });
+    .returning();
 
   return result;
 }

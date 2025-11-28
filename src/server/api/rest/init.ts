@@ -1,11 +1,11 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { Scalar } from "@scalar/hono-api-reference";
 import { cors } from "hono/cors";
 import { requestId } from "hono/request-id";
 import { secureHeaders } from "hono/secure-headers";
 import type { db } from "@/server/db";
 import type { Permissions } from "@/shared/helpers/better-auth/permissions";
 import { getBaseUrl } from "@/shared/helpers/get-url";
-import onError from "./middleware/on-error";
 import { routers } from "./routers/_app";
 
 export type Context = {
@@ -53,8 +53,17 @@ const app = new OpenAPIHono<Context>()
       maxAge: 86400,
     }),
   )
-  // .notFound(notFound)
-  .onError(onError)
+  .get(
+    "/scalar",
+    Scalar({
+      pageTitle: "Acme API",
+      sources: [
+        { url: "/api/rest/openapi", title: "API" },
+        // Better Auth schema generation endpoint
+        { url: "/api/auth/open-api/generate-schema", title: "Auth" },
+      ],
+    }),
+  )
   .route("/", routers);
 
 // TODO: enable Register security scheme

@@ -6,7 +6,6 @@ import {
   getTodos,
   updateTodo,
 } from "@/server/domains/todo/todo-service";
-import { validateResponse } from "@/server/services/validation-service";
 import {
   createTodoSchema,
   getTodoByIdSchema,
@@ -17,12 +16,16 @@ import {
 } from "@/shared/validators/todo.schema";
 import { withRequiredPermissions } from "../middleware/auth";
 import { createErrorSchema } from "../utils/create-error-schema";
-import { notFoundSchema } from "../utils/not-found-schema";
+import {
+  forbiddenSchema,
+  notFoundSchema,
+  unauthorizedSchema,
+} from "../utils/not-found-schema";
 import { createRouter } from "./_app";
 
 const tags = ["Todos"];
 
-const app = createRouter()
+export const todosRouter = createRouter()
   .openapi(
     createRoute({
       method: "get",
@@ -36,10 +39,26 @@ const app = createRouter()
       },
       responses: {
         200: {
-          description: "Retrieve a list of todos.",
+          description: "The list of todos",
           content: {
             "application/json": {
               schema: todosResponseSchema,
+            },
+          },
+        },
+        401: {
+          description: "Unauthorized",
+          content: {
+            "application/json": {
+              schema: unauthorizedSchema(),
+            },
+          },
+        },
+        403: {
+          description: "Forbidden",
+          content: {
+            "application/json": {
+              schema: forbiddenSchema(),
             },
           },
         },
@@ -57,7 +76,7 @@ const app = createRouter()
 
       const result = await getTodos(db, filters, userId);
 
-      return c.json({ data: result }, 200);
+      return c.json(result, 200);
     },
   )
   .openapi(
@@ -80,6 +99,38 @@ const app = createRouter()
             },
           },
         },
+        401: {
+          description: "Unauthorized",
+          content: {
+            "application/json": {
+              schema: unauthorizedSchema(),
+            },
+          },
+        },
+        403: {
+          description: "Forbidden",
+          content: {
+            "application/json": {
+              schema: forbiddenSchema(),
+            },
+          },
+        },
+        404: {
+          description: "Todo not found",
+          content: {
+            "application/json": {
+              schema: notFoundSchema(),
+            },
+          },
+        },
+        422: {
+          description: "The validation error(s)",
+          content: {
+            "application/json": {
+              schema: createErrorSchema(getTodoByIdSchema),
+            },
+          },
+        },
       },
       middleware: [
         withRequiredPermissions({
@@ -94,7 +145,9 @@ const app = createRouter()
 
       const result = await getTodoById(db, { id }, userId);
 
-      return c.json(validateResponse(result, todoResponseSchema));
+      if (!result) return c.json({ message: "Todo not found" }, 404);
+
+      return c.json(result, 200);
     },
   )
   .openapi(
@@ -121,6 +174,22 @@ const app = createRouter()
           content: {
             "application/json": {
               schema: todoResponseSchema,
+            },
+          },
+        },
+        401: {
+          description: "Unauthorized",
+          content: {
+            "application/json": {
+              schema: unauthorizedSchema(),
+            },
+          },
+        },
+        403: {
+          description: "Forbidden",
+          content: {
+            "application/json": {
+              schema: forbiddenSchema(),
             },
           },
         },
@@ -162,7 +231,7 @@ const app = createRouter()
         body: {
           content: {
             "application/json": {
-              schema: updateTodoSchema,
+              schema: updateTodoSchema.omit({ id: true }),
             },
           },
         },
@@ -173,6 +242,22 @@ const app = createRouter()
           content: {
             "application/json": {
               schema: todoResponseSchema,
+            },
+          },
+        },
+        401: {
+          description: "Unauthorized",
+          content: {
+            "application/json": {
+              schema: unauthorizedSchema(),
+            },
+          },
+        },
+        403: {
+          description: "Forbidden",
+          content: {
+            "application/json": {
+              schema: forbiddenSchema(),
             },
           },
         },
@@ -224,11 +309,38 @@ const app = createRouter()
         params: getTodoByIdSchema,
       },
       responses: {
-        200: {
+        204: {
           description: "Todo deleted",
+        },
+        401: {
+          description: "Unauthorized",
           content: {
             "application/json": {
-              schema: todoResponseSchema,
+              schema: unauthorizedSchema(),
+            },
+          },
+        },
+        403: {
+          description: "Forbidden",
+          content: {
+            "application/json": {
+              schema: forbiddenSchema(),
+            },
+          },
+        },
+        404: {
+          description: "Todo not found",
+          content: {
+            "application/json": {
+              schema: notFoundSchema(),
+            },
+          },
+        },
+        422: {
+          description: "The validation error(s)",
+          content: {
+            "application/json": {
+              schema: createErrorSchema(getTodoByIdSchema),
             },
           },
         },
@@ -244,10 +356,10 @@ const app = createRouter()
       const userId = c.get("userId");
       const id = c.req.valid("param").id;
 
-      const result = await deleteTodo(db, { id }, userId);
+      const deleted = await deleteTodo(db, { id }, userId);
 
-      return c.json(validateResponse(result, todoResponseSchema));
+      if (!deleted) return c.json({ message: "Todo not found" }, 404);
+
+      return c.body(null, 204);
     },
   );
-
-export const todosRouter = app;
