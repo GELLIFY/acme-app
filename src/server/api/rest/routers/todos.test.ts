@@ -15,7 +15,8 @@ describe("tasks routes", () => {
     expect(response.status).toBe(422);
     if (response.status === 422) {
       const json = await response.json();
-      expect(json.error.issues[0]!.path[0]).toBe("name");
+      expect(json.error.issues[0]!.code).toBe("too_small");
+      expect(json.error.issues[0]!.path[0]).toBe("text");
     }
   });
 

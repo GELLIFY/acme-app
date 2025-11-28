@@ -1,8 +1,11 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { cors } from "hono/cors";
+import { requestId } from "hono/request-id";
 import { secureHeaders } from "hono/secure-headers";
 import type { db } from "@/server/db";
 import type { Permissions } from "@/shared/helpers/better-auth/permissions";
+import { getBaseUrl } from "@/shared/helpers/get-url";
+import onError from "./middleware/on-error";
 import { routers } from "./routers/_app";
 
 export type Context = {
@@ -14,6 +17,31 @@ export type Context = {
 };
 
 const app = new OpenAPIHono<Context>()
+  .doc31("/openapi", {
+    openapi: "3.1.0",
+    info: {
+      version: "0.0.1",
+      title: "GELLIFY API",
+      description: "Description",
+      contact: {
+        name: "GELLIFY Support",
+        email: "engineer@gellify.dev",
+        url: "https://gellify.dev",
+      },
+      license: {
+        name: "AGPL-3.0 license",
+        url: "https://github.com/GELLIFY/acme-app/blob/main/LICENSE",
+      },
+    },
+    servers: [
+      {
+        url: `${getBaseUrl()}/api/rest/`,
+        description: "Production API",
+      },
+    ],
+    security: [{ cookieAuth: [] }, { apiKeyAuth: [] }],
+  })
+  .use(requestId())
   .use(secureHeaders())
   .use(
     "*",
@@ -25,6 +53,25 @@ const app = new OpenAPIHono<Context>()
       maxAge: 86400,
     }),
   )
+  // .notFound(notFound)
+  .onError(onError)
   .route("/", routers);
+
+// TODO: enable Register security scheme
+// app.openAPIRegistry.registerComponent("securitySchemes", "cookieAuth", {
+//   type: "apiKey",
+//   in: "cookie",
+//   name: "better-auth.session_token",
+//   description:
+//     "Authentication via a session token stored in the 'better-auth.session_token' cookie.",
+// });
+
+// app.openAPIRegistry.registerComponent("securitySchemes", "apiKeyAuth", {
+//   type: "apiKey",
+//   in: "header",
+//   name: "x-api-key",
+//   description:
+//     "Authentication using the x-api-key header. Example: 'x-api-key: <your-api-key>'",
+// });
 
 export { app as routers };

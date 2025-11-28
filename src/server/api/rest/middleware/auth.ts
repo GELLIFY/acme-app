@@ -25,6 +25,7 @@ import type { Context } from "../init";
  * @returns The next middleware invocation if authentication succeeds; otherwise, throws an HTTPException.
  */
 export const withAuth: MiddlewareHandler<Context> = async (c, next) => {
+  // TODO: maybe create a mock session for testing
   if (env.NODE_ENV === "test") {
     c.set("userId", "test_user_id");
     c.set("permissions", expandRoles("user"));

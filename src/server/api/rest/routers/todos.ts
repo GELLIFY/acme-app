@@ -1,4 +1,4 @@
-import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import { createRoute } from "@hono/zod-openapi";
 import {
   createTodo,
   deleteTodo,
@@ -15,14 +15,14 @@ import {
   todosResponseSchema,
   updateTodoSchema,
 } from "@/shared/validators/todo.schema";
-import type { Context } from "../init";
 import { withRequiredPermissions } from "../middleware/auth";
 import { createErrorSchema } from "../utils/create-error-schema";
 import { notFoundSchema } from "../utils/not-found-schema";
+import { createRouter } from "./_app";
 
 const tags = ["Todos"];
 
-const app = new OpenAPIHono<Context>()
+const app = createRouter()
   .openapi(
     createRoute({
       method: "get",
@@ -57,7 +57,7 @@ const app = new OpenAPIHono<Context>()
 
       const result = await getTodos(db, filters, userId);
 
-      return c.json(validateResponse({ data: result }, todosResponseSchema));
+      return c.json({ data: result }, 200);
     },
   )
   .openapi(
