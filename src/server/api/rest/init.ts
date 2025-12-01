@@ -9,6 +9,10 @@ import { getBaseUrl } from "@/shared/helpers/get-url";
 import { routers } from "./routers/_app";
 
 export type Context = {
+  Bindings?: {
+    permissions?: Permissions;
+    userId?: string;
+  };
   Variables: {
     db: typeof db;
     permissions: Permissions;

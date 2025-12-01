@@ -14,7 +14,7 @@ import {
   todosResponseSchema,
   updateTodoSchema,
 } from "@/shared/validators/todo.schema";
-import { withRequiredPermissions } from "../middleware/auth";
+import { withRequiredPermissions } from "../middleware/required-permissions";
 import { createErrorSchema } from "../utils/create-error-schema";
 import {
   forbiddenSchema,

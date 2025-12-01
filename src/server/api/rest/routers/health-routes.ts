@@ -8,16 +8,17 @@ export const healthRouter = createRouter().openapi(
   createRoute({
     method: "get",
     path: "/",
-    summary: "List all todos",
-    operationId: "listTodos",
-    description: "Retrieve a list of todos.",
+    summary: "Health check",
+    operationId: "healthCheck",
+    description:
+      "Check the health/status of the application and database connection.",
     tags: tags,
     responses: {
       204: {
-        description: "Health success",
+        description: "Service is healthy.",
       },
       500: {
-        description: "Todo deleted",
+        description: "Service is unhealthy or an internal error occurred.",
       },
     },
   }),

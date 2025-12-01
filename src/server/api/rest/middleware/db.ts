@@ -1,5 +1,4 @@
-import type { MiddlewareHandler } from "hono";
-
+import { createMiddleware } from "hono/factory";
 import { db } from "@/server/db";
 import type { Context } from "../init";
 
@@ -13,9 +12,9 @@ import type { Context } from "../init";
  * @param c - The Hono context object representing the request.
  * @param next - The next middleware function in the chain.
  */
-export const withDatabase: MiddlewareHandler<Context> = async (c, next) => {
+export const withDatabase = createMiddleware<Context>(async (c, next) => {
   // Set database on context
   c.set("db", db);
 
   await next();
-};
+});

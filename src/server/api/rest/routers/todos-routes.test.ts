@@ -2,9 +2,11 @@ import { describe, expect, expectTypeOf, test } from "bun:test";
 import { testClient } from "hono/testing";
 import { db } from "@/server/db";
 import { todoTable } from "@/server/db/schema/todos";
+import { expandRoles } from "@/shared/helpers/better-auth/permissions";
 import { routers } from "../init";
 
 const userId = "00000000-0000-0000-0000-000000000000";
+const permissions = expandRoles("user");
 
 async function createMockTodo() {
   const [todo] = await db
@@ -21,7 +23,7 @@ async function createMockTodo() {
 
 describe("todos routes", () => {
   // Create the test client from the app instance
-  const client = testClient(routers);
+  const client = testClient(routers, { userId, permissions });
 
   test("post /todos validates the body when creating", async () => {
     const response = await client.todos.$post({
