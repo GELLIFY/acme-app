@@ -39,7 +39,7 @@ describe("todos routes", () => {
     spy.mockRestore();
   });
 
-  test("get /health should return 204 when db is available", async () => {
+  test("get /health should return 200 when db is available", async () => {
     const app = new OpenAPIHono<Context>()
       .use(async (c, next) => {
         c.set("db", db);
@@ -50,6 +50,6 @@ describe("todos routes", () => {
 
     const response = await client.health.$get();
 
-    expect(response.status).toBe(204);
+    expect(response.status).toBe(200);
   });
 });

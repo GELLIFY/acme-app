@@ -1,4 +1,4 @@
-import { createRoute } from "@hono/zod-openapi";
+import { createRoute, z } from "@hono/zod-openapi";
 import { checkHealth } from "@/server/services/health-service";
 import { createRouter } from "../utils/create-router";
 
@@ -14,11 +14,21 @@ export const healthRouter = createRouter().openapi(
       "Check the health/status of the application and database connection.",
     tags: tags,
     responses: {
-      204: {
+      200: {
         description: "Service is healthy.",
+        content: {
+          "application/json": {
+            schema: z.object({ status: z.string() }),
+          },
+        },
       },
       500: {
         description: "Service is unhealthy or an internal error occurred.",
+        content: {
+          "application/json": {
+            schema: z.object({ status: z.string() }),
+          },
+        },
       },
     },
   }),
@@ -27,10 +37,10 @@ export const healthRouter = createRouter().openapi(
 
     try {
       await checkHealth(db);
-      return c.body(null, 204);
+      return c.json({ status: "ok" }, 200);
     } catch (error) {
       console.error(error);
-      return c.body(null, 500);
+      return c.json({ status: "error" }, 500);
     }
   },
 );
