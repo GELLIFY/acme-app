@@ -14,7 +14,7 @@ import type { Context } from "../init";
  *
  * @template TPermissions - The permissions type.
  * @param {TPermissions} requiredPermissions - List or object describing required permissions.
- * @returns {MiddlewareHandler} Middleware that validates user permissions.
+ * @returns {MiddlewareHandler<Context>} Middleware that validates user permissions.
  */
 export const withRequiredPermissions = <TPermissions extends Permissions>(
   requiredPermissions: TPermissions,

@@ -1,6 +1,6 @@
 import { createRoute } from "@hono/zod-openapi";
 import { checkHealth } from "@/server/services/health-service";
-import { createRouter } from "./_app";
+import { createRouter } from "../utils/create-router";
 
 const tags = ["Health"];
 

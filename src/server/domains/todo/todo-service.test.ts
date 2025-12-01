@@ -39,6 +39,15 @@ test("list todos - one user", async () => {
   expect(todos.length).toEqual(1);
 });
 
+test("list todos - filter by text", async () => {
+  await createTodo(db, { text: "text1" }, userId);
+  await createTodo(db, { text: "text2" }, userId);
+  await createTodo(db, { text: "text3" }, userId);
+  const todos = await getTodos(db, { text: "3" }, userId);
+
+  expect(todos.length).toEqual(1);
+});
+
 test("update todo", async () => {
   const todo = await createTodo(db, { text: "text" }, userId);
   const updatedTodo = await updateTodo(

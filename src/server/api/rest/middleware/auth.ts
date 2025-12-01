@@ -1,7 +1,6 @@
 import { getCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
-import { env } from "@/env";
 import { auth } from "@/shared/helpers/better-auth/auth";
 import {
   expandRoles,
@@ -59,15 +58,6 @@ export const withAuth = createMiddleware<Context>(async (c, next) => {
     // Set session on context
     c.set("userId", data.key.userId);
     c.set("permissions", data.key.permissions ?? {});
-    return await next();
-  }
-
-  // 3. If we are in test mode, use the userId and permissions from the context
-  // Refactor with mock.module when this get fixed
-  // @ref https://github.com/oven-sh/bun/issues/7823
-  if (env.NODE_ENV === "test" && c.env?.userId && c.env?.permissions) {
-    c.set("userId", c.env.userId);
-    c.set("permissions", c.env.permissions);
     return await next();
   }
 

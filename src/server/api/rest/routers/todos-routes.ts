@@ -16,12 +16,12 @@ import {
 } from "@/shared/validators/todo.schema";
 import { withRequiredPermissions } from "../middleware/required-permissions";
 import { createErrorSchema } from "../utils/create-error-schema";
+import { createRouter } from "../utils/create-router";
 import {
   forbiddenSchema,
   notFoundSchema,
   unauthorizedSchema,
 } from "../utils/not-found-schema";
-import { createRouter } from "./_app";
 
 const tags = ["Todos"];
 

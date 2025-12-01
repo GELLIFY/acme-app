@@ -1,27 +1,7 @@
-import { OpenAPIHono } from "@hono/zod-openapi";
-import type { Context } from "../init";
 import { protectedMiddleware, publicMiddleware } from "../middleware";
+import { createRouter } from "../utils/create-router";
 import { healthRouter } from "./health-routes";
 import { todosRouter } from "./todos-routes";
-
-export function createRouter() {
-  return new OpenAPIHono<Context>({
-    defaultHook: (result, c) => {
-      if (!result.success) {
-        return c.json(
-          {
-            success: result.success,
-            error: {
-              name: result.error.name,
-              issues: result.error.issues,
-            },
-          },
-          422,
-        );
-      }
-    },
-  });
-}
 
 const routers = createRouter()
   .use(...publicMiddleware)

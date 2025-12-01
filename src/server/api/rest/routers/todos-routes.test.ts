@@ -1,12 +1,37 @@
 import { describe, expect, expectTypeOf, test } from "bun:test";
+import { OpenAPIHono } from "@hono/zod-openapi";
 import { testClient } from "hono/testing";
 import { db } from "@/server/db";
 import { todoTable } from "@/server/db/schema/todos";
-import { expandRoles } from "@/shared/helpers/better-auth/permissions";
-import { routers } from "../init";
+import {
+  expandRoles,
+  type Permissions,
+} from "@/shared/helpers/better-auth/permissions";
+import type { Context } from "../init";
+import { todosRouter } from "./todos-routes";
 
 const userId = "00000000-0000-0000-0000-000000000000";
 const permissions = expandRoles("user");
+
+type TestAppContext = Context & {
+  Bindings?: {
+    permissions?: Permissions;
+    userId?: string;
+  };
+};
+
+const createTestApp = () => {
+  const app = new OpenAPIHono<TestAppContext>()
+    .use(async (c, next) => {
+      c.set("db", db);
+      c.set("userId", c.env?.userId ?? userId);
+      c.set("permissions", c.env?.permissions ?? permissions);
+      await next();
+    })
+    .route("/todos", todosRouter);
+
+  return app;
+};
 
 async function createMockTodo() {
   const [todo] = await db
@@ -23,7 +48,8 @@ async function createMockTodo() {
 
 describe("todos routes", () => {
   // Create the test client from the app instance
-  const client = testClient(routers, { userId, permissions });
+  const app = createTestApp();
+  const client = testClient(app, { userId, permissions });
 
   test("post /todos validates the body when creating", async () => {
     const response = await client.todos.$post({
