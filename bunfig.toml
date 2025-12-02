@@ -22,8 +22,10 @@ coverageDir = "coverage"  # default "coverage"
 # Multiple patterns
 coveragePathIgnorePatterns = [
   "src/app/**",
+  "src/emails/**",
   "src/server/db/**",
   "src/shared/locales/**",
+  "src/shared/helpers/better-auth/auth.ts",
   "src/shared/helpers/trpc/**",
   "src/components/ui/**",
   "src/tests/**",

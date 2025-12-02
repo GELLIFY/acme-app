@@ -15,7 +15,7 @@ export async function getTodosQuery(db: DBClient, filters: GetTodosRequest) {
   const where = [eq(todoTable.userId, filters.userId)];
 
   if (filters?.text) {
-    where.push(ilike(todoTable.text, filters.text));
+    where.push(ilike(todoTable.text, `%${filters.text}%`));
   }
 
   if (filters?.completed) {

@@ -1,12 +1,14 @@
 import {
+  createTodo,
   deleteTodo,
   getTodos,
-  upsertTodo,
+  updateTodo,
 } from "@/server/domains/todo/todo-service";
 import {
+  createTodoSchema,
   getTodoByIdSchema,
   getTodosSchema,
-  upsertTodoSchema,
+  updateTodoSchema,
 } from "@/shared/validators/todo.schema";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
@@ -17,10 +19,16 @@ export const todoRouter = createTRPCRouter({
       return await getTodos(db, input, session.user.id);
     }),
 
-  upsert: protectedProcedure
-    .input(upsertTodoSchema)
+  create: protectedProcedure
+    .input(createTodoSchema)
     .mutation(async ({ ctx: { db, session }, input }) => {
-      return await upsertTodo(db, input, session.user.id);
+      return await createTodo(db, input, session.user.id);
+    }),
+
+  update: protectedProcedure
+    .input(updateTodoSchema)
+    .mutation(async ({ ctx: { db, session }, input }) => {
+      return await updateTodo(db, input, session.user.id);
     }),
 
   delete: protectedProcedure
