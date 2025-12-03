@@ -1,4 +1,5 @@
 import { env } from "@/env";
+import { logger } from "@/lib/logger";
 
 /**
  * Middleware for timing procedure execution and adding an artificial delay in development.
@@ -23,7 +24,7 @@ export const timingMiddleware = async <TReturn>(opts: {
   const result = await next();
 
   const end = Date.now();
-  console.log(`[TRPC] ${path} took ${end - start}ms to execute`);
+  logger.debug(`[TRPC] ${path} took ${end - start}ms to execute`);
 
   return result;
 };

@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { logger } from "@/lib/logger";
 import { useTRPC } from "@/shared/helpers/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 import { changePasswordSchema } from "@/shared/validators/user.schema";
@@ -47,7 +48,7 @@ export function UpdatePassword() {
   const changePasswordMutation = useMutation(
     trpc.user.changePassword.mutationOptions({
       onError: (error) => {
-        console.error(error);
+        logger.error(error, error.message);
         toast.error(error.message);
       },
       onSuccess: () => {

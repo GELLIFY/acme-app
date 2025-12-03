@@ -6,6 +6,7 @@ import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
+import { logger } from "@/lib/logger";
 import { authClient } from "@/shared/helpers/better-auth/auth-client";
 import { useScopedI18n } from "@/shared/locales/client";
 import { Button } from "../ui/button";
@@ -38,7 +39,7 @@ export const ForgotPasswordForm = () => {
         });
 
         if (error) {
-          console.error(error.message);
+          logger.error(error, error.message);
           toast.error(error.message);
           return;
         }
@@ -48,7 +49,7 @@ export const ForgotPasswordForm = () => {
         }
       } catch (error) {
         if (error instanceof APIError) {
-          console.log(error.message, error.status);
+          logger.error(error, error.message);
           toast.error(error.message);
         }
       }

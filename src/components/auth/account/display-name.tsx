@@ -18,6 +18,7 @@ import { Field, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { useUserQuery } from "@/hooks/use-user";
+import { logger } from "@/lib/logger";
 import { authClient } from "@/shared/helpers/better-auth/auth-client";
 import { useScopedI18n } from "@/shared/locales/client";
 
@@ -45,7 +46,7 @@ export function DisplayName() {
       });
 
       if (error) {
-        console.error(error);
+        logger.error(error, error.message);
         toast.error(error.message || "Error updating user");
         return;
       }

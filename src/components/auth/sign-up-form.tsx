@@ -9,6 +9,7 @@ import { useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
+import { logger } from "@/lib/logger";
 import { authClient } from "@/shared/helpers/better-auth/auth-client";
 import { convertImageToBase64 } from "@/shared/helpers/image";
 import { useScopedI18n } from "@/shared/locales/client";
@@ -78,7 +79,7 @@ export const SignUpForm = () => {
         });
 
         if (error) {
-          console.log(error.message, error.status);
+          logger.error(error, error.message);
           toast.error(error.message);
           return;
         }
@@ -88,7 +89,7 @@ export const SignUpForm = () => {
         }
       } catch (error) {
         if (error instanceof APIError) {
-          console.log(error.message, error.status);
+          logger.error(error, error.message);
           toast.error(error.message);
         }
       }
