@@ -1,33 +1,20 @@
 "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import type { DBClient } from "@/server/db";
-import { todo_table } from "@/server/db/schema/todos";
+import { todoTable } from "@/server/db/schema/todos";
 
-type UpsertTodoParams = {
-  id?: string;
+type CreateTodoParams = {
   text: string;
-  completed?: boolean;
+  userId: string;
 };
 
-export async function upsertTodoMutation(
+export async function createTodoMutation(
   db: DBClient,
-  params: UpsertTodoParams,
+  params: CreateTodoParams,
 ) {
-  const { id, ...rest } = params;
-
-  const [todo] = await db
-    .insert(todo_table)
-    .values({ id, ...rest })
-    .onConflictDoUpdate({
-      target: todo_table.id,
-      set: {
-        text: rest.text,
-        completed: rest.completed,
-      },
-    })
-    .returning();
+  const [todo] = await db.insert(todoTable).values(params).returning();
 
   if (!todo) {
     throw new Error("Failed to create or update todo");
@@ -36,8 +23,31 @@ export async function upsertTodoMutation(
   return todo;
 }
 
+type UpdateTodoParams = {
+  id: string;
+  text?: string;
+  completed?: boolean;
+  userId: string;
+};
+
+export async function updateTodoMutation(
+  db: DBClient,
+  params: UpdateTodoParams,
+) {
+  const { id, userId, ...rest } = params;
+
+  const [todo] = await db
+    .update(todoTable)
+    .set(rest)
+    .where(and(eq(todoTable.id, id), eq(todoTable.userId, userId)))
+    .returning();
+
+  return todo;
+}
+
 type DeleteTodoParams = {
   id: string;
+  userId: string;
 };
 
 export async function deleteTodoMutation(
@@ -45,13 +55,11 @@ export async function deleteTodoMutation(
   params: DeleteTodoParams,
 ) {
   const [result] = await db
-    .delete(todo_table)
-    .where(eq(todo_table.id, params.id))
-    .returning({
-      id: todo_table.id,
-      text: todo_table.text,
-      completed: todo_table.completed,
-    });
+    .delete(todoTable)
+    .where(
+      and(eq(todoTable.id, params.id), eq(todoTable.userId, params.userId)),
+    )
+    .returning();
 
   return result;
 }

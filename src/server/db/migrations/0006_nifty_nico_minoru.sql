@@ -1,0 +1,2 @@
+ALTER TABLE "acme_todo_table" ADD COLUMN "user_id" uuid NOT NULL;--> statement-breakpoint
+ALTER TABLE "acme_todo_table" ADD CONSTRAINT "acme_todo_table_user_id_acme_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."acme_user"("id") ON DELETE cascade ON UPDATE no action;

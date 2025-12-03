@@ -3,19 +3,25 @@
 import type z from "zod";
 import type { DBClient } from "@/server/db";
 import type {
+  createTodoSchema,
   getTodoByIdSchema,
   getTodosSchema,
-  upsertTodoSchema,
+  updateTodoSchema,
 } from "@/shared/validators/todo.schema";
 import { shuffleTodos } from "./helpers";
-import { deleteTodoMutation, upsertTodoMutation } from "./mutations";
+import {
+  createTodoMutation,
+  deleteTodoMutation,
+  updateTodoMutation,
+} from "./mutations";
 import { getTodoByIdQuery, getTodosQuery } from "./queries";
 
 export async function getTodos(
   db: DBClient,
   filters: z.infer<typeof getTodosSchema>,
+  userId: string,
 ) {
-  const todos = await getTodosQuery(db, filters);
+  const todos = await getTodosQuery(db, { ...filters, userId });
 
   // NOTE: do whatever you want here, map, aggregate filter...
   // result will be cached and typesafety preserved
@@ -25,20 +31,31 @@ export async function getTodos(
 export async function getTodoById(
   db: DBClient,
   filters: z.infer<typeof getTodoByIdSchema>,
+  userId: string,
 ) {
-  return await getTodoByIdQuery(db, filters);
+  return await getTodoByIdQuery(db, { ...filters, userId });
 }
 
-export async function upsertTodo(
+export async function createTodo(
   db: DBClient,
-  params: z.infer<typeof upsertTodoSchema>,
+  params: z.infer<typeof createTodoSchema>,
+  userId: string,
 ) {
-  return await upsertTodoMutation(db, params);
+  return await createTodoMutation(db, { ...params, userId });
+}
+
+export async function updateTodo(
+  db: DBClient,
+  params: z.infer<typeof updateTodoSchema>,
+  userId: string,
+) {
+  return await updateTodoMutation(db, { ...params, userId });
 }
 
 export async function deleteTodo(
   db: DBClient,
   params: z.infer<typeof getTodoByIdSchema>,
+  userId: string,
 ) {
-  return await deleteTodoMutation(db, params);
+  return await deleteTodoMutation(db, { ...params, userId });
 }

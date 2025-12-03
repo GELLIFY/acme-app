@@ -2,6 +2,7 @@
 
 import type { QueryClient } from "@tanstack/react-query";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
   createTRPCClient,
   httpBatchStreamLink,
@@ -12,6 +13,7 @@ import { useState } from "react";
 import superjson from "superjson";
 import type { AppRouter } from "@/server/api/trpc/routers/_app";
 import { makeQueryClient } from "@/shared/helpers/trpc/query-client";
+import { getBaseUrl } from "../get-url";
 
 let clientQueryClientSingleton: QueryClient;
 
@@ -66,15 +68,9 @@ export function TRPCReactProvider(
       <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
         {props.children}
       </TRPCProvider>
-      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+      {process.env.NODE_ENV === "development" && (
+        <ReactQueryDevtools initialIsOpen={false} />
+      )}
     </QueryClientProvider>
   );
-}
-
-function getBaseUrl() {
-  if (process.env.NODE_ENV === "test")
-    return `http://localhost:${process.env.PORT ?? 3000}`;
-  if (typeof window !== "undefined") return window.location.origin;
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return `http://localhost:${process.env.PORT ?? 3000}`;
 }

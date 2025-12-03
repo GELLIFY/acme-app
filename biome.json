@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.2.6/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.3.6/schema.json",
   "vcs": {
     "enabled": false,
     "clientKind": "git",
@@ -30,15 +30,31 @@
         "useKeyWithClickEvents": "off"
       },
       "style": {
-        "noNonNullAssertion": "off"
+        "noNonNullAssertion": "off",
+        "noRestrictedImports": {
+          "options": {
+            "paths": {
+              "zod": {
+                "importNames": ["z"],
+                "message": "Use `import * as z from \"zod\"` instead of `import { z }`."
+              }
+            }
+          },
+          "level": "error"
+        }
       },
       "correctness": {
-        "useExhaustiveDependencies": "off"
+        "useExhaustiveDependencies": "off",
+        "useUniqueElementIds": "off"
       },
       "suspicious": {
-        "noUnknownAtRules": "off",
         "noArrayIndexKey": "off"
       }
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
     }
   },
   "javascript": {

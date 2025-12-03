@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2Icon } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import type z from "zod";
 
@@ -12,8 +11,9 @@ import { useTodoFilterParams } from "@/hooks/use-todo-filter-params";
 import { logger } from "@/lib/logger";
 import { useTRPC } from "@/shared/helpers/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
-import { upsertTodoSchema } from "@/shared/validators/todo.schema";
+import { createTodoSchema } from "@/shared/validators/todo.schema";
 import { Field, FieldError } from "../ui/field";
+import { Spinner } from "../ui/spinner";
 
 export function CreateTodoForm() {
   const t = useScopedI18n("todo");
@@ -21,13 +21,13 @@ export function CreateTodoForm() {
   const { filter } = useTodoFilterParams();
 
   // 1. Define your form.
-  const form = useForm<z.infer<typeof upsertTodoSchema>>({
-    resolver: zodResolver(upsertTodoSchema),
+  const form = useForm<z.infer<typeof createTodoSchema>>({
+    resolver: zodResolver(createTodoSchema),
     defaultValues: { text: "" },
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof upsertTodoSchema>) {
+  function onSubmit(values: z.infer<typeof createTodoSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     logger.info(values);
@@ -38,7 +38,7 @@ export function CreateTodoForm() {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation(
-    trpc.todo.upsert.mutationOptions({
+    trpc.todo.create.mutationOptions({
       onMutate: async (variables) => {
         // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
         await queryClient.cancelQueries({
@@ -111,11 +111,7 @@ export function CreateTodoForm() {
         )}
       />
       <Button type="submit" disabled={createMutation.isPending}>
-        {createMutation.isPending ? (
-          <Loader2Icon className="h-4 w-4 animate-spin" />
-        ) : (
-          t("add")
-        )}
+        {createMutation.isPending ? <Spinner /> : t("add")}
       </Button>
     </form>
   );

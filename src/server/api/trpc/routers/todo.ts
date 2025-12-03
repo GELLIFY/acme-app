@@ -1,31 +1,39 @@
 import {
+  createTodo,
   deleteTodo,
   getTodos,
-  upsertTodo,
+  updateTodo,
 } from "@/server/domains/todo/todo-service";
 import {
+  createTodoSchema,
   getTodoByIdSchema,
   getTodosSchema,
-  upsertTodoSchema,
+  updateTodoSchema,
 } from "@/shared/validators/todo.schema";
-import { createTRPCRouter, publicProcedure } from "../init";
+import { createTRPCRouter, protectedProcedure } from "../init";
 
 export const todoRouter = createTRPCRouter({
-  get: publicProcedure
+  get: protectedProcedure
     .input(getTodosSchema)
-    .query(async ({ ctx: { db }, input }) => {
-      return await getTodos(db, input);
+    .query(async ({ ctx: { db, session }, input }) => {
+      return await getTodos(db, input, session.user.id);
     }),
 
-  upsert: publicProcedure
-    .input(upsertTodoSchema)
-    .mutation(async ({ ctx: { db }, input }) => {
-      return await upsertTodo(db, input);
+  create: protectedProcedure
+    .input(createTodoSchema)
+    .mutation(async ({ ctx: { db, session }, input }) => {
+      return await createTodo(db, input, session.user.id);
     }),
 
-  delete: publicProcedure
+  update: protectedProcedure
+    .input(updateTodoSchema)
+    .mutation(async ({ ctx: { db, session }, input }) => {
+      return await updateTodo(db, input, session.user.id);
+    }),
+
+  delete: protectedProcedure
     .input(getTodoByIdSchema)
-    .mutation(async ({ ctx: { db }, input }) => {
-      return await deleteTodo(db, input);
+    .mutation(async ({ ctx: { db, session }, input }) => {
+      return await deleteTodo(db, input, session.user.id);
     }),
 });

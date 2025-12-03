@@ -1,0 +1,1 @@
+ALTER TABLE "acme_todo_table" ALTER COLUMN "user_id" DROP NOT NULL;

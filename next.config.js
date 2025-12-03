@@ -32,7 +32,6 @@ const config = {
   },
 
   /** We already do linting and typechecking as separate tasks in CI */
-  eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
   // Nginx will do gzip compression. We disable
   // compression here so we can prevent buffering

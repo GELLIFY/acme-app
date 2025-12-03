@@ -1,9 +1,7 @@
 import { HomeIcon, LayersIcon } from "lucide-react";
+import { headers } from "next/headers";
 import Link from "next/link";
-
 import Logo from "@/components/navbar-components/logo";
-import ThemeToggle from "@/components/navbar-components/theme-toggle";
-import UserMenu from "@/components/navbar-components/user-menu";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -16,7 +14,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { auth } from "@/shared/helpers/better-auth/auth";
+import { getScopedI18n } from "@/shared/locales/server";
 import LanguageSelector from "./navbar-components/language-selector";
+import { UserMenu } from "./navbar-components/user-menu";
 
 // Navigation links with icons for desktop icon-only navigation
 const navigationLinks = [
@@ -24,7 +25,10 @@ const navigationLinks = [
   { href: "/todo", label: "Todo", icon: LayersIcon },
 ];
 
-export default function Navbar() {
+export default async function Navbar() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  const t = await getScopedI18n("auth");
+
   return (
     <header className="border-b px-4 md:px-6">
       <div className="flex h-16 items-center justify-between gap-4">
@@ -119,12 +123,14 @@ export default function Navbar() {
         </div>
         {/* Right side */}
         <div className="flex items-center gap-2">
-          {/* Theme toggle */}
-          <ThemeToggle />
-          {/* Language selector */}
           <LanguageSelector />
-          {/* User menu */}
-          <UserMenu />
+          {session?.user ? (
+            <UserMenu user={session.user} />
+          ) : (
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/sign-in"> {t("signin.title")}</Link>
+            </Button>
+          )}
         </div>
       </div>
     </header>

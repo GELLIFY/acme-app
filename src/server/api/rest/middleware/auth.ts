@@ -1,18 +1,66 @@
-import { auth } from "@clerk/nextjs/server";
-import type { MiddlewareHandler } from "hono";
+import { getCookie } from "hono/cookie";
+import { createMiddleware } from "hono/factory";
+import { HTTPException } from "hono/http-exception";
+import { auth } from "@/shared/helpers/better-auth/auth";
+import {
+  expandRoles,
+  type Role,
+} from "@/shared/helpers/better-auth/permissions";
+import type { Context } from "../init";
 
 /**
- * Database middleware that connects to the database and sets it on context
+ * Authenticates the request using either a session cookie or a Bearer token.
+ *
+ * - If a valid session cookie is present, retrieves and validates the session.
+ * - If not, attempts to authenticate using a Bearer token in the Authorization header.
+ * - On successful authentication, attaches the session to the request context as "session".
+ * - Throws HTTP 401 Unauthorized if authentication fails or required tokens are missing.
+ *
+ * @param c - The Hono context object.
+ * @param next - The next middleware function.
+ * @returns The next middleware invocation if authentication succeeds; otherwise, throws an HTTPException.
  */
-export const withAuth: MiddlewareHandler = async (c, next) => {
-  const session = await auth();
+export const withAuth = createMiddleware<Context>(async (c, next) => {
+  // 1. Handle authentication with session cookie
+  const sessionToken = getCookie(c, "better-auth.session_token");
 
-  if (!session?.userId) {
-    throw new Error("UNAUTHORIZED");
+  if (sessionToken) {
+    const session = await auth.api.getSession({ headers: c.req.raw.headers });
+
+    if (!session) {
+      throw new HTTPException(401, {
+        message: "Invalid or expired session token",
+      });
+    }
+
+    // Set session on context
+    c.set("userId", session.user.id);
+    c.set("permissions", expandRoles(session.user.role as Role));
+    return await next();
   }
 
-  // Set database on context
-  c.set("session", session);
+  // 2. Handle authentication with api-key
+  const apiKey = c.req.header("x-api-key");
 
-  await next();
-};
+  if (apiKey) {
+    const data = await auth.api.verifyApiKey({
+      body: {
+        key: apiKey,
+      },
+    });
+
+    if (!data.valid || data.error || !data.key) {
+      throw new HTTPException(401, {
+        message: data.error?.message ?? "Invalid or expired api-key",
+      });
+    }
+
+    // Set session on context
+    c.set("userId", data.key.userId);
+    c.set("permissions", data.key.permissions ?? {});
+    return await next();
+  }
+
+  // 4. No authentication provided
+  throw new HTTPException(401, { message: "Invalid authorization" });
+});
