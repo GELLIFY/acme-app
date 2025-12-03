@@ -21,6 +21,7 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
+import { logger } from "@/lib/logger";
 import { authClient } from "@/shared/helpers/better-auth/auth-client";
 import { useScopedI18n } from "@/shared/locales/client";
 
@@ -40,8 +41,8 @@ export function SessionManagement({
         token: session.token,
       },
       {
-        onError: (error) => {
-          console.error(error);
+        onError: ({ error }) => {
+          logger.error(error, error.message);
           toast.error("Error revoking session");
         },
         onSuccess: () => {

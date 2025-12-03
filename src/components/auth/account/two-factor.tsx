@@ -53,6 +53,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { Spinner } from "@/components/ui/spinner";
+import { logger } from "@/lib/logger";
 import { authClient } from "@/shared/helpers/better-auth/auth-client";
 import { useTRPC } from "@/shared/helpers/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
@@ -216,7 +217,7 @@ function VerifyToptForm({
       );
     } catch (error) {
       if (error instanceof APIError) {
-        console.log(error.message, error.status);
+        logger.error(error, error.message);
         toast.error(error.message);
       }
     }
@@ -286,7 +287,7 @@ export function TwoFactor() {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error(error);
+      logger.error(error, "Failed to download backup codes");
       toast.error("Failed to download backup codes");
     }
   };
@@ -306,7 +307,7 @@ export function TwoFactor() {
       await navigator.clipboard.writeText(twoFactorData.backupCodes.join("\n"));
       toast.success("Backup codes copied");
     } catch (error) {
-      console.error(error);
+      logger.error(error, "Failed to copy backup codes");
       toast.error("Failed to copy backup codes");
     }
   };

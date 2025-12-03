@@ -1,4 +1,5 @@
 import { createRoute, z } from "@hono/zod-openapi";
+import { logger } from "@/lib/logger";
 import { checkHealth } from "@/server/services/health-service";
 import { createRouter } from "../utils/create-router";
 
@@ -39,7 +40,7 @@ export const healthRouter = createRouter().openapi(
       await checkHealth(db);
       return c.json({ status: "ok" }, 200);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       return c.json({ status: "error" }, 500);
     }
   },

@@ -10,6 +10,7 @@ import {
   type Statements,
   twoFactor,
 } from "better-auth/plugins";
+import { logger } from "@/lib/logger";
 import { db } from "@/server/db";
 import {
   sendChangeEmailConfirmationEmail,
@@ -78,7 +79,7 @@ export const auth = betterAuth({
             todo: ["create"],
           };
 
-          console.log(
+          logger.info(
             `Creating API Key for user ${userId} with permissions: ${formatPermissions(permissions)}`,
           );
 

@@ -1,6 +1,7 @@
 import { describe, expect, mock, spyOn, test } from "bun:test";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { testClient } from "hono/testing";
+import { logger } from "@/lib/logger";
 import { db } from "@/server/db";
 import type { Context } from "../init";
 import { healthRouter } from "./health-routes";
@@ -28,14 +29,14 @@ describe("todos routes", () => {
 
     // Even though the error is caught, it still gets printed to the console
     // so we mock that out to avoid the wall of red text.
-    const spy = spyOn(console, "error");
+    const spy = spyOn(logger, "error");
     spy.mockImplementation(() => {});
 
     const response = await client.health.$get();
 
     expect(response.status).toBe(500);
 
-    // restore console.error
+    // restore logger.error
     spy.mockRestore();
   });
 

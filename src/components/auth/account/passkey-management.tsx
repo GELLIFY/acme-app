@@ -56,6 +56,7 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import { Spinner } from "@/components/ui/spinner";
+import { logger } from "@/lib/logger";
 import { authClient } from "@/shared/helpers/better-auth/auth-client";
 import { useScopedI18n } from "@/shared/locales/client";
 
@@ -87,9 +88,9 @@ export function PasskeyManagement({ passkeys }: { passkeys: Passkey[] }) {
         onResponse: () => {
           setLoading(false);
         },
-        onError: (error) => {
-          console.error(error);
-          toast.error(error.error.message || "Failed to add passkey");
+        onError: ({ error }) => {
+          logger.error(error, error.message);
+          toast.error(error.message || "Failed to add passkey");
         },
         onSuccess: () => {
           router.refresh();
@@ -98,7 +99,7 @@ export function PasskeyManagement({ passkeys }: { passkeys: Passkey[] }) {
       });
     } catch (error) {
       if (error instanceof APIError) {
-        console.log(error.message, error.status);
+        logger.error(error, error.message);
         toast.error(error.message);
       }
     }

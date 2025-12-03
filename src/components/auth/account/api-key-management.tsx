@@ -65,6 +65,7 @@ import {
   NativeSelectOption,
 } from "@/components/ui/native-select";
 import { Spinner } from "@/components/ui/spinner";
+import { logger } from "@/lib/logger";
 import type { auth } from "@/shared/helpers/better-auth/auth";
 import { authClient } from "@/shared/helpers/better-auth/auth-client";
 import { useScopedI18n } from "@/shared/locales/client";
@@ -152,7 +153,7 @@ function ApiKeyForm({
       );
 
       if (error) {
-        console.log(error.message, error.status);
+        logger.error(error, error.message);
         toast.error(error.message);
         return;
       }
@@ -161,7 +162,7 @@ function ApiKeyForm({
       setApiKeyData(data);
     } catch (error) {
       if (error instanceof APIError) {
-        console.log(error.message, error.status);
+        logger.error(error, error.message);
         toast.error(error.message);
       }
     }
@@ -237,7 +238,7 @@ export function ApiKeyManagement({ apiKeys }: { apiKeys: ApiKey[] }) {
       );
 
       if (error) {
-        console.log(error.message, error.status);
+        logger.error(error, error.message);
         toast.error(error.message);
         return;
       }
@@ -248,7 +249,7 @@ export function ApiKeyManagement({ apiKeys }: { apiKeys: ApiKey[] }) {
       }
     } catch (error) {
       if (error instanceof APIError) {
-        console.log(error.message, error.status);
+        logger.error(error, error.message);
         toast.error(error.message);
       }
     }
