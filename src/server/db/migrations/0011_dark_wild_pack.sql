@@ -1,0 +1,1 @@
+ALTER TABLE "acme_apikey" ALTER COLUMN "id" SET DEFAULT pg_catalog.gen_random_uuid();

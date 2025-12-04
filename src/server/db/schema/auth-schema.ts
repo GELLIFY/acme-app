@@ -102,7 +102,7 @@ export const verification = createTable(
 export const apikey = createTable(
   "apikey",
   (d) => ({
-    id: d.uuid().defaultRandom().primaryKey(),
+    id: d.uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
     createdAt: d.timestamp("created_at").notNull(),
     updatedAt: d.timestamp("updated_at").notNull(),
 
