@@ -27,7 +27,7 @@
     "start": "node .next/standalone/server.js"
   },
   "dependencies": {
-    "@better-auth/passkey": "^1.4.6",
+    "@better-auth/passkey": "^1.4.7",
     "@hono/zod-openapi": "^1.1.5",
     "@hookform/resolvers": "^5.2.2",
     "@kubiks/otel-drizzle": "^2.1.0",
@@ -42,7 +42,7 @@
     "@trpc/server": "^11.7.2",
     "@trpc/tanstack-react-query": "^11.7.2",
     "@vercel/otel": "^2.1.0",
-    "better-auth": "^1.4.6",
+    "better-auth": "^1.4.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
