@@ -4,7 +4,7 @@ import DeleteAccountVerificationEmail from "@/emails/delete-account-verification
 import EmailVerificationEmail from "@/emails/email-verification-email";
 import ResetPasswordEmail from "@/emails/reset-password-email";
 import { env } from "@/env";
-import { logger } from "@/lib/logger";
+import { logger } from "@/shared/infrastructure/logger";
 
 export const resend = new Resend(env.RESEND_API_KEY || "re_123");
 

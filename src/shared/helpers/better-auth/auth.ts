@@ -10,7 +10,6 @@ import {
   type Statements,
   twoFactor,
 } from "better-auth/plugins";
-import { logger } from "@/lib/logger";
 import { db } from "@/server/db";
 import {
   sendChangeEmailConfirmationEmail,
@@ -18,6 +17,7 @@ import {
   sendEmailVerificationEmail,
   sendResetPasswordEmail,
 } from "@/server/services/email-service";
+import { logger } from "@/shared/infrastructure/logger";
 import { ac, adminRole, formatPermissions, userRole } from "./permissions";
 
 export const auth = betterAuth({

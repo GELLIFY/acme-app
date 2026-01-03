@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { initTRPC } from "@trpc/server";
-import { logger } from "@/lib/logger";
+import { logger } from "@/shared/infrastructure/logger";
 import type { createTRPCContext } from "../init";
 
 export function wideEventPlugin() {

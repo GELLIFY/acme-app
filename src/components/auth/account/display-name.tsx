@@ -18,8 +18,8 @@ import { Field, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { useUserQuery } from "@/hooks/use-user";
-import { logger } from "@/lib/logger";
 import { authClient } from "@/shared/helpers/better-auth/auth-client";
+import { logger } from "@/shared/infrastructure/logger";
 import { useScopedI18n } from "@/shared/locales/client";
 
 const formSchema = z.object({

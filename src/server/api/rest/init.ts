@@ -2,10 +2,10 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
 import { cors } from "hono/cors";
 import { secureHeaders } from "hono/secure-headers";
-import type { WideEvent } from "@/lib/logger";
 import type { db } from "@/server/db";
 import type { Permissions } from "@/shared/helpers/better-auth/permissions";
 import { getBaseUrl } from "@/shared/helpers/get-url";
+import type { WideEvent } from "@/shared/infrastructure/logger";
 import { routers } from "./routers/_app";
 
 export type Context = {
