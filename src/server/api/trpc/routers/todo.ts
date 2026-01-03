@@ -15,14 +15,26 @@ import { createTRPCRouter, protectedProcedure } from "../init";
 export const todoRouter = createTRPCRouter({
   get: protectedProcedure
     .input(getTodosSchema)
-    .query(async ({ ctx: { db, session }, input }) => {
-      return await getTodos(db, input, session.user.id);
+    .query(async ({ ctx: { db, session, wideEvent }, input }) => {
+      // Add business context as you process
+      const res = await getTodos(db, input, session.user.id);
+      wideEvent.todos = {
+        todo_count: res.length,
+      };
+
+      return res;
     }),
 
   create: protectedProcedure
     .input(createTodoSchema)
-    .mutation(async ({ ctx: { db, session }, input }) => {
-      return await createTodo(db, input, session.user.id);
+    .mutation(async ({ ctx: { db, session, wideEvent }, input }) => {
+      // Add business context as you process
+      const res = await createTodo(db, input, session.user.id);
+      wideEvent.todo = {
+        todo_id: res.id,
+      };
+
+      return res;
     }),
 
   update: protectedProcedure

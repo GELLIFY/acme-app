@@ -1,7 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
 import { cors } from "hono/cors";
-import { requestId } from "hono/request-id";
 import { secureHeaders } from "hono/secure-headers";
 import type { WideEvent } from "@/lib/logger";
 import type { db } from "@/server/db";
@@ -43,7 +42,6 @@ const app = new OpenAPIHono<Context>()
     ],
     security: [{ cookieAuth: [] }, { apiKeyAuth: [] }],
   })
-  .use(requestId())
   .use(secureHeaders())
   .use(
     "*",

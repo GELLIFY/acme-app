@@ -3,14 +3,14 @@ import { rateLimiter } from "hono-rate-limiter";
 import type { Context } from "../init";
 import { withAuth } from "./auth";
 import { withDatabase } from "./db";
-import { withEvent } from "./with-event";
+import { withWideEvent } from "./wide-event";
 
 /**
  * Public endpoint middleware - only attaches database with smart routing
  * No authentication required
  */
 export const publicMiddleware: MiddlewareHandler<Context>[] = [
-  withEvent,
+  withWideEvent,
   withDatabase,
 ];
 
@@ -20,7 +20,7 @@ export const publicMiddleware: MiddlewareHandler<Context>[] = [
  * Note: withAuth must be first to set session in context
  */
 export const protectedMiddleware: MiddlewareHandler<Context>[] = [
-  withEvent,
+  withWideEvent,
   withDatabase,
   withAuth,
   rateLimiter({

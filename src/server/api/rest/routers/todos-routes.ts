@@ -6,7 +6,6 @@ import {
   getTodos,
   updateTodo,
 } from "@/server/domains/todo/todo-service";
-import { tryCatch } from "@/shared/helpers/try-catch";
 import {
   createTodoSchema,
   getTodoByIdSchema,
@@ -80,37 +79,14 @@ export const todosRouter = createRouter()
       ],
     }),
     async (ctx) => {
-      const event = ctx.get("wideEvent");
       const db = ctx.get("db");
       const userId = ctx.get("userId");
       const filters = ctx.req.valid("query");
 
-      // Add user context
-      // event.user = {
-      //   id: userId,
-      // };
-
       // Get todos
-      const queryStart = Date.now();
-      const { data, error } = await tryCatch(getTodos(db, filters, userId));
+      const result = await getTodos(db, filters, userId);
 
-      // If fails, add error details
-      if (error) {
-        event.error = {
-          name: error.name,
-          message: error.message,
-          stack: error.stack,
-          cause: error.cause,
-        };
-        return ctx.json({ error: error.name, description: error.message }, 500);
-      }
-
-      event.todos = {
-        count: data?.length ?? 0,
-        latency_ms: Date.now() - queryStart,
-      };
-
-      return ctx.json(data, 200);
+      return ctx.json(result, 200);
     },
   )
   .openapi(

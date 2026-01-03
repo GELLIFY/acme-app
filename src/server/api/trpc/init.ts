@@ -7,13 +7,15 @@
  * need to use are documented accordingly near the end.
  */
 
-import { initTRPC, TRPCError } from "@trpc/server";
+import { initTRPC } from "@trpc/server";
 import { cache } from "react";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { auth } from "@/shared/helpers/better-auth/auth";
 import { db } from "../../db";
-import { timingMiddleware } from "./middleware/timing";
+import { adminPlugin } from "./middleware/admin-plugin";
+import { authPlugin } from "./middleware/auth-plugin";
+import { wideEventPlugin } from "./middleware/wide-event";
 
 /**
  * 1. CONTEXT
@@ -29,9 +31,11 @@ import { timingMiddleware } from "./middleware/timing";
  */
 export const createTRPCContext = cache(async (opts: { headers: Headers }) => {
   const session = await auth.api.getSession({ headers: opts.headers });
+  const event: Record<string, unknown> = {};
   return {
     db,
     session,
+    wideEvent: event,
     ...opts,
   };
 });
@@ -85,46 +89,23 @@ export const createTRPCRouter = t.router;
  * guarantee that a user querying is authorized, but you can still access user session data if they
  * are logged in.
  */
-export const publicProcedure = t.procedure.use(timingMiddleware);
+export const publicProcedure = t.procedure.concat(wideEventPlugin().pluginProc);
 
 /**
  * Private (authenticated) procedure
  *
  * Use this when you need to guarantee that a user querying is authorized.
  */
-export const protectedProcedure = t.procedure.use(async (opts) => {
-  const { session } = opts.ctx;
-
-  if (!session) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
-  }
-
-  return opts.next({
-    ctx: {
-      session,
-    },
-  });
-});
+export const protectedProcedure = t.procedure
+  .concat(wideEventPlugin().pluginProc)
+  .concat(authPlugin().pluginProc);
 
 /**
  * Private (authenticated) procedure
  *
  * Use this when you need to guarantee that a user querying is authorized.
  */
-export const adminProcedure = t.procedure.use(async (opts) => {
-  const { session } = opts.ctx;
-
-  if (!session) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
-  }
-
-  if (session.user.role !== "admin") {
-    throw new TRPCError({ code: "FORBIDDEN" });
-  }
-
-  return opts.next({
-    ctx: {
-      session,
-    },
-  });
-});
+export const adminProcedure = t.procedure
+  .concat(wideEventPlugin().pluginProc)
+  .concat(authPlugin().pluginProc)
+  .concat(adminPlugin().pluginProc);
