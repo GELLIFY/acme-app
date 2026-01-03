@@ -11,6 +11,7 @@ import {
   twoFactor,
 } from "better-auth/plugins";
 import { db } from "@/server/db";
+import { schema } from "@/server/db/schema";
 import {
   sendChangeEmailConfirmationEmail,
   sendDeleteAccountVerificationEmail,
@@ -31,6 +32,7 @@ export const auth = betterAuth({
   },
   database: drizzleAdapter(db, {
     provider: "pg",
+    schema,
   }),
   emailAndPassword: {
     enabled: true,
