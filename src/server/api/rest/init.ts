@@ -3,6 +3,7 @@ import { Scalar } from "@scalar/hono-api-reference";
 import { cors } from "hono/cors";
 import { requestId } from "hono/request-id";
 import { secureHeaders } from "hono/secure-headers";
+import type { WideEvent } from "@/lib/logger";
 import type { db } from "@/server/db";
 import type { Permissions } from "@/shared/helpers/better-auth/permissions";
 import { getBaseUrl } from "@/shared/helpers/get-url";
@@ -13,6 +14,7 @@ export type Context = {
     db: typeof db;
     permissions: Permissions;
     userId: string;
+    wideEvent: Partial<WideEvent>;
   };
 };
 
