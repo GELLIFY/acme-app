@@ -1,19 +1,18 @@
-import { randomUUID } from "node:crypto";
 import { createMiddleware } from "hono/factory";
-import { logger } from "@/shared/infrastructure/logger";
+import {
+  createWideEvent,
+  logger,
+  shouldSample,
+} from "@/shared/infrastructure/logger";
 import type { Context } from "../init";
 
 export const withWideEvent = createMiddleware<Context>(async (ctx, next) => {
   const startTime = Date.now();
 
   // Initialize the wide event with request context
-  const event: Record<string, unknown> = {
-    request_id: ctx.req.header("x-request-id") || randomUUID(),
-    timestamp: new Date().toISOString(),
-    method: ctx.req.method,
-    path: ctx.req.path,
-    // ... add event fields here
-  };
+  const event = createWideEvent();
+  event.method = ctx.req.method;
+  event.path = ctx.req.path;
 
   // Make the event accessible to handlers
   ctx.set("wideEvent", event);
@@ -22,13 +21,19 @@ export const withWideEvent = createMiddleware<Context>(async (ctx, next) => {
     await next();
     event.status_code = ctx.res.status;
   } catch (error) {
+    const e = error as Error;
     event.status_code = 500;
-    event.error = error;
+    event.error = {
+      message: e.message,
+      stack: e.stack,
+      cause: e.cause,
+      name: e.name,
+    };
     throw error;
   } finally {
     event.duration_ms = Date.now() - startTime;
 
     // Emit the wide event
-    logger.info(event);
+    if (shouldSample(event)) logger.info(event);
   }
 });

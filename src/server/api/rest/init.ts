@@ -5,7 +5,7 @@ import { secureHeaders } from "hono/secure-headers";
 import type { db } from "@/server/db";
 import type { Permissions } from "@/shared/helpers/better-auth/permissions";
 import { getBaseUrl } from "@/shared/helpers/get-url";
-import type { WideEvent } from "@/shared/infrastructure/logger";
+import type { LogContext } from "@/shared/infrastructure/logger";
 import { routers } from "./routers/_app";
 
 export type Context = {
@@ -13,7 +13,7 @@ export type Context = {
     db: typeof db;
     permissions: Permissions;
     userId: string;
-    wideEvent: Partial<WideEvent>;
+    wideEvent: Partial<LogContext>;
   };
 };
 

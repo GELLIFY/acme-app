@@ -1,6 +1,9 @@
-import { randomUUID } from "node:crypto";
 import { initTRPC } from "@trpc/server";
-import { logger } from "@/shared/infrastructure/logger";
+import {
+  createWideEvent,
+  logger,
+  shouldSample,
+} from "@/shared/infrastructure/logger";
 import type { createTRPCContext } from "../init";
 
 export function wideEventPlugin() {
@@ -14,13 +17,9 @@ export function wideEventPlugin() {
       const startTime = Date.now();
 
       // Initialize the wide event with request context
-      const event: Record<string, unknown> = {
-        request_id: opts.ctx.headers.get("x-request-id") || randomUUID(),
-        timestamp: new Date().toISOString(),
-        method: opts.type,
-        path: opts.path,
-        // ... add event fields here
-      };
+      const event = createWideEvent();
+      event.method = opts.type;
+      event.path = opts.path;
 
       try {
         const result = await opts.next({
@@ -40,13 +39,20 @@ export function wideEventPlugin() {
 
         return result;
       } catch (error) {
-        event.error = error;
+        const e = error as Error;
+        event.status_code = 500;
+        event.error = {
+          message: e.message,
+          stack: e.stack,
+          cause: e.cause,
+          name: e.name,
+        };
         throw error;
       } finally {
         event.duration_ms = Date.now() - startTime;
 
         // Emit the wide event
-        logger.info(event);
+        if (shouldSample(event)) logger.info(event);
       }
     }),
   };

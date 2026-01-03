@@ -17,8 +17,5 @@ export async function register() {
         process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT ??
         process.env.OTEL_EXPORTER_OTLP_ENDPOINT,
     }),
-    // traceSampler: {
-    //   shouldSample,
-    // },
   });
 }
