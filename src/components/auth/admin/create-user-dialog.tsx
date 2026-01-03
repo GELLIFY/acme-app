@@ -28,6 +28,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/shared/helpers/better-auth/auth-client";
 import { ROLES } from "@/shared/helpers/better-auth/permissions";
+import { logger } from "@/shared/infrastructure/logger";
 
 const formSchema = z.object({
   firstName: z.string().min(1),
@@ -74,7 +75,7 @@ export function CreateUserDialog() {
       );
 
       if (error) {
-        console.log(error);
+        logger.error(error, error.message);
         toast.error(error.message || "Error creating user");
       }
 
@@ -84,7 +85,7 @@ export function CreateUserDialog() {
       toast.success("User created");
     } catch (error) {
       if (error instanceof APIError) {
-        console.log(error.message, error.status);
+        logger.error(error, error.message);
         toast.error(error.message);
       }
     }

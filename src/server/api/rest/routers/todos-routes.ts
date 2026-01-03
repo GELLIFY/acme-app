@@ -19,6 +19,7 @@ import { createErrorSchema } from "../utils/create-error-schema";
 import { createRouter } from "../utils/create-router";
 import {
   forbiddenSchema,
+  internalServerErrorSchema,
   notFoundSchema,
   unauthorizedSchema,
 } from "../utils/not-found-schema";
@@ -62,6 +63,14 @@ export const todosRouter = createRouter()
             },
           },
         },
+        500: {
+          description: "Internal Server Error",
+          content: {
+            "application/json": {
+              schema: internalServerErrorSchema(),
+            },
+          },
+        },
       },
       middleware: [
         withRequiredPermissions({
@@ -69,14 +78,15 @@ export const todosRouter = createRouter()
         }),
       ],
     }),
-    async (c) => {
-      const db = c.get("db");
-      const userId = c.get("userId");
-      const filters = c.req.valid("query");
+    async (ctx) => {
+      const db = ctx.get("db");
+      const userId = ctx.get("userId");
+      const filters = ctx.req.valid("query");
 
+      // Get todos
       const result = await getTodos(db, filters, userId);
 
-      return c.json(result, 200);
+      return ctx.json(result, 200);
     },
   )
   .openapi(

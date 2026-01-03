@@ -39,3 +39,19 @@ export const forbiddenSchema = (defaultError: string = "Forbidden") => {
       },
     });
 };
+
+export const internalServerErrorSchema = (
+  defaultError: string = "Internal Server Error",
+) => {
+  return z
+    .object({
+      error: z.string(),
+      description: z.string(),
+    })
+    .openapi({
+      example: {
+        error: defaultError,
+        description: "An unexpected error occurred.",
+      },
+    });
+};

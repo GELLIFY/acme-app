@@ -11,4 +11,8 @@ pnpm db:push
 pnpm db:seed
 
 # run
-#pnpm run dev
+pnpm run dev
+
+# for local first OTEL
+# npm i -g @kubiks/cli
+# kubiks

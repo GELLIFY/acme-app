@@ -36,7 +36,7 @@ if (env.NODE_ENV === "development") {
 // export const drizzleClientHttp = drizzleHttp({
 //   client: neon(connectionString),
 //   schema,
-//   logger: env.NODE_ENV !== "production",
+//   logger: env.LOG_LEVEL === "debug",
 //   casing: "snake_case",
 // });
 
@@ -48,7 +48,7 @@ if (env.NODE_ENV === "development") {
 const drizzleClientWs = drizzleWs({
   client: new Pool({ connectionString }),
   schema,
-  logger: process.env.LOG_LEVEL === "debug",
+  logger: env.LOG_LEVEL === "debug",
   casing: "snake_case",
 });
 

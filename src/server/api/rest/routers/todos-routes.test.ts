@@ -23,6 +23,7 @@ type TestAppContext = Context & {
 const createTestApp = () => {
   const app = new OpenAPIHono<TestAppContext>()
     .use(async (c, next) => {
+      c.set("wideEvent", {});
       c.set("db", db);
       c.set("userId", c.env?.userId ?? userId);
       c.set("permissions", c.env?.permissions ?? permissions);
