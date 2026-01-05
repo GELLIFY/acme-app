@@ -6,7 +6,7 @@ import { todoTable } from "@/server/db/schema/todos";
 import {
   expandRoles,
   type Permissions,
-} from "@/shared/helpers/better-auth/permissions";
+} from "@/shared/infrastructure/better-auth/permissions";
 import type { Context } from "../init";
 import { todosRouter } from "./todos-routes";
 

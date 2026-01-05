@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from "bun:test";
-import { createWideEvent, shouldSample } from "./logger";
+import { randomUUIDv7 } from "bun";
+import { createWideEvent, shouldSample } from "./wide-event";
 
 const originalRandom = Math.random;
 
@@ -50,7 +51,7 @@ describe("shouldSample", () => {
 
 describe("createWideEvent", () => {
   it("creates a wide event with defaults and trace context", () => {
-    const event = createWideEvent();
+    const event = createWideEvent(randomUUIDv7());
 
     expect(event.duration_ms).toBe(0);
     expect(event.environment).toBe("test");

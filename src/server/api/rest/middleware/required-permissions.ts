@@ -4,7 +4,7 @@ import { createMiddleware } from "hono/factory";
 import {
   formatPermissions,
   type Permissions,
-} from "@/shared/helpers/better-auth/permissions";
+} from "@/shared/infrastructure/better-auth/permissions";
 import type { Context } from "../init";
 
 /**

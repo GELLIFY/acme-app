@@ -1,6 +1,5 @@
-import pino, { type Logger } from "pino";
 import { env } from "@/env";
-import { getTraceContext } from "./tracing";
+import { getTraceContext } from "../infrastructure/tracing";
 
 // @ref https://loggingsucks.com/
 export type LogContext = {
@@ -81,21 +80,3 @@ export function createWideEvent(requestId: string): LogContext {
     duration_ms: 0, // real value at the end of the request
   };
 }
-
-export const logger: Logger = pino({
-  level: process.env.LOG_LEVEL || "info",
-  // Use pretty printing in development, structured JSON in production
-  ...(process.env.NODE_ENV === "development" && {
-    transport: {
-      target: "pino-pretty",
-      options: {
-        colorize: true,
-        translateTime: "HH:MM:ss",
-        ignore: "pid,hostname",
-        messageFormat: true,
-        hideObject: false,
-        singleLine: true,
-      },
-    },
-  }),
-});

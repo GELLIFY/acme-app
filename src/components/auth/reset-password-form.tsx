@@ -7,7 +7,7 @@ import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
-import { authClient } from "@/shared/helpers/better-auth/auth-client";
+import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
 import { logger } from "@/shared/infrastructure/logger";
 import { useScopedI18n } from "@/shared/locales/client";
 import { Button } from "../ui/button";

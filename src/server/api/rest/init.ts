@@ -1,15 +1,16 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
 import { cors } from "hono/cors";
+import { type RequestIdVariables, requestId } from "hono/request-id";
 import { secureHeaders } from "hono/secure-headers";
 import type { db } from "@/server/db";
-import type { Permissions } from "@/shared/helpers/better-auth/permissions";
 import { getBaseUrl } from "@/shared/helpers/get-url";
-import type { LogContext } from "@/shared/infrastructure/logger";
+import type { LogContext } from "@/shared/helpers/wide-event";
+import type { Permissions } from "@/shared/infrastructure/better-auth/permissions";
 import { routers } from "./routers/_app";
 
 export type Context = {
-  Variables: {
+  Variables: RequestIdVariables & {
     db: typeof db;
     permissions: Permissions;
     userId: string;
@@ -42,6 +43,7 @@ const app = new OpenAPIHono<Context>()
     ],
     security: [{ cookieAuth: [] }, { apiKeyAuth: [] }],
   })
+  .use("*", requestId())
   .use(secureHeaders())
   .use(
     "*",

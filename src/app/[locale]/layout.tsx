@@ -6,7 +6,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { ImpersonationIndicator } from "@/components/auth/admin/impersonation-indicator";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { TRPCReactProvider } from "@/shared/helpers/trpc/client";
+import { TRPCReactProvider } from "@/shared/infrastructure/trpc/client";
 import { I18nProviderClient } from "@/shared/locales/client";
 
 const inter = Inter({

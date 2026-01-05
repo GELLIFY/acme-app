@@ -3,7 +3,7 @@ import {
   adminRole,
   ROLES,
   userRole,
-} from "@/shared/helpers/better-auth/permissions";
+} from "@/shared/infrastructure/better-auth/permissions";
 import { expandRoles } from "./permissions";
 
 describe("expandRoles", () => {

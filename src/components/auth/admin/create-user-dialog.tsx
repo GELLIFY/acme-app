@@ -26,8 +26,8 @@ import {
   NativeSelectOption,
 } from "@/components/ui/native-select";
 import { Spinner } from "@/components/ui/spinner";
-import { authClient } from "@/shared/helpers/better-auth/auth-client";
-import { ROLES } from "@/shared/helpers/better-auth/permissions";
+import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
+import { ROLES } from "@/shared/infrastructure/better-auth/permissions";
 import { logger } from "@/shared/infrastructure/logger";
 
 const formSchema = z.object({
