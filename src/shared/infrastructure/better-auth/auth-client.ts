@@ -27,4 +27,9 @@ export const authClient = createAuthClient({
     twoFactorClient(),
     inferAdditionalFields<typeof auth>(),
   ],
+  fetchOptions: {
+    headers: {
+      "x-request-id": crypto.randomUUID(),
+    },
+  },
 });

@@ -3,7 +3,7 @@
 import { FingerprintIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { authClient } from "@/shared/helpers/better-auth/auth-client";
+import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 

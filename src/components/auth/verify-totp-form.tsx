@@ -7,7 +7,8 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type z from "zod";
-import { authClient } from "@/shared/helpers/better-auth/auth-client";
+import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
+import { logger } from "@/shared/infrastructure/logger";
 import { useScopedI18n } from "@/shared/locales/client";
 import { verifyTotpSchema } from "@/shared/validators/user.schema";
 import { Button } from "../ui/button";
@@ -35,8 +36,9 @@ export function VerifyTotpForm() {
         onResponse: () => {
           setLoading(false);
         },
-        onError: (error) => {
-          toast.error(error.error.message || "Failed to verify code");
+        onError: ({ error }) => {
+          logger.error(error, error.message);
+          toast.error(error.message || "Failed to verify code");
         },
         onSuccess: () => {
           router.push("/");
@@ -44,7 +46,7 @@ export function VerifyTotpForm() {
       });
     } catch (error) {
       if (error instanceof APIError) {
-        console.log(error.message, error.status);
+        logger.error(error, error.message);
         toast.error(error.message);
       }
     }

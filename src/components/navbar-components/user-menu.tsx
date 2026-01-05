@@ -18,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { authClient } from "@/shared/helpers/better-auth/auth-client";
+import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
 import { ThemeToggle } from "./theme-toggle";
 
 type User = typeof authClient.$Infer.Session.user;

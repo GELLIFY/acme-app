@@ -25,7 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
-import { useTRPC } from "@/shared/helpers/trpc/client";
+import { useTRPC } from "@/shared/infrastructure/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 
 export function DeleteAccount() {

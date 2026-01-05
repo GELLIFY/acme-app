@@ -6,7 +6,7 @@ import { todoTable } from "@/server/db/schema/todos";
 import {
   expandRoles,
   type Permissions,
-} from "@/shared/helpers/better-auth/permissions";
+} from "@/shared/infrastructure/better-auth/permissions";
 import type { Context } from "../init";
 import { todosRouter } from "./todos-routes";
 
@@ -23,6 +23,7 @@ type TestAppContext = Context & {
 const createTestApp = () => {
   const app = new OpenAPIHono<TestAppContext>()
     .use(async (c, next) => {
+      c.set("wideEvent", {});
       c.set("db", db);
       c.set("userId", c.env?.userId ?? userId);
       c.set("permissions", c.env?.permissions ?? permissions);

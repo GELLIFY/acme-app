@@ -65,8 +65,9 @@ import {
   NativeSelectOption,
 } from "@/components/ui/native-select";
 import { Spinner } from "@/components/ui/spinner";
-import type { auth } from "@/shared/helpers/better-auth/auth";
-import { authClient } from "@/shared/helpers/better-auth/auth-client";
+import type { auth } from "@/shared/infrastructure/better-auth/auth";
+import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
+import { logger } from "@/shared/infrastructure/logger";
 import { useScopedI18n } from "@/shared/locales/client";
 
 type ApiKey = Awaited<ReturnType<typeof auth.api.listApiKeys>>[number];
@@ -152,7 +153,7 @@ function ApiKeyForm({
       );
 
       if (error) {
-        console.log(error.message, error.status);
+        logger.error(error, error.message);
         toast.error(error.message);
         return;
       }
@@ -161,7 +162,7 @@ function ApiKeyForm({
       setApiKeyData(data);
     } catch (error) {
       if (error instanceof APIError) {
-        console.log(error.message, error.status);
+        logger.error(error, error.message);
         toast.error(error.message);
       }
     }
@@ -237,7 +238,7 @@ export function ApiKeyManagement({ apiKeys }: { apiKeys: ApiKey[] }) {
       );
 
       if (error) {
-        console.log(error.message, error.status);
+        logger.error(error, error.message);
         toast.error(error.message);
         return;
       }
@@ -248,7 +249,7 @@ export function ApiKeyManagement({ apiKeys }: { apiKeys: ApiKey[] }) {
       }
     } catch (error) {
       if (error instanceof APIError) {
-        console.log(error.message, error.status);
+        logger.error(error, error.message);
         toast.error(error.message);
       }
     }

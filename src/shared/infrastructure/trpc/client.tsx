@@ -12,8 +12,8 @@ import { createTRPCContext } from "@trpc/tanstack-react-query";
 import { useState } from "react";
 import superjson from "superjson";
 import type { AppRouter } from "@/server/api/trpc/routers/_app";
-import { makeQueryClient } from "@/shared/helpers/trpc/query-client";
-import { getBaseUrl } from "../get-url";
+import { getBaseUrl } from "@/shared/helpers/get-url";
+import { makeQueryClient } from "./query-client";
 
 let clientQueryClientSingleton: QueryClient;
 
@@ -56,6 +56,7 @@ export function TRPCReactProvider(
           headers: () => {
             const headers = new Headers();
             headers.set("x-trpc-source", "nextjs-react");
+            headers.set("x-request-id", crypto.randomUUID());
             return headers;
           },
         }),

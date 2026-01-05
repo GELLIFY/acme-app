@@ -11,12 +11,14 @@ import {
   twoFactor,
 } from "better-auth/plugins";
 import { db } from "@/server/db";
+import { schema } from "@/server/db/schema";
 import {
   sendChangeEmailConfirmationEmail,
   sendDeleteAccountVerificationEmail,
   sendEmailVerificationEmail,
   sendResetPasswordEmail,
 } from "@/server/services/email-service";
+import { logger } from "@/shared/infrastructure/logger";
 import { ac, adminRole, formatPermissions, userRole } from "./permissions";
 
 export const auth = betterAuth({
@@ -30,6 +32,7 @@ export const auth = betterAuth({
   },
   database: drizzleAdapter(db, {
     provider: "pg",
+    schema,
   }),
   emailAndPassword: {
     enabled: true,
@@ -78,7 +81,7 @@ export const auth = betterAuth({
             todo: ["create"],
           };
 
-          console.log(
+          logger.info(
             `Creating API Key for user ${userId} with permissions: ${formatPermissions(permissions)}`,
           );
 

@@ -8,7 +8,8 @@ import type z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTodoFilterParams } from "@/hooks/use-todo-filter-params";
-import { useTRPC } from "@/shared/helpers/trpc/client";
+import { logger } from "@/shared/infrastructure/logger";
+import { useTRPC } from "@/shared/infrastructure/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 import { createTodoSchema } from "@/shared/validators/todo.schema";
 import { Field, FieldError } from "../ui/field";
@@ -29,7 +30,7 @@ export function CreateTodoForm() {
   function onSubmit(values: z.infer<typeof createTodoSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log(values);
+    logger.info(values);
     createMutation.mutate(values);
   }
 

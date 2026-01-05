@@ -4,6 +4,7 @@ import DeleteAccountVerificationEmail from "@/emails/delete-account-verification
 import EmailVerificationEmail from "@/emails/email-verification-email";
 import ResetPasswordEmail from "@/emails/reset-password-email";
 import { env } from "@/env";
+import { logger } from "@/shared/infrastructure/logger";
 
 export const resend = new Resend(env.RESEND_API_KEY || "re_123");
 
@@ -16,7 +17,7 @@ export const sendResetPasswordEmail = async ({
   user,
   url,
 }: ResetPasswordEmailParams) => {
-  console.log(`Click the link to reset your password: ${url}`);
+  logger.debug(`Click the link to reset your password: ${url}`);
 
   return await resend.emails.send({
     from: "Acme <noreply@acme.gellify.dev>",
@@ -40,7 +41,7 @@ export const sendChangeEmailConfirmationEmail = async ({
   url,
   user,
 }: ChangeEmailConfirmationParams) => {
-  console.log(`Click the link to approve email change: ${url}`);
+  logger.debug(`Click the link to approve email change: ${url}`);
 
   await resend.emails.send({
     from: "Acme <noreply@acme.gellify.dev>",
@@ -63,7 +64,7 @@ export const sendEmailVerificationEmail = async ({
   url,
   user,
 }: EmailVerificationEmailParams) => {
-  console.log(`Click the link to verify your email: ${url}`);
+  logger.debug(`Click the link to verify your email: ${url}`);
 
   await resend.emails.send({
     from: "Acme <noreply@acme.gellify.dev>",
@@ -85,7 +86,7 @@ export const sendDeleteAccountVerificationEmail = async ({
   user,
   url,
 }: DeleteAccountVerificationParams) => {
-  console.log(`Click the link to delete the account: ${url}`);
+  logger.debug(`Click the link to delete the account: ${url}`);
 
   await resend.emails.send({
     from: "Acme <noreply@acme.gellify.dev>",
