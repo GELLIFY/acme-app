@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { initTRPC } from "@trpc/server";
 import {
   createWideEvent,
@@ -17,7 +18,8 @@ export function wideEventPlugin() {
       const startTime = Date.now();
 
       // Initialize the wide event with request context
-      const event = createWideEvent();
+      const requestId = opts.ctx.headers.get("x-request-id") ?? randomUUID();
+      const event = createWideEvent(requestId);
       event.method = opts.type;
       event.path = opts.path;
 

@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { createMiddleware } from "hono/factory";
 import {
   createWideEvent,
@@ -10,7 +11,8 @@ export const withWideEvent = createMiddleware<Context>(async (ctx, next) => {
   const startTime = Date.now();
 
   // Initialize the wide event with request context
-  const event = createWideEvent();
+  const requestId = ctx.req.header("x-request-id") || randomUUID();
+  const event = createWideEvent(requestId);
   event.method = ctx.req.method;
   event.path = ctx.req.path;
 

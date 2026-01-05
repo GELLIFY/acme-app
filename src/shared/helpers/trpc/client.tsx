@@ -56,6 +56,7 @@ export function TRPCReactProvider(
           headers: () => {
             const headers = new Headers();
             headers.set("x-trpc-source", "nextjs-react");
+            headers.set("x-request-id", crypto.randomUUID());
             return headers;
           },
         }),

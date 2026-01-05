@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import pino, { type Logger } from "pino";
 import { env } from "@/env";
 import { getTraceContext } from "./tracing";
@@ -70,11 +69,11 @@ export function shouldSample(event: LogContext): boolean {
   return Math.random() < (env.NODE_ENV === "development" ? 1 : 0.05);
 }
 
-export function createWideEvent(): LogContext {
+export function createWideEvent(requestId: string): LogContext {
   const traceCtx = getTraceContext();
 
   return {
-    request_id: randomUUID(), // TODO: use default Next.js request-id
+    request_id: requestId,
     trace_id: traceCtx.traceId,
     span_id: traceCtx.spanId,
     timestamp: new Date().toISOString(),
