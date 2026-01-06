@@ -28,7 +28,6 @@ export function tracingPlugin(options: TracingOptions = {}) {
           span.setAttributes(flatten({ input: rawInput }));
         }
         const meta = { path: opts.path, type: opts.type, ok: result.ok };
-        console.log(meta);
         span.setAttributes(meta);
         span.end();
         return result;
