@@ -53,7 +53,10 @@ const drizzleClientWs = drizzleWs({
 });
 
 // Add instrumentation
-instrumentDrizzleClient(drizzleClientWs, { dbSystem: "postgresql" });
+instrumentDrizzleClient(drizzleClientWs, {
+  dbSystem: "postgresql",
+  tracerName: "drizzle",
+});
 
 export const db = drizzleClientWs;
 

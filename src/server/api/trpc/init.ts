@@ -15,6 +15,7 @@ import { auth } from "@/shared/infrastructure/better-auth/auth";
 import { db } from "../../db";
 import { adminPlugin } from "./middleware/admin-plugin";
 import { authPlugin } from "./middleware/auth-plugin";
+import { tracingPlugin } from "./middleware/tracing-plugin";
 import { wideEventPlugin } from "./middleware/wide-event";
 
 /**
@@ -89,7 +90,9 @@ export const createTRPCRouter = t.router;
  * guarantee that a user querying is authorized, but you can still access user session data if they
  * are logged in.
  */
-export const publicProcedure = t.procedure.concat(wideEventPlugin().pluginProc);
+export const publicProcedure = t.procedure
+  .concat(tracingPlugin().pluginProc)
+  .concat(wideEventPlugin().pluginProc);
 
 /**
  * Private (authenticated) procedure
@@ -97,6 +100,7 @@ export const publicProcedure = t.procedure.concat(wideEventPlugin().pluginProc);
  * Use this when you need to guarantee that a user querying is authorized.
  */
 export const protectedProcedure = t.procedure
+  .concat(tracingPlugin().pluginProc)
   .concat(wideEventPlugin().pluginProc)
   .concat(authPlugin().pluginProc);
 
@@ -106,6 +110,7 @@ export const protectedProcedure = t.procedure
  * Use this when you need to guarantee that a user querying is authorized.
  */
 export const adminProcedure = t.procedure
+  .concat(tracingPlugin().pluginProc)
   .concat(wideEventPlugin().pluginProc)
   .concat(authPlugin().pluginProc)
   .concat(adminPlugin().pluginProc);
