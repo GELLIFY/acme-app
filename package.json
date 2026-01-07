@@ -30,6 +30,7 @@
     "@better-auth/passkey": "^1.4.10",
     "@hono/zod-openapi": "^1.2.0",
     "@hookform/resolvers": "^5.2.2",
+    "@kubiks/otel-better-auth": "^2.0.2",
     "@kubiks/otel-drizzle": "^2.1.0",
     "@kubiks/otel-resend": "^1.1.0",
     "@neondatabase/serverless": "^1.0.2",

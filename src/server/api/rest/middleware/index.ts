@@ -3,7 +3,7 @@ import { rateLimiter } from "hono-rate-limiter";
 import type { Context } from "../init";
 import { withAuth } from "./auth";
 import { withDatabase } from "./db";
-import { withWideEvent } from "./wide-event";
+import { withWideEvent } from "./with-wide-event";
 
 /**
  * Public endpoint middleware - only attaches database with smart routing

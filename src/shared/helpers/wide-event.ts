@@ -1,9 +1,7 @@
 import { env } from "@/env";
-import { getTraceContext } from "../infrastructure/tracing";
+import { getTraceContext } from "../infrastructure/otel/get-trace-context";
 
-// @ref https://loggingsucks.com/
-export type LogContext = {
-  // request context
+type RequestContext = {
   request_id: string; // request
   trace_id?: string; // otel trace id
   span_id?: string; // otel span id
@@ -19,12 +17,14 @@ export type LogContext = {
   content_type?: string;
   request_size_bytes?: number;
   response_size_bytes?: number;
+};
 
-  // user context
+type UserContext = {
   user?: Record<string, unknown>;
   feature_flags?: Record<string, boolean>;
+};
 
-  // infrastructure context
+type InfrastructureContext = {
   service_name?: string;
   service_version?: string;
   deployment_id?: string;
@@ -35,11 +35,13 @@ export type LogContext = {
   container_id?: string;
   cloud_provider?: string;
   environment?: string;
+};
 
-  // error context
+type ErrorContext = {
   error?: Record<string, unknown>;
+};
 
-  // performance context
+type PerformanceContext = {
   db_query_count?: number;
   db_query_time_ms?: number;
   cache_hits?: number;
@@ -50,6 +52,14 @@ export type LogContext = {
   cpu_time_ms?: number;
 };
 
+// general contexts + business context
+export type LogContext = Record<string, unknown> &
+  RequestContext &
+  UserContext &
+  InfrastructureContext &
+  ErrorContext &
+  PerformanceContext;
+
 // Tail sampling decision function
 export function shouldSample(event: LogContext): boolean {
   // Always keep errors
@@ -59,10 +69,10 @@ export function shouldSample(event: LogContext): boolean {
   if (event.duration_ms > 2000) return true;
 
   // Always keep VIP users
-  // if (event.user?.role === "admin") return true;
+  if (event.user?.role === "admin") return true;
 
-  // Always keep requests with specific feature flags (debugging rollouts)
-  // if (event.feature_flags?.new_magic_flow) return true;
+  // Always keep requests with feature flags (debugging rollouts)
+  if (event.feature_flags) return true;
 
   // Random sample the rest at 5%
   return Math.random() < (env.NODE_ENV === "development" ? 1 : 0.05);
