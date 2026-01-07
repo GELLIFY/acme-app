@@ -1,6 +1,6 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: from library */
 import { describe, expect, it, vi } from "bun:test";
 import type { Auth, BetterAuthOptions } from "better-auth";
-import type { u } from "node_modules/@electric-sql/pglite/dist/pglite-CntadC_p";
 import {
   instrumentBetterAuth,
   otelPlugin,

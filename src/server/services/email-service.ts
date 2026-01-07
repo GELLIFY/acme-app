@@ -1,15 +1,9 @@
-import { instrumentResend } from "@kubiks/otel-resend";
-import { Resend } from "resend";
 import ChangeEmailConfirmationEmail from "@/emails/change-email-confirmation-email";
 import DeleteAccountVerificationEmail from "@/emails/delete-account-verification-email";
 import EmailVerificationEmail from "@/emails/email-verification-email";
 import ResetPasswordEmail from "@/emails/reset-password-email";
-import { env } from "@/env";
 import { logger } from "@/shared/infrastructure/logger";
-
-export const resend = instrumentResend(
-  new Resend(env.RESEND_API_KEY || "re_123"),
-);
+import { resend } from "@/shared/infrastructure/resend";
 
 type ResetPasswordEmailParams = {
   user: { email: string };

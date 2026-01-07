@@ -15,8 +15,8 @@ import { auth } from "@/shared/infrastructure/better-auth/auth";
 import { db } from "../../db";
 import { adminPlugin } from "./middleware/admin-plugin";
 import { authPlugin } from "./middleware/auth-plugin";
-import { tracingPlugin } from "./middleware/tracing-plugin";
-import { wideEventPlugin } from "./middleware/wide-event";
+import { otelPlugin } from "./middleware/otel-plugin";
+import { wideEventPlugin } from "./middleware/wide-event-plugin";
 
 /**
  * 1. CONTEXT
@@ -91,7 +91,7 @@ export const createTRPCRouter = t.router;
  * are logged in.
  */
 export const publicProcedure = t.procedure
-  .concat(tracingPlugin().pluginProc)
+  .concat(otelPlugin().pluginProc)
   .concat(wideEventPlugin().pluginProc);
 
 /**
@@ -100,7 +100,7 @@ export const publicProcedure = t.procedure
  * Use this when you need to guarantee that a user querying is authorized.
  */
 export const protectedProcedure = t.procedure
-  .concat(tracingPlugin().pluginProc)
+  .concat(otelPlugin().pluginProc)
   .concat(wideEventPlugin().pluginProc)
   .concat(authPlugin().pluginProc);
 
@@ -110,7 +110,7 @@ export const protectedProcedure = t.procedure
  * Use this when you need to guarantee that a user querying is authorized.
  */
 export const adminProcedure = t.procedure
-  .concat(tracingPlugin().pluginProc)
+  .concat(otelPlugin().pluginProc)
   .concat(wideEventPlugin().pluginProc)
   .concat(authPlugin().pluginProc)
   .concat(adminPlugin().pluginProc);

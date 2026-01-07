@@ -74,16 +74,16 @@ function endSpanWithSuccess(span: Span): void {
 /**
  * Wraps an async function with OpenTelemetry tracing.
  */
+
+// biome-ignore lint/suspicious/noExplicitAny: args type cannot be known
 function wrapAuthMethod<T extends (...args: any[]) => Promise<any>>(
   originalFn: T,
   spanName: string,
   attributes: Record<string, string>,
   tracer: Tracer,
 ): T {
-  return async function instrumented(
-    this: any,
-    ...args: Parameters<T>
-  ): Promise<any> {
+  // biome-ignore lint/suspicious/noExplicitAny: this type cannot be known
+  return async function instrumented(this: any, ...args: Parameters<T>) {
     const span = tracer.startSpan(spanName, {
       kind: SpanKind.CLIENT,
       attributes,
@@ -186,6 +186,7 @@ function instrumentServer<TOptions extends BetterAuthOptions>(
   server: Auth<TOptions>,
   tracer: Tracer,
 ): Auth<TOptions> {
+  // biome-ignore lint/suspicious/noExplicitAny: TODO: update types
   const api = server.api as Record<string, any>;
   const instrumentedMethods = new Set<string>();
 
@@ -246,8 +247,7 @@ function ensureOtelPlugin<TOptions extends BetterAuthOptions>(
   const existingPlugins = options.plugins;
   const pluginsArray = Array.isArray(existingPlugins)
     ? existingPlugins
-    : existingPlugins &&
-        typeof (existingPlugins as any)[Symbol.iterator] === "function"
+    : existingPlugins && typeof existingPlugins[Symbol.iterator] === "function"
       ? Array.from(existingPlugins as Iterable<BetterAuthPlugin>)
       : [];
 
