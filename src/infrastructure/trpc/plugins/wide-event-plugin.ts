@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { initTRPC } from "@trpc/server";
-import { createWideEvent, shouldSample } from "@/shared/helpers/wide-event";
-import { logger } from "@/shared/infrastructure/logger";
-import type { createTRPCContext } from "../init";
+import { logger } from "@/infrastructure/logger";
+import { createWideEvent, shouldSample } from "@/shared/utils/wide-event";
+import type { createTRPCContext } from "..";
 
 export function wideEventPlugin() {
   // When creating a plugin for tRPC, you use the same API as creating any other tRPC-app

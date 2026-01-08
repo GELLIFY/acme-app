@@ -1,3 +1,4 @@
+import { createTRPCRouter, protectedProcedure } from "@/infrastructure/trpc";
 import {
   changePassword,
   deleteUser,
@@ -7,7 +8,6 @@ import {
   changePasswordSchema,
   updateUserSchema,
 } from "@/shared/validators/user.schema";
-import { createTRPCRouter, protectedProcedure } from "../init";
 
 export const userRouter = createTRPCRouter({
   me: protectedProcedure.query(async ({ ctx: { session } }) => {

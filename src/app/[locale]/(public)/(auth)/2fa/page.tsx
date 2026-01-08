@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { auth } from "@/shared/infrastructure/better-auth/auth";
+import { auth } from "@/infrastructure/better-auth/auth";
 import { getScopedI18n } from "@/shared/locales/server";
 
 export default async function TwoFactorPage() {

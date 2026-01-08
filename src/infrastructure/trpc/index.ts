@@ -11,12 +11,12 @@ import { initTRPC } from "@trpc/server";
 import { cache } from "react";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { auth } from "@/shared/infrastructure/better-auth/auth";
-import { db } from "../../db";
-import { adminPlugin } from "./middleware/admin-plugin";
-import { authPlugin } from "./middleware/auth-plugin";
-import { otelPlugin } from "./middleware/otel-plugin";
-import { wideEventPlugin } from "./middleware/wide-event-plugin";
+import { auth } from "@/infrastructure/better-auth/auth";
+import { adminPlugin } from "@/infrastructure/trpc/plugins/admin-plugin";
+import { authPlugin } from "@/infrastructure/trpc/plugins/auth-plugin";
+import { otelPlugin } from "@/infrastructure/trpc/plugins/otel-plugin";
+import { wideEventPlugin } from "@/infrastructure/trpc/plugins/wide-event-plugin";
+import { db } from "@/server/db";
 
 /**
  * 1. CONTEXT

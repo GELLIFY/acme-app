@@ -38,11 +38,8 @@ import {
   NativeSelect,
   NativeSelectOption,
 } from "@/components/ui/native-select";
-import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
-import {
-  ROLES,
-  type Role,
-} from "@/shared/infrastructure/better-auth/permissions";
+import { authClient } from "@/infrastructure/better-auth/auth-client";
+import { ROLES, type Role } from "@/infrastructure/better-auth/permissions";
 
 export const columns: ColumnDef<UserWithRole>[] = [
   {

@@ -12,8 +12,8 @@ import { TwoFactor } from "@/components/auth/account/two-factor";
 import { UpdatePassword } from "@/components/auth/account/update-password";
 import { UserAvatar } from "@/components/auth/account/user-avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { auth } from "@/shared/infrastructure/better-auth/auth";
-import { getQueryClient, trpc } from "@/shared/infrastructure/trpc/server";
+import { auth } from "@/infrastructure/better-auth/auth";
+import { getQueryClient, trpc } from "@/infrastructure/trpc/server";
 import { getScopedI18n } from "@/shared/locales/server";
 
 export const metadata: Metadata = {

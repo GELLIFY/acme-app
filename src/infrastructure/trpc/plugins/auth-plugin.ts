@@ -1,5 +1,5 @@
 import { initTRPC, TRPCError } from "@trpc/server";
-import type { createTRPCContext } from "../init";
+import type { createTRPCContext } from "..";
 
 export function authPlugin() {
   // When creating a plugin for tRPC, you use the same API as creating any other tRPC-app

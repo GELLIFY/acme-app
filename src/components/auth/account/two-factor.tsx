@@ -53,9 +53,9 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { Spinner } from "@/components/ui/spinner";
-import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
-import { logger } from "@/shared/infrastructure/logger";
-import { useTRPC } from "@/shared/infrastructure/trpc/client";
+import { authClient } from "@/infrastructure/better-auth/auth-client";
+import { logger } from "@/infrastructure/logger";
+import { useTRPC } from "@/infrastructure/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 import {
   twoFactorSchema,

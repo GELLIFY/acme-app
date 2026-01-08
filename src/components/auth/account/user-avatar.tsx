@@ -15,9 +15,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { useUserQuery } from "@/hooks/use-user";
-import { convertImageToBase64 } from "@/shared/helpers/image";
-import { useTRPC } from "@/shared/infrastructure/trpc/client";
+import { useTRPC } from "@/infrastructure/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
+import { convertImageToBase64 } from "@/shared/utils/image";
 
 export function UserAvatar() {
   const t = useScopedI18n("account");

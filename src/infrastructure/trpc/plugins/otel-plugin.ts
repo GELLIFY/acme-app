@@ -1,7 +1,7 @@
 import { type Span, trace } from "@opentelemetry/api";
 import { initTRPC } from "@trpc/server";
 import { flatten } from "flat";
-import type { createTRPCContext } from "../init";
+import type { createTRPCContext } from "..";
 
 type OtelOptions = {
   collectInput?: boolean;

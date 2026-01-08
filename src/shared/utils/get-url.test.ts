@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "bun:test";
-import { getBaseUrl } from "@/shared/helpers/get-url";
+import { getBaseUrl } from "@/shared/utils/get-url";
 
 describe("getBaseUrl", () => {
   const originalNodeEnv = process.env.NODE_ENV;
