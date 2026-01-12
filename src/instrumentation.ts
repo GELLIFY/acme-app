@@ -1,3 +1,4 @@
+import { PinoInstrumentation } from "@opentelemetry/instrumentation-pino";
 import { OTLPHttpJsonTraceExporter, registerOTel } from "@vercel/otel";
 
 /**
@@ -11,6 +12,7 @@ import { OTLPHttpJsonTraceExporter, registerOTel } from "@vercel/otel";
 export async function register() {
   registerOTel({
     serviceName: "acme-app",
+    instrumentations: [new PinoInstrumentation({})],
     traceExporter: new OTLPHttpJsonTraceExporter({
       // Prefer traces-specific endpoint, fallback to base
       url:

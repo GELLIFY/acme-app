@@ -30,6 +30,7 @@ const logger: Logger = pino({
 
       const LEVEL_COLOR = LEVEL_COLORS[logLevel as keyof typeof LEVEL_COLORS];
 
+      // TODO: use correct console method based on level
       console.log(
         `[${timeFormatted}] ${LEVEL_COLOR}${logLevel} ${COLOR.CYAN}[${group}] ${msg} ${COLOR.WHITE}`,
       );
@@ -39,6 +40,11 @@ const logger: Logger = pino({
         return {
           level: label,
         };
+      },
+    },
+    transmit: {
+      send: async (_level, _event) => {
+        // TODO: send log to server
       },
     },
   },
