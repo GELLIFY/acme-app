@@ -1,5 +1,9 @@
 import { format } from "date-fns";
 import { type Logger, pino } from "pino";
+import { browserLogBuffer } from "./browser-log-buffer";
+import { toLogLevel } from "./levels";
+import { normalizeLogArgs } from "./normalize-log-args";
+import type { LogContext } from "./types";
 
 const COLOR = {
   GREEN: `\x1b[32m`,
@@ -33,6 +37,29 @@ const logger: Logger = pino({
       console.log(
         `[${timeFormatted}] ${LEVEL_COLOR}${logLevel} ${COLOR.CYAN}[${group}] ${msg} ${COLOR.WHITE}`,
       );
+    },
+    transmit: {
+      send: (_level, logEvent) => {
+        const { message, context, error } = normalizeLogArgs(logEvent.messages);
+        const bindings = logEvent.bindings.reduce<LogContext>(
+          (accumulator, binding) => ({
+            ...accumulator,
+            ...binding,
+          }),
+          {},
+        );
+
+        browserLogBuffer.enqueue(
+          toLogLevel(logEvent.level.label),
+          message,
+          {
+            ...bindings,
+            ...context,
+            source: "browser",
+          },
+          error,
+        );
+      },
     },
     formatters: {
       level: (label) => {

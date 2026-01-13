@@ -44,6 +44,10 @@ The following extensions are recommended for an optimal developer experience. Th
 
 Have a look around the [docs↗](https://gellify.dev), as well as the docs of the packages that your app includes.
 
+## Observability
+
+See `docs/observability.md` for the SigNoz + OpenTelemetry setup.
+
 ## Notes 2025-10-23
 
 - [ ] fix 422 example

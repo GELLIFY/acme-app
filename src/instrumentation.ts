@@ -1,4 +1,23 @@
-import { OTLPHttpJsonTraceExporter, registerOTel } from "@vercel/otel";
+import { registerOTel } from "@vercel/otel";
+
+const DEFAULT_SERVICE_NAME = "acme-app";
+
+const parseRegexList = (value?: string): RegExp[] => {
+  if (!value) return [];
+
+  return value
+    .split(",")
+    .map((pattern) => pattern.trim())
+    .filter(Boolean)
+    .map((pattern) => {
+      try {
+        return new RegExp(pattern);
+      } catch {
+        return null;
+      }
+    })
+    .filter((pattern): pattern is RegExp => pattern !== null);
+};
 
 /**
  * Registers application instrumentation.
@@ -9,13 +28,31 @@ import { OTLPHttpJsonTraceExporter, registerOTel } from "@vercel/otel";
  * Call this early in your application's lifecycle.
  */
 export async function register() {
+  const propagateContextUrls = parseRegexList(
+    process.env.OTEL_FETCH_PROPAGATE_CONTEXT_URLS,
+  );
+  const resolvedPropagateContextUrls =
+    propagateContextUrls.length > 0 ? propagateContextUrls : [/.*/];
+
   registerOTel({
-    serviceName: "acme-app",
-    traceExporter: new OTLPHttpJsonTraceExporter({
-      // Prefer traces-specific endpoint, fallback to base
-      url:
-        process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT ??
-        process.env.OTEL_EXPORTER_OTLP_ENDPOINT,
-    }),
+    serviceName: process.env.OTEL_SERVICE_NAME ?? DEFAULT_SERVICE_NAME,
+    attributes: {
+      "deployment.environment": process.env.NODE_ENV,
+      "service.version": process.env.npm_package_version,
+    },
+    instrumentationConfig: {
+      fetch: {
+        propagateContextUrls: resolvedPropagateContextUrls,
+        ignoreUrls: parseRegexList(process.env.OTEL_FETCH_IGNORE_URLS),
+        resourceNameTemplate: "{http.method} {http.host}{http.target}",
+      },
+    },
   });
+
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    const { initializeLogsExporter } = await import(
+      "@/shared/infrastructure/otel/logs-exporter"
+    );
+    initializeLogsExporter();
+  }
 }

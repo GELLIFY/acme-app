@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { ImpersonationIndicator } from "@/components/auth/admin/impersonation-indicator";
+import { TelemetryProvider } from "@/components/telemetry-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TRPCReactProvider } from "@/shared/infrastructure/trpc/client";
@@ -32,6 +33,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`font-sans ${inter.variable}`}>
+        <TelemetryProvider />
         <TRPCReactProvider>
           <I18nProviderClient locale={locale}>
             <NuqsAdapter>
