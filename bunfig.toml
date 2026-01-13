@@ -23,9 +23,9 @@ coverageDir = "coverage"  # default "coverage"
 coveragePathIgnorePatterns = [
   "src/app/**",
   "src/emails/**",
+  "src/infrastructure/**",
   "src/server/db/**",
   "src/shared/locales/**",
-  "src/shared/infrastructure/**",
   "src/components/ui/**",
   "src/tests/**",
   "src/instrumentation.ts",
