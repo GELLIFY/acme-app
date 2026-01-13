@@ -33,6 +33,6 @@ export const withWideEvent = createMiddleware<Context>(async (ctx, next) => {
     event.duration_ms = Date.now() - startTime;
 
     // Emit the wide event
-    if (shouldSample(event)) logger.info(event);
+    if (shouldSample(event)) logger.info("wide_event", event);
   }
 });

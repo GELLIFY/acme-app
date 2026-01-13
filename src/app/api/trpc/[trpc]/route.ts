@@ -27,6 +27,7 @@ const handler = (req: NextRequest) =>
         ? ({ path, error }) => {
             logger.error(
               `❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`,
+              error,
             );
           }
         : undefined,

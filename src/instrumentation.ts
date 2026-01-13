@@ -1,4 +1,5 @@
 import { registerOTel } from "@vercel/otel";
+import { initializeLogsExporter } from "@/shared/infrastructure/logger/log-exporter";
 
 /**
  * Registers application instrumentation.
@@ -35,4 +36,8 @@ export async function register() {
       },
     },
   });
+
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    initializeLogsExporter();
+  }
 }

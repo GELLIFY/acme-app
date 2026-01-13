@@ -46,7 +46,7 @@ export function DisplayName() {
       });
 
       if (error) {
-        logger.error(error, error.message);
+        logger.error(error.message || "Error updating user", error);
         toast.error(error.message || "Error updating user");
         return;
       }

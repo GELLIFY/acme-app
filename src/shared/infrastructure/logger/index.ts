@@ -1,5 +1,5 @@
-import { clientLogger } from "./client";
-import { serverLogger } from "./server";
+import { browserLogger } from "./browser-logger";
+import { serverLogger } from "./pino-logger";
 
 export const logger =
-  typeof window === "undefined" ? serverLogger : clientLogger;
+  typeof window === "undefined" ? serverLogger : browserLogger;
