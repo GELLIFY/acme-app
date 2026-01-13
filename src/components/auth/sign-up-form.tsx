@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 import { convertImageToBase64 } from "@/shared/helpers/image";
 import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
-import { logger } from "@/shared/infrastructure/logger";
+import { browserLogger } from "@/shared/infrastructure/logger/browser-logger";
 import { useScopedI18n } from "@/shared/locales/client";
 import { Button } from "../ui/button";
 import { Field, FieldError, FieldLabel } from "../ui/field";
@@ -79,7 +79,7 @@ export const SignUpForm = () => {
         });
 
         if (error) {
-          logger.error(error, error.message);
+          browserLogger.error(error.statusText, new Error(error.message));
           toast.error(error.message);
           return;
         }
@@ -89,7 +89,7 @@ export const SignUpForm = () => {
         }
       } catch (error) {
         if (error instanceof APIError) {
-          logger.error(error, error.message);
+          browserLogger.error(error.message, error);
           toast.error(error.message);
         }
       }

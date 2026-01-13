@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { logger } from "@/shared/infrastructure/logger";
+import { browserLogger } from "@/shared/infrastructure/logger/browser-logger";
 
 export function useCopyToClipboard({
   timeout = 2000,
@@ -19,19 +19,22 @@ export function useCopyToClipboard({
 
     if (!value) return;
 
-    navigator.clipboard.writeText(value).then(() => {
-      setIsCopied(true);
+    navigator.clipboard.writeText(value).then(
+      () => {
+        setIsCopied(true);
 
-      if (onCopy) {
-        onCopy();
-      }
+        if (onCopy) {
+          onCopy();
+        }
 
-      if (timeout !== 0) {
-        setTimeout(() => {
-          setIsCopied(false);
-        }, timeout);
-      }
-    }, logger.error);
+        if (timeout !== 0) {
+          setTimeout(() => {
+            setIsCopied(false);
+          }, timeout);
+        }
+      },
+      (error) => browserLogger.error("Copy error", error),
+    );
   };
 
   return { isCopied, copyToClipboard };

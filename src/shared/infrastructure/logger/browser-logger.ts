@@ -24,8 +24,6 @@ class BrowserLogger {
   constructor() {
     if (typeof window === "undefined") return;
 
-    this.setupGlobalErrorHandlers();
-
     setInterval(() => this.flush(), this.flushInterval);
 
     // Optional: Also flush when the page is hidden
@@ -139,31 +137,6 @@ class BrowserLogger {
   }
   error(message: string, error: Error, context?: LogContext) {
     this.log("error", message, context, error);
-  }
-
-  private setupGlobalErrorHandlers() {
-    window.onerror = (message, source, lineno, colno, error) => {
-      this.error(
-        `Unhandled error: ${message}`,
-        error || new Error(message as string),
-        {
-          source: "window.onerror",
-          sourceFile: source,
-          line: lineno,
-          column: colno,
-        },
-      );
-    };
-
-    window.onunhandledrejection = (event) => {
-      this.error(
-        "Unhandled promise rejection",
-        event.reason || new Error("Unknown rejection reason"),
-        {
-          source: "window.onunhandledrejection",
-        },
-      );
-    };
   }
 }
 

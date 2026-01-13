@@ -6,6 +6,7 @@ const createPinoConfig = (
   environment: string = process.env.NODE_ENV,
 ): LoggerOptions => ({
   name: process.env.OTEL_SERVICE_NAME ?? "acme-app",
+  enabled: environment !== "test",
   level: environment === "production" ? "info" : "debug",
   timestamp: pino.stdTimeFunctions.isoTime,
   formatters: {

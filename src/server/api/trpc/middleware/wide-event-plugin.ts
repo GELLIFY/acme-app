@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { initTRPC } from "@trpc/server";
 import { createWideEvent, shouldSample } from "@/shared/helpers/wide-event";
-import { logger } from "@/shared/infrastructure/logger";
+import { serverLogger } from "@/shared/infrastructure/logger/pino-logger";
 import type { createTRPCContext } from "../init";
 
 export function wideEventPlugin() {
@@ -51,7 +51,7 @@ export function wideEventPlugin() {
         event.duration_ms = Date.now() - startTime;
 
         // Emit the wide event
-        if (shouldSample(event)) logger.info("wide_event", event);
+        if (shouldSample(event)) serverLogger.info("wide_event", event);
       }
     }),
   };

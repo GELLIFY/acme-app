@@ -22,7 +22,7 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
-import { logger } from "@/shared/infrastructure/logger";
+import { browserLogger } from "@/shared/infrastructure/logger/browser-logger";
 import { useScopedI18n } from "@/shared/locales/client";
 
 export function SessionManagement({
@@ -42,7 +42,7 @@ export function SessionManagement({
       },
       {
         onError: ({ error }) => {
-          logger.error(error, error.message);
+          browserLogger.error(error.message, error);
           toast.error("Error revoking session");
         },
         onSuccess: () => {

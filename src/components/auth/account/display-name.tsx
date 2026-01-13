@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { useUserQuery } from "@/hooks/use-user";
 import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
-import { logger } from "@/shared/infrastructure/logger";
+import { browserLogger } from "@/shared/infrastructure/logger/browser-logger";
 import { useScopedI18n } from "@/shared/locales/client";
 
 const formSchema = z.object({
@@ -46,8 +46,8 @@ export function DisplayName() {
       });
 
       if (error) {
-        logger.error(error.message || "Error updating user", error);
         toast.error(error.message || "Error updating user");
+        browserLogger.error(error.statusText, new Error(error.message), error);
         return;
       }
 

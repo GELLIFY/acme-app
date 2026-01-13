@@ -18,9 +18,8 @@ import {
   sendEmailVerificationEmail,
   sendResetPasswordEmail,
 } from "@/server/services/email-service";
-import { logger } from "@/shared/infrastructure/logger";
 import { instrumentBetterAuth } from "../otel/otel-better-auth";
-import { ac, adminRole, formatPermissions, userRole } from "./permissions";
+import { ac, adminRole, userRole } from "./permissions";
 
 export const auth = instrumentBetterAuth(
   betterAuth({
@@ -77,15 +76,11 @@ export const auth = instrumentBetterAuth(
       }),
       apiKey({
         permissions: {
-          defaultPermissions: async (userId) => {
+          defaultPermissions: async (_userId) => {
             // Fetch user role or other data to determine permissions
             const permissions: Statements = {
               todo: ["create"],
             };
-
-            logger.info(
-              `Creating API Key for user ${userId} with permissions: ${formatPermissions(permissions)}`,
-            );
 
             return {
               ...permissions,
