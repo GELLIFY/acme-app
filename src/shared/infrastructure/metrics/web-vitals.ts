@@ -30,11 +30,11 @@ export function initializeWebVitals() {
   metrics.setGlobalMeterProvider(meterProvider);
 
   const meter = metrics.getMeter("web-vitals");
-  const lcp = meter.createHistogram("web_vitals_lcp");
-  const inp = meter.createHistogram("web_vitals_inp");
-  const cls = meter.createObservableGauge("web_vitals_cls");
-  const ttfb = meter.createHistogram("web_vitals_ttfb");
-  const fcp = meter.createHistogram("web_vitals_fcp");
+  const lcp = meter.createHistogram("web_vitals_lcp", { unit: "ms" });
+  const inp = meter.createHistogram("web_vitals_inp", { unit: "ms" });
+  const cls = meter.createObservableGauge("web_vitals_cls", { unit: "1" });
+  const ttfb = meter.createHistogram("web_vitals_ttfb", { unit: "ms" });
+  const fcp = meter.createHistogram("web_vitals_fcp", { unit: "ms" });
 
   // TODO: Sample metrics if your traffic is high
   const record = (metric: Metric) => {
