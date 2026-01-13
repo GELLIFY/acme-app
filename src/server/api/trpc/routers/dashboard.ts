@@ -1,4 +1,7 @@
-import { createTRPCRouter, protectedProcedure } from "../init";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+} from "@/infrastructure/trpc/init";
 
 export const dashboardRouter = createTRPCRouter({
   privateData: protectedProcedure.query(({ ctx }) => {

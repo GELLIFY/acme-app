@@ -1,4 +1,8 @@
 import {
+  createTRPCRouter,
+  protectedProcedure,
+} from "@/infrastructure/trpc/init";
+import {
   createTodo,
   deleteTodo,
   getTodos,
@@ -10,7 +14,6 @@ import {
   getTodosSchema,
   updateTodoSchema,
 } from "@/shared/validators/todo.schema";
-import { createTRPCRouter, protectedProcedure } from "../init";
 
 export const todoRouter = createTRPCRouter({
   get: protectedProcedure

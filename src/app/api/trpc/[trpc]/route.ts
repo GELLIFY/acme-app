@@ -3,8 +3,8 @@ import type { NextRequest } from "next/server";
 
 import { env } from "@/env";
 import { logger } from "@/infrastructure/logger";
-import { createTRPCContext } from "@/server/api/trpc/init";
-import { appRouter } from "@/server/api/trpc/routers/_app";
+import { createTRPCContext } from "@/infrastructure/trpc/init";
+import { appRouter } from "@/server/api/trpc/app-router";
 
 /**
  * This wraps the `createTRPCContext` helper and provides the required context for the tRPC API when

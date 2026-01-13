@@ -12,7 +12,7 @@ import { cache } from "react";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { auth } from "@/infrastructure/better-auth/auth";
-import { db } from "../../db";
+import { db } from "@/server/db";
 import { adminPlugin } from "./middleware/admin-plugin";
 import { authPlugin } from "./middleware/auth-plugin";
 import { otelPlugin } from "./middleware/otel-plugin";

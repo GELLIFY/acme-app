@@ -1,13 +1,13 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
-import { checkHealth } from "@/server/services/health-service";
 import {
   createCallerFactory,
   createTRPCRouter,
   publicProcedure,
-} from "../init";
-import { dashboardRouter } from "./dashboard";
-import { todoRouter } from "./todo";
-import { userRouter } from "./user";
+} from "@/infrastructure/trpc/init";
+import { checkHealth } from "@/server/services/health-service";
+import { dashboardRouter } from "./routers/dashboard";
+import { todoRouter } from "./routers/todo";
+import { userRouter } from "./routers/user";
 
 /**
  * This is the primary router for your server.
