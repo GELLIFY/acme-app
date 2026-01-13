@@ -19,7 +19,7 @@ import {
   getQueryClient,
   HydrateClient,
   trpc,
-} from "@/shared/infrastructure/trpc/server";
+} from "@/infrastructure/trpc/server";
 import { getScopedI18n } from "@/shared/locales/server";
 import { todoFilterParamsSchema } from "@/shared/validators/todo.schema";
 

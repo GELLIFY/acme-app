@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { auth } from "@/shared/infrastructure/better-auth/auth";
+import { auth } from "@/infrastructure/better-auth/auth";
 import { getScopedI18n } from "@/shared/locales/server";
 
 export const metadata: Metadata = {

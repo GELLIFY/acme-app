@@ -1,11 +1,11 @@
 import { getCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
-import { auth } from "@/shared/infrastructure/better-auth/auth";
+import { auth } from "@/infrastructure/better-auth/auth";
 import {
   expandRoles,
   type Role,
-} from "@/shared/infrastructure/better-auth/permissions";
+} from "@/infrastructure/better-auth/permissions";
 import type { Context } from "../init";
 
 /**

@@ -1,4 +1,4 @@
-import { caller } from "@/shared/infrastructure/trpc/server";
+import { caller } from "@/infrastructure/trpc/server";
 
 export default async function DashboardPage() {
   const privateData = await caller.dashboard.privateData();

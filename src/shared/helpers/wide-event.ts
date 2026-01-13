@@ -1,5 +1,5 @@
 import { env } from "@/env";
-import { getTraceContext } from "../infrastructure/otel/get-trace-context";
+import { getTraceContext } from "@/infrastructure/otel/get-trace-context";
 
 type RequestContext = {
   request_id: string; // request

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { logger } from "@/shared/infrastructure/logger";
+import { logger } from "@/infrastructure/logger";
 
 export function useCopyToClipboard({
   timeout = 2000,

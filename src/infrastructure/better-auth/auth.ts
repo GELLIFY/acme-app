@@ -10,6 +10,7 @@ import {
   type Statements,
   twoFactor,
 } from "better-auth/plugins";
+import { logger } from "@/infrastructure/logger";
 import { db } from "@/server/db";
 import { schema } from "@/server/db/schema";
 import {
@@ -18,7 +19,6 @@ import {
   sendEmailVerificationEmail,
   sendResetPasswordEmail,
 } from "@/server/services/email-service";
-import { logger } from "@/shared/infrastructure/logger";
 import { instrumentBetterAuth } from "../otel/otel-better-auth";
 import { ac, adminRole, formatPermissions, userRole } from "./permissions";
 

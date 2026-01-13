@@ -65,9 +65,9 @@ import {
   NativeSelectOption,
 } from "@/components/ui/native-select";
 import { Spinner } from "@/components/ui/spinner";
-import type { auth } from "@/shared/infrastructure/better-auth/auth";
-import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
-import { logger } from "@/shared/infrastructure/logger";
+import type { auth } from "@/infrastructure/better-auth/auth";
+import { authClient } from "@/infrastructure/better-auth/auth-client";
+import { logger } from "@/infrastructure/logger";
 import { useScopedI18n } from "@/shared/locales/client";
 
 type ApiKey = Awaited<ReturnType<typeof auth.api.listApiKeys>>[number];

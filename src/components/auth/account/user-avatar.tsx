@@ -15,8 +15,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { useUserQuery } from "@/hooks/use-user";
+import { useTRPC } from "@/infrastructure/trpc/client";
 import { convertImageToBase64 } from "@/shared/helpers/image";
-import { useTRPC } from "@/shared/infrastructure/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 
 export function UserAvatar() {

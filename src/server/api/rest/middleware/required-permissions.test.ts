@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { Hono } from "hono";
-import type { Permissions } from "@/shared/infrastructure/better-auth/permissions";
+import type { Permissions } from "@/infrastructure/better-auth/permissions";
 import type { Context } from "../init";
 import { withRequiredPermissions } from "./required-permissions";
 

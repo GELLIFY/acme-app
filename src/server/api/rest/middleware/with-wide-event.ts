@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { createMiddleware } from "hono/factory";
+import { logger } from "@/infrastructure/logger";
 import { createWideEvent, shouldSample } from "@/shared/helpers/wide-event";
-import { logger } from "@/shared/infrastructure/logger";
 import type { Context } from "../init";
 
 export const withWideEvent = createMiddleware<Context>(async (ctx, next) => {

@@ -14,7 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { auth } from "@/shared/infrastructure/better-auth/auth";
+import { auth } from "@/infrastructure/better-auth/auth";
 import { getScopedI18n } from "@/shared/locales/server";
 import LanguageSelector from "./navbar-components/language-selector";
 import { UserMenu } from "./navbar-components/user-menu";
