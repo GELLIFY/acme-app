@@ -23,3 +23,5 @@ window.onunhandledrejection = (event) => {
     },
   );
 };
+
+console.log("✅ Global error handlers initialized");
