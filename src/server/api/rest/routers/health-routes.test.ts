@@ -1,9 +1,9 @@
 import { describe, expect, mock, spyOn, test } from "bun:test";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { testClient } from "hono/testing";
+import type { Context } from "@/infrastructure/hono/init";
 import { logger } from "@/infrastructure/logger";
 import { db } from "@/server/db";
-import type { Context } from "../init";
 import { healthRouter } from "./health-routes";
 
 describe("todos routes", () => {

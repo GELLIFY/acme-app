@@ -1,5 +1,5 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
-import type { Context } from "../init";
+import type { Context } from "@/infrastructure/hono/init";
 
 export function createRouter() {
   return new OpenAPIHono<Context>({

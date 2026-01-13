@@ -1,8 +1,7 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { handle } from "hono/vercel";
-
-import type { Context } from "@/server/api/rest/init";
-import { routers } from "@/server/api/rest/init";
+import type { Context } from "@/infrastructure/hono/init";
+import { routers } from "@/server/api/rest/rest-router";
 
 const app = new OpenAPIHono<Context>().basePath("/api/rest");
 

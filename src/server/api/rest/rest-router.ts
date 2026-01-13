@@ -1,7 +1,10 @@
-import { protectedMiddleware, publicMiddleware } from "../middleware";
-import { createRouter } from "../utils/create-router";
-import { healthRouter } from "./health-routes";
-import { todosRouter } from "./todos-routes";
+import {
+  protectedMiddleware,
+  publicMiddleware,
+} from "@/infrastructure/hono/middleware";
+import { healthRouter } from "./routers/health-routes";
+import { todosRouter } from "./routers/todos-routes";
+import { createRouter } from "./utils/create-router";
 
 const routers = createRouter()
   .use(...publicMiddleware)

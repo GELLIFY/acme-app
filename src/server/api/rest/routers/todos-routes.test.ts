@@ -5,9 +5,9 @@ import {
   expandRoles,
   type Permissions,
 } from "@/infrastructure/better-auth/permissions";
+import type { Context } from "@/infrastructure/hono/init";
 import { db } from "@/server/db";
 import { todoTable } from "@/server/db/schema/todos";
-import type { Context } from "../init";
 import { todosRouter } from "./todos-routes";
 
 const userId = "00000000-0000-0000-0000-000000000000";

@@ -1,4 +1,5 @@
 import { createRoute } from "@hono/zod-openapi";
+import { withRequiredPermissions } from "@/infrastructure/hono/middleware/required-permissions";
 import {
   createTodo,
   deleteTodo,
@@ -14,7 +15,6 @@ import {
   todosResponseSchema,
   updateTodoSchema,
 } from "@/shared/validators/todo.schema";
-import { withRequiredPermissions } from "../middleware/required-permissions";
 import { createErrorSchema } from "../utils/create-error-schema";
 import { createRouter } from "../utils/create-router";
 import {

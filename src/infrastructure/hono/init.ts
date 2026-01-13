@@ -4,9 +4,9 @@ import { cors } from "hono/cors";
 import { type RequestIdVariables, requestId } from "hono/request-id";
 import { secureHeaders } from "hono/secure-headers";
 import type { Permissions } from "@/infrastructure/better-auth/permissions";
+import { routers } from "@/server/api/rest/rest-router";
 import type { db } from "@/server/db";
 import { getBaseUrl } from "@/shared/helpers/get-url";
-import { routers } from "./routers/_app";
 
 export type Context = {
   Variables: RequestIdVariables & {
