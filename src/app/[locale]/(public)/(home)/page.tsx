@@ -3,9 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Github } from "lucide-react";
 import Link from "next/link";
-
 import { Button } from "@/components/ui/button";
-import { browserLogger } from "@/shared/infrastructure/logger/browser-logger";
 import { useTRPC } from "@/shared/infrastructure/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 
@@ -30,8 +28,6 @@ export default function Home() {
       return (await res.json()) as { status: "ok" | "error" };
     },
   });
-
-  browserLogger.info("Home page loaded");
 
   return (
     <div className="flex min-h-[calc(100vh-65px)] flex-col">
@@ -83,6 +79,7 @@ export default function Home() {
             </div>
           </div>
         </section>
+        <ClientPanel />
         <div className="mx-auto max-w-3xl space-y-8 text-center">
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <Button asChild>
