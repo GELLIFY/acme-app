@@ -1,5 +1,6 @@
 import { registerOTel } from "@vercel/otel";
 import { initializeLogsExporter } from "@/shared/infrastructure/logger/log-exporter";
+import { ATTR_DEPLOYMENT_ENVIRONMENT_NAME } from "@/shared/infrastructure/otel/semantic-conventions";
 
 /**
  * Registers application instrumentation.
@@ -11,7 +12,7 @@ import { initializeLogsExporter } from "@/shared/infrastructure/logger/log-expor
  */
 export async function register() {
   registerOTel({
-    serviceName: "acme-app",
+    serviceName: process.env.OTEL_SERVICE_NAME ?? "acme-app",
     // You can send traces directly from the app (skip collector),
     // but it’s not ideal for production
     //
@@ -21,6 +22,11 @@ export async function register() {
     //     'signoz-ingestion-key': env.SIGNOZ_INGESTION_KEY || ''
     //   }
     // })
+    attributes: {
+      // By default, @vercel/otel configures relevant Vercel attributes based on the environment
+      // Any additional attributes will be merged with the default attributes.
+      [ATTR_DEPLOYMENT_ENVIRONMENT_NAME]: process.env.NODE_ENV ?? "development",
+    },
     instrumentationConfig: {
       // Monitoring third party APIs
       // @ref: https://signoz.io/blog/opentelemetry-nextjs-use-cases/#monitoring-third-party-apis-in-signoz
