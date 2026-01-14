@@ -39,5 +39,29 @@ export async function register() {
 
   if (process.env.NEXT_RUNTIME === "nodejs") {
     initializeLogsExporter();
+
+    // // Handle uncaught exceptions
+    // process.on('uncaughtException', (error) => {
+    //   const finalLogger = pino.final(logger)
+    //   finalLogger.fatal({ err: error }, 'Uncaught exception')
+    //   process.exit(1)
+    // })
+
+    // // Handle unhandled promise rejections
+    // process.on('unhandledRejection', (reason, promise) => {
+    //   const finalLogger = pino.final(logger)
+    //   finalLogger.fatal({ reason }, 'Unhandled promise rejection')
+    //   process.exit(1)
+    // })
+
+    // // Graceful shutdown
+    // process.on('SIGTERM', () => {
+    //   logger.info('Received SIGTERM, shutting down gracefully')
+    //   pino.final(logger, (err, finalLogger) => {
+    //     if (err) finalLogger.error(err, 'Shutdown error')
+    //     finalLogger.info('Application shutdown complete')
+    //     process.exit(0)
+    //   })
+    // })
   }
 }
