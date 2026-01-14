@@ -1,8 +1,8 @@
-import { browserLogger } from "./shared/infrastructure/logger/browser-logger";
+import { logger } from "./shared/infrastructure/logger/pino-logger";
 
 // Set up error tracking
 window.onerror = (message, source, lineno, colno, error) => {
-  browserLogger.error(
+  logger.error(
     `Unhandled error: ${message}`,
     error || new Error(message as string),
     {
@@ -15,7 +15,7 @@ window.onerror = (message, source, lineno, colno, error) => {
 };
 
 window.onunhandledrejection = (event) => {
-  browserLogger.error(
+  logger.error(
     "Unhandled promise rejection",
     event.reason || new Error("Unknown rejection reason"),
     {

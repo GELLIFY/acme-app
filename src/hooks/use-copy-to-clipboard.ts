@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { browserLogger } from "@/shared/infrastructure/logger/browser-logger";
+import { logger } from "@/shared/infrastructure/logger/pino-logger";
 
 export function useCopyToClipboard({
   timeout = 2000,
@@ -33,7 +33,7 @@ export function useCopyToClipboard({
           }, timeout);
         }
       },
-      (error) => browserLogger.error("Copy error", error),
+      (error) => logger.error("Copy error", error),
     );
   };
 

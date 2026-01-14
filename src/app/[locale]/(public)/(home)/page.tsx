@@ -79,7 +79,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <ClientPanel />
         <div className="mx-auto max-w-3xl space-y-8 text-center">
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <Button asChild>
