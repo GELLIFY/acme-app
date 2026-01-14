@@ -28,7 +28,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
 import { ROLES } from "@/shared/infrastructure/better-auth/permissions";
-import { browserLogger } from "@/shared/infrastructure/logger/browser-logger";
+import { logger } from "@/shared/infrastructure/logger/pino-logger";
 
 const formSchema = z.object({
   firstName: z.string().min(1),
@@ -75,7 +75,7 @@ export function CreateUserDialog() {
       );
 
       if (error) {
-        browserLogger.error(error.statusText, new Error(error.message));
+        logger.error(error.statusText, new Error(error.message));
         toast.error(error.message || "Error creating user");
       }
 
@@ -85,7 +85,7 @@ export function CreateUserDialog() {
       toast.success("User created");
     } catch (error) {
       if (error instanceof APIError) {
-        browserLogger.error(error.message, error);
+        logger.error(error.message, error);
         toast.error(error.message);
       }
     }

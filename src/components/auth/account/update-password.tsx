@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { browserLogger } from "@/shared/infrastructure/logger/browser-logger";
+import { logger } from "@/shared/infrastructure/logger/pino-logger";
 import { useTRPC } from "@/shared/infrastructure/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 import { changePasswordSchema } from "@/shared/validators/user.schema";
@@ -49,7 +49,7 @@ export function UpdatePassword() {
     trpc.user.changePassword.mutationOptions({
       onError: (error) => {
         toast.error(error.message);
-        browserLogger.error(error.message, new Error(error.message));
+        logger.error(error.message, new Error(error.message));
       },
       onSuccess: () => {
         toast.success("Password changed");
