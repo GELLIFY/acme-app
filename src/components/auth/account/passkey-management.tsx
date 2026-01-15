@@ -57,7 +57,7 @@ import {
 } from "@/components/ui/item";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
-import { logger } from "@/shared/infrastructure/logger";
+import { logger } from "@/shared/infrastructure/logger/pino-logger";
 import { useScopedI18n } from "@/shared/locales/client";
 
 const passkeySchema = z.object({
@@ -89,7 +89,7 @@ export function PasskeyManagement({ passkeys }: { passkeys: Passkey[] }) {
           setLoading(false);
         },
         onError: ({ error }) => {
-          logger.error(error, error.message);
+          logger.error(error.message, error);
           toast.error(error.message || "Failed to add passkey");
         },
         onSuccess: () => {
@@ -99,7 +99,7 @@ export function PasskeyManagement({ passkeys }: { passkeys: Passkey[] }) {
       });
     } catch (error) {
       if (error instanceof APIError) {
-        logger.error(error, error.message);
+        logger.error(error.message, error);
         toast.error(error.message);
       }
     }

@@ -8,7 +8,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
-import { logger } from "@/shared/infrastructure/logger";
+import { logger } from "@/shared/infrastructure/logger/pino-logger";
 import { useScopedI18n } from "@/shared/locales/client";
 import { Button } from "../ui/button";
 import { Field, FieldError, FieldLabel } from "../ui/field";
@@ -54,7 +54,7 @@ export const ResetPasswordForm = ({ token }: { token: string }) => {
         });
 
         if (error) {
-          logger.error(error, error.message);
+          logger.error(error.statusText, new Error(error.message));
           toast.error(error.message);
           return;
         }
@@ -65,7 +65,7 @@ export const ResetPasswordForm = ({ token }: { token: string }) => {
         }
       } catch (error) {
         if (error instanceof APIError) {
-          logger.error(error, error.message);
+          logger.error(error.message, error);
           toast.error(error.message);
         }
       }

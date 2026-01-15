@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { useUserQuery } from "@/hooks/use-user";
 import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
-import { logger } from "@/shared/infrastructure/logger";
+import { logger } from "@/shared/infrastructure/logger/pino-logger";
 import { useScopedI18n } from "@/shared/locales/client";
 
 export const formSchema = z.object({
@@ -46,8 +46,14 @@ export function ChangeEmail() {
       });
 
       if (error) {
-        logger.error(error);
         toast.error(error.message || "Error changing email");
+
+        logger.error(
+          "Error changing email",
+          new Error(error.statusText),
+          error,
+        );
+
         return;
       }
 

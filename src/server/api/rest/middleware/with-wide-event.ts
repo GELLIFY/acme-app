@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { createMiddleware } from "hono/factory";
 import { createWideEvent, shouldSample } from "@/shared/helpers/wide-event";
-import { logger } from "@/shared/infrastructure/logger";
+import { logger } from "@/shared/infrastructure/logger/pino-logger";
 import type { Context } from "../init";
 
 export const withWideEvent = createMiddleware<Context>(async (ctx, next) => {
@@ -33,6 +33,6 @@ export const withWideEvent = createMiddleware<Context>(async (ctx, next) => {
     event.duration_ms = Date.now() - startTime;
 
     // Emit the wide event
-    if (shouldSample(event)) logger.info(event);
+    if (shouldSample(event)) logger.info("wide_event", event);
   }
 });

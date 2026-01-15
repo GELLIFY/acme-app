@@ -67,7 +67,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import type { auth } from "@/shared/infrastructure/better-auth/auth";
 import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
-import { logger } from "@/shared/infrastructure/logger";
+import { logger } from "@/shared/infrastructure/logger/pino-logger";
 import { useScopedI18n } from "@/shared/locales/client";
 
 type ApiKey = Awaited<ReturnType<typeof auth.api.listApiKeys>>[number];
@@ -153,7 +153,7 @@ function ApiKeyForm({
       );
 
       if (error) {
-        logger.error(error, error.message);
+        logger.error(error.statusText, new Error(error.message), error);
         toast.error(error.message);
         return;
       }
@@ -162,7 +162,7 @@ function ApiKeyForm({
       setApiKeyData(data);
     } catch (error) {
       if (error instanceof APIError) {
-        logger.error(error, error.message);
+        logger.error(error.message, new Error(error.message));
         toast.error(error.message);
       }
     }
@@ -238,8 +238,8 @@ export function ApiKeyManagement({ apiKeys }: { apiKeys: ApiKey[] }) {
       );
 
       if (error) {
-        logger.error(error, error.message);
         toast.error(error.message);
+        logger.error(error.statusText, new Error(error.message), error);
         return;
       }
 
@@ -249,8 +249,8 @@ export function ApiKeyManagement({ apiKeys }: { apiKeys: ApiKey[] }) {
       }
     } catch (error) {
       if (error instanceof APIError) {
-        logger.error(error, error.message);
         toast.error(error.message);
+        logger.error(error.message, error);
       }
     }
   }

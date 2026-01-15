@@ -6,6 +6,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { ImpersonationIndicator } from "@/components/auth/admin/impersonation-indicator";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { WebVitalsProvider } from "@/components/web-vitals-provider";
 import { TRPCReactProvider } from "@/shared/infrastructure/trpc/client";
 import { I18nProviderClient } from "@/shared/locales/client";
 
@@ -32,22 +33,24 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`font-sans ${inter.variable}`}>
-        <TRPCReactProvider>
-          <I18nProviderClient locale={locale}>
-            <NuqsAdapter>
-              <ThemeProvider
-                attribute="class"
-                defaultTheme="system"
-                enableSystem
-                disableTransitionOnChange
-              >
-                {children}
-                <Toaster />
-                <ImpersonationIndicator />
-              </ThemeProvider>
-            </NuqsAdapter>
-          </I18nProviderClient>
-        </TRPCReactProvider>
+        <WebVitalsProvider>
+          <TRPCReactProvider>
+            <I18nProviderClient locale={locale}>
+              <NuqsAdapter>
+                <ThemeProvider
+                  attribute="class"
+                  defaultTheme="system"
+                  enableSystem
+                  disableTransitionOnChange
+                >
+                  {children}
+                  <Toaster />
+                  <ImpersonationIndicator />
+                </ThemeProvider>
+              </NuqsAdapter>
+            </I18nProviderClient>
+          </TRPCReactProvider>
+        </WebVitalsProvider>
       </body>
     </html>
   );
