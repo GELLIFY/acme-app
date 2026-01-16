@@ -53,9 +53,7 @@ export function initializeLogsExporter() {
 
 export function exportLogEntry(entry: LogEntry) {
   if (typeof window !== "undefined") return;
-  if (!isInitialized) {
-    initializeLogsExporter();
-  }
+  if (!isInitialized) initializeLogsExporter();
   if (!loggerProvider) return;
 
   const logger = loggerProvider.getLogger(

@@ -67,7 +67,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import type { auth } from "@/shared/infrastructure/better-auth/auth";
 import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
-import { logger } from "@/shared/infrastructure/logger/pino-logger";
+import { browserLogger as logger } from "@/shared/infrastructure/logger/browser-logger";
 import { useScopedI18n } from "@/shared/locales/client";
 
 type ApiKey = Awaited<ReturnType<typeof auth.api.listApiKeys>>[number];

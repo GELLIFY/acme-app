@@ -10,7 +10,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
-import { logger } from "@/shared/infrastructure/logger/pino-logger";
+import { browserLogger as logger } from "@/shared/infrastructure/logger/browser-logger";
 import { useScopedI18n } from "@/shared/locales/client";
 import { Field, FieldError, FieldLabel } from "../ui/field";
 import { Spinner } from "../ui/spinner";

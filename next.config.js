@@ -9,7 +9,11 @@ const config = {
   // Recommended: this will reduce output
   // Docker image size by 80%+
   output: "standalone",
-  serverExternalPackages: ["pino", "pino-pretty"],
+  serverExternalPackages: [
+    "pino",
+    "pino-pretty",
+    "pino-opentelemetry-transport",
+  ],
   transpilePackages: ["@t3-oss/env-nextjs", "@t3-oss/env-core"],
   // Optional: bring your own cache handler
   // cacheHandler: path.resolve('./cache-handler.mjs'),

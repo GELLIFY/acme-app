@@ -28,7 +28,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
 import { ROLES } from "@/shared/infrastructure/better-auth/permissions";
-import { logger } from "@/shared/infrastructure/logger/pino-logger";
+import { browserLogger as logger } from "@/shared/infrastructure/logger/browser-logger";
 
 const formSchema = z.object({
   firstName: z.string().min(1),

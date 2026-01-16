@@ -8,7 +8,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type z from "zod";
 import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
-import { logger } from "@/shared/infrastructure/logger/pino-logger";
+import { browserLogger as logger } from "@/shared/infrastructure/logger/browser-logger";
 import { useScopedI18n } from "@/shared/locales/client";
 import { verifyTotpSchema } from "@/shared/validators/user.schema";
 import { Button } from "../ui/button";
