@@ -9,13 +9,11 @@ import {
   ATTR_SERVICE_NAME,
   ATTR_SERVICE_VERSION,
 } from "@opentelemetry/semantic-conventions";
+import { env } from "@/env";
 import type { LogEntry } from "./logger";
 
 let isInitialized = false;
 let loggerProvider: LoggerProvider | null = null;
-
-const LOG_EXPORT_URL =
-  process.env.OTEL_EXPORTER_OTLP_ENDPOINT ?? "http://localhost:4318";
 
 function createLoggerProvider() {
   const resource = resourceFromAttributes({
@@ -24,7 +22,7 @@ function createLoggerProvider() {
   });
 
   const exporter = new OTLPLogExporter({
-    url: `${LOG_EXPORT_URL.replace(/\/$/, "")}/v1/logs`,
+    url: env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT,
   });
 
   const batchProcessor = new BatchLogRecordProcessor(exporter, {
@@ -56,14 +54,12 @@ export function exportLogEntry(entry: LogEntry) {
   if (!isInitialized) initializeLogsExporter();
   if (!loggerProvider) return;
 
-  const logger = loggerProvider.getLogger(
-    process.env.OTEL_SERVICE_NAME ?? "acme-app",
-  );
+  const logger = loggerProvider.getLogger(env.OTEL_SERVICE_NAME);
 
   const attributes: Record<string, unknown> = {
     ...entry.context,
     "log.level": entry.level,
-    "service.name": process.env.OTEL_SERVICE_NAME ?? "acme-app",
+    "service.name": env.OTEL_SERVICE_NAME,
   };
 
   if (entry.error) {

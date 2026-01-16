@@ -1,13 +1,16 @@
+"server-only";
+
 import { trace } from "@opentelemetry/api";
 import {
   ATTR_SERVICE_NAME,
   ATTR_SERVICE_VERSION,
 } from "@opentelemetry/semantic-conventions";
 import pino, { type LoggerOptions } from "pino";
+import { env } from "@/env";
 import { ATTR_DEPLOYMENT_ENVIRONMENT_NAME } from "../otel/semantic-conventions";
 import type { LogContext } from "./logger";
 
-const environment = process.env.NODE_ENV ?? "development";
+const environment = env.NODE_ENV;
 
 const createPinoConfig = (): LoggerOptions => ({
   level: environment === "production" ? "info" : "debug",
@@ -24,14 +27,14 @@ const createPinoConfig = (): LoggerOptions => ({
         level: "info",
         options: {
           resourceAttributes: {
-            [ATTR_SERVICE_NAME]: process.env.OTEL_SERVICE_NAME ?? "acme-app",
+            [ATTR_SERVICE_NAME]: env.OTEL_SERVICE_NAME,
             [ATTR_SERVICE_VERSION]: process.env.npm_package_version ?? "1.0.0",
             [ATTR_DEPLOYMENT_ENVIRONMENT_NAME]: environment,
           },
         },
       },
       // Keep console output for development
-      ...(process.env.NODE_ENV === "development"
+      ...(environment === "development"
         ? [
             {
               target: "pino-pretty",

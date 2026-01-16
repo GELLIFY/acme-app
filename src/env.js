@@ -8,15 +8,27 @@ export const env = createEnv({
    */
   server: {
     DATABASE_URL: z.string().min(1, "url is required"),
-    LOG_LEVEL: z
-      .enum(["fatal", "error", "warn", "info", "debug", "trace"])
-      .default("info"),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
 
     BETTER_AUTH_SECRET: z.string().min(1),
     RESEND_API_KEY: z.string().min(1),
+
+    OTEL_SERVICE_NAME: z.string().default("acme-app"),
+    OTEL_EXPORTER_OTLP_ENDPOINT: z.string().default("http://localhost:4318"),
+    OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: z
+      .string()
+      .default("http://localhost:4318/v1/logs"),
+    OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: z
+      .string()
+      .default("http://localhost:4318/v1/metrics"),
+    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: z
+      .string()
+      .default("http://localhost:4318/v1/traces"),
+    OTEL_EXPORTER_OTLP_TRACES_PROTOCOL: z.string().default("http/protobuf"),
+    OTEL_TRACES_SAMPLER: z.string().default("parentbased_traceidratio"),
+    OTEL_TRACES_SAMPLER_ARG: z.string().default("0.05"),
   },
 
   /**

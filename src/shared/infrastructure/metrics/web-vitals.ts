@@ -11,6 +11,7 @@ import { ATTR_SERVICE_NAME } from "@opentelemetry/semantic-conventions";
 import { type Metric, onCLS, onFCP, onINP, onLCP, onTTFB } from "web-vitals";
 
 let isInitialized = false;
+
 export function initializeWebVitals() {
   if (typeof window === "undefined" || isInitialized) return;
 
@@ -78,5 +79,7 @@ export function initializeWebVitals() {
   onCLS(record);
   onTTFB(record);
   onFCP(record);
+
   isInitialized = true;
+  console.log("✅ OpenTelemetry metrics exporter initialized");
 }
