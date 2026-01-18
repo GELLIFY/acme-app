@@ -25,7 +25,7 @@ export function TodoFilters() {
           }}
           id={id}
         />
-        <Label htmlFor="todo-state">{t("filter")}</Label>
+        <Label htmlFor={id}>{t("filter")}</Label>
       </div>
     </div>
   );
