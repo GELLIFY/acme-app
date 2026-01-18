@@ -8,5 +8,12 @@
       "command": "npx",
       "args": ["-y", "next-devtools-mcp@latest"],
     },
+    "better-auth": {
+      "command": "npx",
+      "args": ["@better-auth/mcp"],
+    },
+    "better-auth-docs": {
+      "url": "https://mcp.chonkie.ai/better-auth/better-auth-builder/mcp",
+    },
   },
 }

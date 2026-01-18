@@ -13,22 +13,37 @@ export function PasskeyButton() {
   const lastMethod = authClient.getLastUsedLoginMethod();
 
   useEffect(() => {
-    if (
-      !PublicKeyCredential ||
-      !PublicKeyCredential.isConditionalMediationAvailable
-    ) {
-      return;
-    }
+    let isActive = true;
 
-    authClient.signIn.passkey(
-      { autoFill: true },
-      {
-        onSuccess() {
-          refetch();
-          router.push("/");
+    const maybeSignIn = async () => {
+      if (typeof PublicKeyCredential === "undefined") return;
+      if (
+        typeof PublicKeyCredential.isConditionalMediationAvailable !==
+        "function"
+      ) {
+        return;
+      }
+
+      const supported =
+        await PublicKeyCredential.isConditionalMediationAvailable();
+      if (!supported || !isActive) return;
+
+      authClient.signIn.passkey(
+        { autoFill: true },
+        {
+          onSuccess() {
+            refetch();
+            router.push("/");
+          },
         },
-      },
-    );
+      );
+    };
+
+    void maybeSignIn();
+
+    return () => {
+      isActive = false;
+    };
   }, [router, refetch]);
 
   return (

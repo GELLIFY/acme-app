@@ -2,14 +2,10 @@ import { passkey } from "@better-auth/passkey";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
-import {
-  admin,
-  apiKey,
-  lastLoginMethod,
-  openAPI,
-  type Statements,
-  twoFactor,
-} from "better-auth/plugins";
+import { apiKey, lastLoginMethod, openAPI } from "better-auth/plugins";
+import type { Statements } from "better-auth/plugins/access";
+import { admin } from "better-auth/plugins/admin";
+import { twoFactor } from "better-auth/plugins/two-factor";
 import { db } from "@/server/db";
 import { schema } from "@/server/db/schema";
 import {

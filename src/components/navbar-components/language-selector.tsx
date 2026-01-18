@@ -25,7 +25,7 @@ export default function LanguageSelector() {
 
   return (
     <Select
-      defaultValue={locale}
+      value={locale}
       onValueChange={(value) => {
         changeLocale(value as "it" | "en");
       }}

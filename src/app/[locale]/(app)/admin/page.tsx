@@ -15,13 +15,16 @@ export const metadata: Metadata = {
 export default async function AdminPage({
   searchParams,
 }: PageProps<"/[locale]/admin">) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) return redirect("/sign-in");
+  const headersList = await headers();
+  const [session, hasAccess] = await Promise.all([
+    auth.api.getSession({ headers: headersList }),
+    auth.api.userHasPermission({
+      headers: headersList,
+      body: { permission: { user: ["list"] } },
+    }),
+  ]);
 
-  const hasAccess = await auth.api.userHasPermission({
-    headers: await headers(),
-    body: { permission: { user: ["list"] } },
-  });
+  if (!session) return redirect("/sign-in");
   if (!hasAccess.success) return redirect("/");
 
   const filters = await loadFilters(searchParams);

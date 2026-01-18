@@ -13,7 +13,11 @@ import { UpdatePassword } from "@/components/auth/account/update-password";
 import { UserAvatar } from "@/components/auth/account/user-avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { auth } from "@/shared/infrastructure/better-auth/auth";
-import { getQueryClient, trpc } from "@/shared/infrastructure/trpc/server";
+import {
+  getQueryClient,
+  HydrateClient,
+  trpc,
+} from "@/shared/infrastructure/trpc/server";
 import { getScopedI18n } from "@/shared/locales/server";
 
 export const metadata: Metadata = {
@@ -21,65 +25,69 @@ export const metadata: Metadata = {
 };
 
 export default async function AccountPage() {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const headersList = await headers();
+
+  const session = await auth.api.getSession({ headers: headersList });
   if (!session) return redirect("/sign-in");
 
   const t = await getScopedI18n("account");
 
   const queryClient = getQueryClient();
-  queryClient.prefetchQuery(trpc.user.me.queryOptions());
+  await queryClient.prefetchQuery(trpc.user.me.queryOptions());
 
   const [sessions, passkeys, apiKeys] = await Promise.all([
-    auth.api.listSessions({ headers: await headers() }),
-    auth.api.listPasskeys({ headers: await headers() }),
-    auth.api.listApiKeys({ headers: await headers() }),
+    auth.api.listSessions({ headers: headersList }),
+    auth.api.listPasskeys({ headers: headersList }),
+    auth.api.listApiKeys({ headers: headersList }),
   ]);
 
   return (
-    <Tabs className="space-y-2" defaultValue="profile">
-      <TabsList className="grid w-full grid-cols-4">
-        <TabsTrigger value="profile">
-          <UserIcon size={16} aria-hidden="true" />
-          <span className="max-sm:hidden">{t("profile")}</span>
-        </TabsTrigger>
-        <TabsTrigger value="security">
-          <LockIcon size={16} aria-hidden="true" />
-          <span className="max-sm:hidden">{t("security")}</span>
-        </TabsTrigger>
-        <TabsTrigger value="api_keys">
-          <KeyIcon size={16} aria-hidden="true" />
-          <span className="max-sm:hidden">{t("api_keys")}</span>
-        </TabsTrigger>
-        <TabsTrigger value="danger">
-          <TriangleAlertIcon size={16} aria-hidden="true" />
-          <span className="max-sm:hidden">{t("danger")}</span>
-        </TabsTrigger>
-      </TabsList>
+    <HydrateClient>
+      <Tabs className="space-y-2" defaultValue="profile">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="profile">
+            <UserIcon size={16} aria-hidden="true" />
+            <span className="max-sm:hidden">{t("profile")}</span>
+          </TabsTrigger>
+          <TabsTrigger value="security">
+            <LockIcon size={16} aria-hidden="true" />
+            <span className="max-sm:hidden">{t("security")}</span>
+          </TabsTrigger>
+          <TabsTrigger value="api_keys">
+            <KeyIcon size={16} aria-hidden="true" />
+            <span className="max-sm:hidden">{t("api_keys")}</span>
+          </TabsTrigger>
+          <TabsTrigger value="danger">
+            <TriangleAlertIcon size={16} aria-hidden="true" />
+            <span className="max-sm:hidden">{t("danger")}</span>
+          </TabsTrigger>
+        </TabsList>
 
-      <TabsContent value="profile">
-        <div className="text-muted-foreground space-y-4">
-          <UserAvatar />
-          <DisplayName />
-          <ChangeEmail />
-        </div>
-      </TabsContent>
-      <TabsContent value="security">
-        <div className="text-muted-foreground space-y-4">
-          <UpdatePassword />
-          <TwoFactor />
-          <PasskeyManagement passkeys={passkeys} />
-          <SessionManagement
-            sessions={sessions}
-            currentSession={session.session}
-          />
-        </div>
-      </TabsContent>
-      <TabsContent value="api_keys">
-        <ApiKeyManagement apiKeys={apiKeys} />
-      </TabsContent>
-      <TabsContent value="danger">
-        <DeleteAccount />
-      </TabsContent>
-    </Tabs>
+        <TabsContent value="profile">
+          <div className="text-muted-foreground space-y-4">
+            <UserAvatar />
+            <DisplayName />
+            <ChangeEmail />
+          </div>
+        </TabsContent>
+        <TabsContent value="security">
+          <div className="text-muted-foreground space-y-4">
+            <UpdatePassword />
+            <TwoFactor />
+            <PasskeyManagement passkeys={passkeys} />
+            <SessionManagement
+              sessions={sessions}
+              currentSession={session.session}
+            />
+          </div>
+        </TabsContent>
+        <TabsContent value="api_keys">
+          <ApiKeyManagement apiKeys={apiKeys} />
+        </TabsContent>
+        <TabsContent value="danger">
+          <DeleteAccount />
+        </TabsContent>
+      </Tabs>
+    </HydrateClient>
   );
 }
