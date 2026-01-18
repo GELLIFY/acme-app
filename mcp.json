@@ -1,0 +1,8 @@
+{
+  "better-auth-docs": {
+    "url": "https://mcp.chonkie.ai/better-auth/better-auth-builder/mcp"
+  },
+  "better-auth": {
+    "command": "npx @better-auth/mcp"
+  }
+}
