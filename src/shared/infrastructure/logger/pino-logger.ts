@@ -9,6 +9,7 @@ import pino, { type LoggerOptions } from "pino";
 import { env } from "@/env";
 import { ATTR_DEPLOYMENT_ENVIRONMENT_NAME } from "../otel/semantic-conventions";
 import type { LogContext } from "./logger";
+import "pino-opentelemetry-transport"; // important for vercel build
 
 const environment = env.NODE_ENV;
 
