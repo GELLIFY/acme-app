@@ -26,18 +26,18 @@ jobs:
       pull-requests: write
       id-token: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
 
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
 
       - name: Get branch name
         id: branch_name
-        uses: tj-actions/branch-names@v9
+        uses: tj-actions/branch-names@5250492686b253f06fa55861556d1027b067aeb5 # v9
 
       - name: Create Neon Branch
         id: create_branch
-        uses: neondatabase/create-branch-action@v6
+        uses: neondatabase/create-branch-action@72ed4f69a12b6be9c16aebfad893f6a21e9aba8b # v6
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
           # parent: main # optional (defaults to your primary branch)
@@ -71,7 +71,7 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.vercel_token }}
 
       - name: Comment on Pull Request
-        uses: thollander/actions-comment-pull-request@v3
+        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           message: |

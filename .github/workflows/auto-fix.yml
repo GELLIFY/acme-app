@@ -30,7 +30,7 @@ jobs:
           fi
 
       - name: Checkout Failing Ref
-        uses: actions/checkout@v5
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
         with:
           ref: ${{ env.FAILED_HEAD_SHA }}
           fetch-depth: 0
@@ -54,7 +54,7 @@ jobs:
 
       - name: Create pull request with fixes
         if: success()
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6
         with:
           commit-message: "fix(ci): auto-fix failing tests via Codex"
           branch: codex/auto-fix-${{ github.event.workflow_run.run_id }}

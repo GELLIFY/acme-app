@@ -13,7 +13,7 @@ services:
       - db
 
   db:
-    image: postgres:17
+    image: postgres:17@sha256:7352e0c4d62bbac8aa69d95e40220a60967c4a19f9c4f65b4d118175f7ce9e3b
     command: "-d 1"
     environment:
       POSTGRES_DB: main
@@ -37,7 +37,7 @@ services:
         max-file: "5"
 
   neon-proxy:
-    image: ghcr.io/timowilhelm/local-neon-http-proxy:main
+    image: ghcr.io/timowilhelm/local-neon-http-proxy:main@sha256:19b528f4565b4d9b282bc64a8fb9d0b3a7f0ca7cd1b56d21e122ac7e0927a091
     environment:
       - PG_CONNECTION_STRING=postgres://postgres:postgres@db:5432/main
     ports:
