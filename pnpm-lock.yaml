@@ -13,7 +13,7 @@ importers:
         version: 1.4.10(@better-auth/core@1.4.10(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.7(zod@4.3.5))(jose@6.1.0)(kysely@0.28.8)(nanostores@1.0.1))(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-auth@1.4.10(drizzle-kit@0.31.8)(drizzle-orm@0.45.1(@electric-sql/pglite@0.3.14)(@neondatabase/serverless@1.0.2)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(bun-types@1.3.5)(kysely@0.28.8)(pg@8.16.3))(next@16.1.1(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(pg@8.16.3)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(better-call@1.1.7(zod@4.3.5))(nanostores@1.0.1)
       '@hono/zod-openapi':
         specifier: ^1.2.0
-        version: 1.2.0(hono@4.11.3)(zod@4.3.5)
+        version: 1.2.0(hono@4.11.4)(zod@4.3.5)
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.70.0(react@19.2.3))
@@ -58,7 +58,7 @@ importers:
         version: 1.0.3(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@scalar/hono-api-reference':
         specifier: ^0.9.30
-        version: 0.9.30(hono@4.11.3)
+        version: 0.9.30(hono@4.11.4)
       '@t3-oss/env-nextjs':
         specifier: ^0.13.10
         version: 0.13.10(typescript@5.9.3)(zod@4.3.5)
@@ -109,10 +109,10 @@ importers:
         version: 6.0.1
       hono:
         specifier: ^4.11.3
-        version: 4.11.3
+        version: 4.11.4
       hono-rate-limiter:
         specifier: ^0.5.3
-        version: 0.5.3(hono@4.11.3)
+        version: 0.5.3(hono@4.11.4)
       input-otp:
         specifier: ^1.4.2
         version: 1.4.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -2862,6 +2862,15 @@ packages:
       supports-color:
         optional: true
 
+  debug@4.4.3:
+    resolution: {integrity: sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA==}
+    engines: {node: '>=6.0'}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
+
   deepmerge@4.3.1:
     resolution: {integrity: sha512-3sUqbMEc77XqpdNO7FRyRog+eW3ph+GYCbj+rK+uYyRMuwsVy0rMiVtPn+QJlKFvWP/1PYpapqYn0Me2knFn+A==}
     engines: {node: '>=0.10.0'}
@@ -3147,8 +3156,8 @@ packages:
       unstorage:
         optional: true
 
-  hono@4.11.3:
-    resolution: {integrity: sha512-PmQi306+M/ct/m5s66Hrg+adPnkD5jiO6IjA7WhWw0gSBSo1EcRegwuI1deZ+wd5pzCGynCcn2DprnE4/yEV4w==}
+  hono@4.11.4:
+    resolution: {integrity: sha512-U7tt8JsyrxSRKspfhtLET79pU8K+tInj5QZXs1jSugO1Vq5dFj3kmZsRldo29mTBfcjDRVRXrEZ6LS63Cog9ZA==}
     engines: {node: '>=16.9.0'}
 
   html-to-text@9.0.5:
@@ -3792,8 +3801,8 @@ packages:
     resolution: {integrity: sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==}
     engines: {node: '>=0.10.0'}
 
-  require-in-the-middle@8.0.0:
-    resolution: {integrity: sha512-9s0pnM5tH8G4dSI3pms2GboYOs25LwOGnRMxN/Hx3TYT1K0rh6OjaWf4dI0DAQnMyaEXWoGVnSTPQasqwzTTAA==}
+  require-in-the-middle@8.0.1:
+    resolution: {integrity: sha512-QT7FVMXfWOYFbeRBF6nu+I6tr2Tf3u0q8RIEjNob/heKY/nh7drD/k7eeMFmSQgnTtCzLDcCu/XEnpW2wk4xCQ==}
     engines: {node: '>=9.3.0 || >=8.10.0 <9.0.0'}
 
   requires-port@1.0.0:
@@ -4542,17 +4551,17 @@ snapshots:
 
   '@hexagon/base64@1.1.28': {}
 
-  '@hono/zod-openapi@1.2.0(hono@4.11.3)(zod@4.3.5)':
+  '@hono/zod-openapi@1.2.0(hono@4.11.4)(zod@4.3.5)':
     dependencies:
       '@asteasolutions/zod-to-openapi': 8.1.0(zod@4.3.5)
-      '@hono/zod-validator': 0.7.6(hono@4.11.3)(zod@4.3.5)
-      hono: 4.11.3
+      '@hono/zod-validator': 0.7.6(hono@4.11.4)(zod@4.3.5)
+      hono: 4.11.4
       openapi3-ts: 4.5.0
       zod: 4.3.5
 
-  '@hono/zod-validator@0.7.6(hono@4.11.3)(zod@4.3.5)':
+  '@hono/zod-validator@0.7.6(hono@4.11.4)(zod@4.3.5)':
     dependencies:
-      hono: 4.11.3
+      hono: 4.11.4
       zod: 4.3.5
 
   '@hookform/resolvers@5.2.2(react-hook-form@7.70.0(react@19.2.3))':
@@ -4845,7 +4854,7 @@ snapshots:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/api-logs': 0.206.0
       import-in-the-middle: 1.15.0
-      require-in-the-middle: 8.0.0
+      require-in-the-middle: 8.0.1
     transitivePeerDependencies:
       - supports-color
 
@@ -5999,10 +6008,10 @@ snapshots:
 
   '@scalar/helpers@0.2.4': {}
 
-  '@scalar/hono-api-reference@0.9.30(hono@4.11.3)':
+  '@scalar/hono-api-reference@0.9.30(hono@4.11.4)':
     dependencies:
       '@scalar/core': 0.3.28
-      hono: 4.11.3
+      hono: 4.11.4
 
   '@scalar/types@0.5.4':
     dependencies:
@@ -6447,6 +6456,10 @@ snapshots:
     dependencies:
       ms: 2.1.3
 
+  debug@4.4.3:
+    dependencies:
+      ms: 2.1.3
+
   deepmerge@4.3.1: {}
 
   defu@6.1.4: {}
@@ -6695,11 +6708,11 @@ snapshots:
 
   help-me@5.0.0: {}
 
-  hono-rate-limiter@0.5.3(hono@4.11.3):
+  hono-rate-limiter@0.5.3(hono@4.11.4):
     dependencies:
-      hono: 4.11.3
+      hono: 4.11.4
 
-  hono@4.11.3: {}
+  hono@4.11.4: {}
 
   html-to-text@9.0.5:
     dependencies:
@@ -7370,9 +7383,9 @@ snapshots:
 
   require-from-string@2.0.2: {}
 
-  require-in-the-middle@8.0.0:
+  require-in-the-middle@8.0.1:
     dependencies:
-      debug: 4.4.1
+      debug: 4.4.3
       module-details-from-path: 1.0.4
     transitivePeerDependencies:
       - supports-color
