@@ -55,7 +55,7 @@ jobs:
           pnpm run db:migrate
 
       - name: Post Schema Diff Comment to PR
-        uses: neondatabase/schema-diff-action@v1
+        uses: neondatabase/schema-diff-action@80cfa8521628e890015b60f5291a7738926617dc # v1
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
           compare_branch: preview/pr-${{ github.event.number }}-${{ steps.branch_name.outputs.current_branch }}
