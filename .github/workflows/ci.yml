@@ -2,9 +2,6 @@ name: CI
 
 on:
   workflow_call:
-    secrets:
-      SONAR_TOKEN:
-        required: true
 
 jobs:
   lint:
@@ -40,7 +37,7 @@ jobs:
         run: pnpm run typecheck
 
   test:
-    name: "SonarQube"
+    name: "Test"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -59,7 +56,3 @@ jobs:
           echo SKIP_ENV_VALIDATION=1 >> .env
       - name: Run Tests
         run: pnpm test
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
