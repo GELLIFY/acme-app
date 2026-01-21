@@ -1,5 +1,5 @@
 node {
-  def nodeHome = tool 'node25'
+  def nodeHome = tool 'node22'
   env.PATH = "${nodeHome}/bin:${env.PATH}"
 
   stage('SCM') {
@@ -12,6 +12,8 @@ node {
   }
   stage('Test with coverage') {
     sh '''
+      export BUN_INSTALL="$HOME/.bun"
+      export PATH="$BUN_INSTALL/bin:$PATH"
       pnpm test
     '''
   }
