@@ -4,7 +4,6 @@ node {
   }
   stage('Install dependencies') {
     sh '''
-      corepack enable
       pnpm install
     '''
   }
