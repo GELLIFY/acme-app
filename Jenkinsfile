@@ -10,6 +10,12 @@ node {
       pnpm install
     '''
   }
+  stage('Setup env') {
+    sh '''
+      cp .env.example .env
+      echo SKIP_ENV_VALIDATION=1 >> .env
+    '''
+  }
   stage('Test with coverage') {
     sh '''
       pnpm test
