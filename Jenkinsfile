@@ -1,10 +1,12 @@
 node {
+  def nodeHome = tool 'node25'
+  env.PATH = "${nodeHome}/bin:${env.PATH}"
+
   stage('SCM') {
     checkout scm
   }
   stage('Install dependencies') {
     sh '''
-      corepack enable
       pnpm install
     '''
   }
