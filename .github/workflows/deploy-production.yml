@@ -12,8 +12,6 @@ jobs:
   code_quality:
     name: Code quality
     uses: ./.github/workflows/ci.yml
-    secrets:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   run_migrations:
     name: Run Migrations
