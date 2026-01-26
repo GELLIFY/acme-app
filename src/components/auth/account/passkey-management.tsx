@@ -204,9 +204,9 @@ export function PasskeyManagement({ passkeys }: { passkeys: Passkey[] }) {
             setIsDialogOpen(o);
           }}
         >
-          <DialogTrigger asChild>
-            <Button>{t("new_btn")}</Button>
-          </DialogTrigger>
+          <DialogTrigger
+            render={<Button>{t("new_btn")}</Button>}
+          ></DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>{t("new_title")}</DialogTitle>

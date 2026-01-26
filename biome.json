@@ -9,6 +9,7 @@
     "ignoreUnknown": true,
     "includes": [
       "src/**",
+      "!src/components/ui",
       "public/**",
       "drizzle.config.ts",
       "next.config.js",

@@ -340,9 +340,9 @@ export function ApiKeyManagement({ apiKeys }: { apiKeys: ApiKey[] }) {
       <CardFooter className="border-t text-muted-foreground text-sm justify-between gap-4">
         <div>{t("message")}</div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>{t("create_btn")}</Button>
-          </DialogTrigger>
+          <DialogTrigger
+            render={<Button>{t("create_btn")}</Button>}
+          ></DialogTrigger>
           <DialogContent className="gap-6">
             <DialogHeader>
               <DialogTitle>{t("dialog_title")}</DialogTitle>

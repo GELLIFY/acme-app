@@ -93,12 +93,14 @@ export function CreateUserDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <PlusIcon />
-          Add User
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger
+        render={
+          <Button>
+            <PlusIcon />
+            Add User
+          </Button>
+        }
+      ></DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Create user</DialogTitle>
@@ -204,9 +206,9 @@ export function CreateUserDialog() {
             )}
           />
           <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
+            <DialogClose
+              render={<Button variant="outline">Cancel</Button>}
+            ></DialogClose>
             <Button type="submit" disabled={loading}>
               {loading ? <Spinner /> : "Create User"}
             </Button>

@@ -230,11 +230,13 @@ export const columns: ColumnDef<UserWithRole>[] = [
 
       return (
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
+          <DropdownMenuTrigger
+            render={
+              <Button variant="ghost" size="icon">
+                <MoreHorizontal />
+              </Button>
+            }
+          ></DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem>
               <CopyIcon />
