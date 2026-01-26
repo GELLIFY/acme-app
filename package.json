@@ -27,6 +27,7 @@
     "start": "node .next/standalone/server.js"
   },
   "dependencies": {
+    "@base-ui/react": "^1.1.0",
     "@better-auth/passkey": "1.4.10",
     "@hono/zod-openapi": "1.2.0",
     "@hookform/resolvers": "5.2.2",

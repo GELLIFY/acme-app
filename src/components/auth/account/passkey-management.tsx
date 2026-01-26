@@ -153,11 +153,13 @@ export function PasskeyManagement({ passkeys }: { passkeys: Passkey[] }) {
               </ItemContent>
               <ItemActions>
                 <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive" size="icon">
-                      <TrashIcon />
-                    </Button>
-                  </AlertDialogTrigger>
+                  <AlertDialogTrigger
+                    render={
+                      <Button variant="destructive" size="icon">
+                        <TrashIcon />
+                      </Button>
+                    }
+                  ></AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>{t("delete_title")}</AlertDialogTitle>

@@ -268,12 +268,14 @@ export const columns: ColumnDef<UserWithRole>[] = [
                 <DropdownMenuSeparator />
 
                 <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <DropdownMenuItem variant="destructive">
-                      <TrashIcon />
-                      Delete User
-                    </DropdownMenuItem>
-                  </AlertDialogTrigger>
+                  <AlertDialogTrigger
+                    render={
+                      <DropdownMenuItem variant="destructive">
+                        <TrashIcon />
+                        Delete User
+                      </DropdownMenuItem>
+                    }
+                  ></AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>Delete User</AlertDialogTitle>

@@ -300,15 +300,17 @@ export function ApiKeyManagement({ apiKeys }: { apiKeys: ApiKey[] }) {
               </ItemContent>
               <ItemActions>
                 <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      className="text-muted hover:bg-destructive"
-                    >
-                      <TrashIcon />
-                    </Button>
-                  </AlertDialogTrigger>
+                  <AlertDialogTrigger
+                    render={
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="text-muted hover:bg-destructive"
+                      >
+                        <TrashIcon />
+                      </Button>
+                    }
+                  ></AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>{t("delete.title")}</AlertDialogTitle>
