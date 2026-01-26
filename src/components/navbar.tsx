@@ -127,9 +127,11 @@ export default async function Navbar() {
           {session?.user ? (
             <UserMenu user={session.user} />
           ) : (
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/sign-in"> {t("signin.title")}</Link>
-            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              render={<Link href="/sign-in"> {t("signin.title")}</Link>}
+            ></Button>
           )}
         </div>
       </div>

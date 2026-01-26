@@ -81,20 +81,25 @@ export default function Home() {
         </section>
         <div className="mx-auto max-w-3xl space-y-8 text-center">
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
-            <Button asChild>
-              <Link href="https://www.gellify.dev/docs/usage/first-steps">
-                {t("doc")}
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link
-                href="https://github.com/GELLIFY/acme-app"
-                className="flex items-center gap-2"
-              >
-                <Github className="h-4 w-4" />
-                GitHub
-              </Link>
-            </Button>
+            <Button
+              render={
+                <Link href="https://www.gellify.dev/docs/usage/first-steps">
+                  {t("doc")}
+                </Link>
+              }
+            ></Button>
+            <Button
+              variant="outline"
+              render={
+                <Link
+                  href="https://github.com/GELLIFY/acme-app"
+                  className="flex items-center gap-2"
+                >
+                  <Github className="h-4 w-4" />
+                  GitHub
+                </Link>
+              }
+            ></Button>
           </div>
         </div>
       </main>

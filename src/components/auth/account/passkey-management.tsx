@@ -175,12 +175,12 @@ export function PasskeyManagement({ passkeys }: { passkeys: Passkey[] }) {
                       <Button
                         variant="destructive"
                         onClick={() => handleDeletePasskey(passkey.id)}
-                        asChild
-                      >
-                        <AlertDialogAction>
-                          {loading ? <Spinner /> : t("delete_confirm")}
-                        </AlertDialogAction>
-                      </Button>
+                        render={
+                          <AlertDialogAction>
+                            {loading ? <Spinner /> : t("delete_confirm")}
+                          </AlertDialogAction>
+                        }
+                      ></Button>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
