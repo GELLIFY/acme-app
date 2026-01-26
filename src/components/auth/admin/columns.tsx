@@ -35,9 +35,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
 import {
   ROLES,
@@ -123,17 +126,22 @@ export const columns: ColumnDef<UserWithRole>[] = [
       }
 
       return (
-        <NativeSelect
+        <Select
           value={user.role}
-          onChange={(e) => handleSetUserRole(e.target.value as Role)}
+          onValueChange={(value) => handleSetUserRole(value as Role)}
           disabled={user.id === data?.user.id}
         >
-          {Object.values(ROLES).map((role) => (
-            <NativeSelectOption key={role} value={role}>
-              {role}
-            </NativeSelectOption>
-          ))}
-        </NativeSelect>
+          <SelectTrigger>
+            <SelectValue placeholder="Select" />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.values(ROLES).map((role) => (
+              <SelectItem key={role} value={role}>
+                {role}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       );
     },
   },

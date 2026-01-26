@@ -61,9 +61,12 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import type { auth } from "@/shared/infrastructure/better-auth/auth";
 import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
@@ -188,18 +191,25 @@ function ApiKeyForm({
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor="expires_in">{t("expires_fld")}</FieldLabel>
-              <NativeSelect
-                id="expires_in"
-                {...field}
+              <Select
+                name={field.name}
                 value={field.value}
-                onChange={(e) => field.onChange(Number(e.target.value))}
+                onValueChange={field.onChange}
               >
-                {Object.entries(EXPIRES_OPTIONS).map(([key, value]) => (
-                  <NativeSelectOption key={key} value={value}>
-                    {t(`expirations.${key as keyof typeof EXPIRES_OPTIONS}`)}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
+                <SelectTrigger
+                  id="expires_in"
+                  aria-invalid={fieldState.invalid}
+                >
+                  <SelectValue placeholder="Select" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(EXPIRES_OPTIONS).map(([key, value]) => (
+                    <SelectItem key={key} value={value}>
+                      {t(`expirations.${key as keyof typeof EXPIRES_OPTIONS}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}

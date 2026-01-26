@@ -22,9 +22,12 @@ import {
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
 import { ROLES } from "@/shared/infrastructure/better-auth/permissions";
@@ -192,13 +195,18 @@ export function CreateUserDialog() {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="role">Role</FieldLabel>
-                <NativeSelect id="role" {...field}>
-                  {Object.values(ROLES).map((role) => (
-                    <NativeSelectOption key={role} value={role}>
-                      {role}
-                    </NativeSelectOption>
-                  ))}
-                </NativeSelect>
+                <Select id="role" {...field}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(ROLES).map((role) => (
+                      <SelectItem key={role} value={role}>
+                        {role}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
