@@ -35,9 +35,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
 import {
   ROLES,
@@ -123,17 +126,22 @@ export const columns: ColumnDef<UserWithRole>[] = [
       }
 
       return (
-        <NativeSelect
+        <Select
           value={user.role}
-          onChange={(e) => handleSetUserRole(e.target.value as Role)}
+          onValueChange={(value) => handleSetUserRole(value as Role)}
           disabled={user.id === data?.user.id}
         >
-          {Object.values(ROLES).map((role) => (
-            <NativeSelectOption key={role} value={role}>
-              {role}
-            </NativeSelectOption>
-          ))}
-        </NativeSelect>
+          <SelectTrigger>
+            <SelectValue placeholder="Select" />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.values(ROLES).map((role) => (
+              <SelectItem key={role} value={role}>
+                {role}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       );
     },
   },
@@ -230,11 +238,13 @@ export const columns: ColumnDef<UserWithRole>[] = [
 
       return (
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
+          <DropdownMenuTrigger
+            render={
+              <Button variant="ghost" size="icon">
+                <MoreHorizontal />
+              </Button>
+            }
+          ></DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem>
               <CopyIcon />
@@ -268,12 +278,14 @@ export const columns: ColumnDef<UserWithRole>[] = [
                 <DropdownMenuSeparator />
 
                 <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <DropdownMenuItem variant="destructive">
-                      <TrashIcon />
-                      Delete User
-                    </DropdownMenuItem>
-                  </AlertDialogTrigger>
+                  <AlertDialogTrigger
+                    render={
+                      <DropdownMenuItem variant="destructive">
+                        <TrashIcon />
+                        Delete User
+                      </DropdownMenuItem>
+                    }
+                  ></AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>Delete User</AlertDialogTitle>

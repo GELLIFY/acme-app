@@ -45,9 +45,11 @@ export default async function ResetPasswordPage(props: PageProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button type="button" className="w-full mt-2" asChild>
-            <Link href="/sign-in">{t("back_btn")}</Link>
-          </Button>
+          <Button
+            type="button"
+            className="w-full mt-2"
+            render={<Link href="/sign-in">{t("back_btn")}</Link>}
+          ></Button>
         </CardContent>
       </Card>
     );
