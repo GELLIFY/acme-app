@@ -5,7 +5,9 @@ export const metadata: Metadata = {
   title: "Login | Acme.",
 };
 
-export default async function Layout({ children }: PropsWithChildren) {
+export default async function Layout({
+  children,
+}: Readonly<PropsWithChildren>) {
   return (
     <div className="h-screen">
       {/* Main Layout */}

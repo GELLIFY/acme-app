@@ -10,7 +10,7 @@
 import { initTRPC } from "@trpc/server";
 import { cache } from "react";
 import superjson from "superjson";
-import { ZodError } from "zod";
+import * as z from "zod";
 import { auth } from "@/shared/infrastructure/better-auth/auth";
 import { db } from "../../db";
 import { adminPlugin } from "./middleware/admin-plugin";
@@ -56,7 +56,9 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
       data: {
         ...shape.data,
         zodError:
-          error.cause instanceof ZodError ? error.cause.flatten() : null,
+          error.cause instanceof z.ZodError
+            ? z.treeifyError(error.cause)
+            : null,
       },
     };
   },
