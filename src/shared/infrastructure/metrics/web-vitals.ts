@@ -45,7 +45,7 @@ export function initializeWebVitals() {
       }
     } catch (error) {
       console.error("Failed to send browser metrics", error);
-      // If sending fails, put logs back in the queue
+      // If sending fails, put metrics back in the queue
       metrics = metricsToSend.concat(metrics);
     }
   };
