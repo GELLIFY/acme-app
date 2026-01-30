@@ -25,7 +25,6 @@ class Meter {
   record(metric: Metric, context?: MetricContext) {
     const entry: MetricEntry = {
       ...metric,
-      // page: "",
       context: { ...this.getTraceContext(), ...context },
     };
 

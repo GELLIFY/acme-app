@@ -18,8 +18,7 @@ export async function POST(request: NextRequest) {
 
     for (const metricEntry of metrics) {
       // Extract the metric data and context
-      const { context, page, name, value, rating, delta, id } = metricEntry;
-      const metric = { name, value, rating, delta, id };
+      const { context, page, ...metric } = metricEntry;
       // Use our server-side meter to forward the metric with client context
       meter.record(metric, { ...context, page });
     }
