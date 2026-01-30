@@ -63,7 +63,6 @@ export function exportLogEntry(entry: LogEntry) {
   const attributes: Record<string, unknown> = {
     ...entry.context,
     "log.level": entry.level,
-    "service.name": process.env.npm_package_name,
   };
 
   if (entry.error) {
