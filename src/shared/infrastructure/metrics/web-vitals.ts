@@ -1,41 +1,54 @@
 "use client";
 
-import { metrics } from "@opentelemetry/api";
-import { OTLPMetricExporter } from "@opentelemetry/exporter-metrics-otlp-http";
-import { resourceFromAttributes } from "@opentelemetry/resources";
-import {
-  MeterProvider,
-  PeriodicExportingMetricReader,
-} from "@opentelemetry/sdk-metrics";
-import { ATTR_SERVICE_NAME } from "@opentelemetry/semantic-conventions";
 import { type Metric, onCLS, onFCP, onINP, onLCP, onTTFB } from "web-vitals";
 
-let isInitialized = false;
+let metrics: Metric[] = [];
+const flushInterval = 10000; // Flush every 10 seconds
 
 export function initializeWebVitals() {
-  if (typeof window === "undefined" || isInitialized) return;
+  if (typeof window === "undefined") return;
 
-  const resource = resourceFromAttributes({
-    [ATTR_SERVICE_NAME]: "acme-app-frontend",
+  setInterval(() => flush(), flushInterval);
+  // Optional: Also flush when the page is hidden
+  window.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      flush();
+    }
   });
 
-  const reader = new PeriodicExportingMetricReader({
-    exporter: new OTLPMetricExporter({
-      url: `http://localhost:4318/v1/metrics`,
-    }),
-    // TODO: Reduce in production to lower overhead
-    exportIntervalMillis: 10000,
-  });
+  const flush = () => {
+    if (typeof window === "undefined" || metrics.length === 0) {
+      return;
+    }
 
-  const meterProvider = new MeterProvider({ resource, readers: [reader] });
-  metrics.setGlobalMeterProvider(meterProvider);
+    const metricsToSend = metrics;
+    metrics = [];
 
-  const meter = metrics.getMeter("web-vitals");
-  const lcp = meter.createHistogram("web_vitals_lcp", { unit: "ms" });
-  const inp = meter.createHistogram("web_vitals_inp", { unit: "ms" });
-  const cls = meter.createObservableGauge("web_vitals_cls", { unit: "1" });
-  const ttfb = meter.createHistogram("web_vitals_ttfb", { unit: "ms" });
-  const fcp = meter.createHistogram("web_vitals_fcp", { unit: "ms" });
+    // Use navigator.sendBeacon if available for reliability,
+    // especially on page unload.
+    // Note: sendBeacon only supports POST and specific data types.
+    try {
+      if (navigator.sendBeacon) {
+        const blob = new Blob([JSON.stringify(metricsToSend)], {
+          type: "application/json",
+        });
+        navigator.sendBeacon("/api/otel/metrics", blob);
+      } else {
+        fetch("/api/otel/metrics", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(metricsToSend),
+          keepalive: true, // Important for reliability
+        });
+      }
+    } catch (error) {
+      console.error("Failed to send browser metrics", error);
+      // If sending fails, put logs back in the queue
+      metrics = metricsToSend.concat(metrics);
+    }
+  };
 
   // TODO: Sample metrics if your traffic is high
   const record = (metric: Metric) => {
@@ -46,26 +59,23 @@ export function initializeWebVitals() {
 
     switch (metric.name) {
       case "LCP": {
-        lcp.record(metric.value, attrs);
+        metrics.push({ ...metric, ...attrs });
         break;
       }
       case "CLS": {
-        cls.addCallback((result) => {
-          result.observe(metric.value, attrs);
-        });
+        metrics.push({ ...metric, ...attrs });
         break;
       }
       case "INP": {
-        inp.record(metric.value, attrs);
+        metrics.push({ ...metric, ...attrs });
         break;
       }
       case "TTFB": {
-        ttfb.record(metric.value, attrs);
-
+        metrics.push({ ...metric, ...attrs });
         break;
       }
       case "FCP": {
-        fcp.record(metric.value, attrs);
+        metrics.push({ ...metric, ...attrs });
         break;
       }
       default: {
@@ -79,7 +89,4 @@ export function initializeWebVitals() {
   onCLS(record);
   onTTFB(record);
   onFCP(record);
-
-  isInitialized = true;
-  console.log("✅ OpenTelemetry metrics exporter initialized");
 }
