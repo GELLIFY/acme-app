@@ -22,18 +22,26 @@ const createPinoConfig = (): LoggerOptions => ({
   // In development, it also sends debug-level logs to the console
   transport: {
     targets: [
-      {
-        // Always export to otel collector
-        target: "pino-opentelemetry-transport",
-        level: "info",
-        options: {
-          resourceAttributes: {
-            [ATTR_SERVICE_NAME]: process.env.npm_package_name ?? "acme-app",
-            [ATTR_SERVICE_VERSION]: process.env.npm_package_version ?? "1.0.0",
-            [ATTR_DEPLOYMENT_ENVIRONMENT_NAME]: environment,
-          },
-        },
-      },
+      // Export to otel collector on prod
+      ...(environment === "production"
+        ? [
+            {
+              // Always export to otel collector
+              target: "pino-opentelemetry-transport",
+              level: "info",
+              options: {
+                resourceAttributes: {
+                  [ATTR_SERVICE_NAME]:
+                    process.env.npm_package_name ?? "acme-app",
+                  [ATTR_SERVICE_VERSION]:
+                    process.env.npm_package_version ?? "1.0.0",
+                  [ATTR_DEPLOYMENT_ENVIRONMENT_NAME]: environment,
+                },
+              },
+            },
+          ]
+        : []),
+
       // Keep console output for development
       ...(environment === "development"
         ? [
