@@ -21,7 +21,6 @@ App (Next.js) -> OTel Collector (OTLP HTTP) -> Backend osservabilita
 Queste variabili sono standard OTel e configurano il collector e il sampling:
 
 ```
-OTEL_SERVICE_NAME=acme-app
 OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
 OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4318/v1/traces
 OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=http/protobuf

@@ -1,3 +1,5 @@
+"server-only";
+
 import { type LogRecord, logs } from "@opentelemetry/api-logs";
 import { OTLPLogExporter } from "@opentelemetry/exporter-logs-otlp-http";
 import { resourceFromAttributes } from "@opentelemetry/resources";
@@ -17,7 +19,7 @@ let loggerProvider: LoggerProvider | null = null;
 
 function createLoggerProvider() {
   const resource = resourceFromAttributes({
-    [ATTR_SERVICE_NAME]: process.env.OTEL_SERVICE_NAME ?? "acme-app",
+    [ATTR_SERVICE_NAME]: process.env.npm_package_name ?? "acme-app",
     [ATTR_SERVICE_VERSION]: process.env.npm_package_version ?? "1.0.0",
   });
 
@@ -54,12 +56,13 @@ export function exportLogEntry(entry: LogEntry) {
   if (!isInitialized) initializeLogsExporter();
   if (!loggerProvider) return;
 
-  const logger = loggerProvider.getLogger(env.OTEL_SERVICE_NAME);
+  const logger = loggerProvider.getLogger(
+    process.env.npm_package_name ?? "acme-app",
+  );
 
   const attributes: Record<string, unknown> = {
     ...entry.context,
     "log.level": entry.level,
-    "service.name": env.OTEL_SERVICE_NAME,
   };
 
   if (entry.error) {

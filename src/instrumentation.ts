@@ -1,3 +1,4 @@
+import { ATTR_SERVICE_VERSION } from "@opentelemetry/semantic-conventions";
 import { registerOTel } from "@vercel/otel";
 import { initializeLogsExporter } from "@/shared/infrastructure/logger/log-exporter";
 import { ATTR_DEPLOYMENT_ENVIRONMENT_NAME } from "@/shared/infrastructure/otel/semantic-conventions";
@@ -12,7 +13,7 @@ import { ATTR_DEPLOYMENT_ENVIRONMENT_NAME } from "@/shared/infrastructure/otel/s
  */
 export async function register() {
   registerOTel({
-    serviceName: process.env.OTEL_SERVICE_NAME ?? "acme-app",
+    serviceName: process.env.npm_package_name ?? "acme-app",
     // You can send traces directly from the app (skip collector),
     // but it’s not ideal for production
     //
@@ -26,6 +27,7 @@ export async function register() {
       // By default, @vercel/otel configures relevant Vercel attributes based on the environment
       // Any additional attributes will be merged with the default attributes.
       [ATTR_DEPLOYMENT_ENVIRONMENT_NAME]: process.env.NODE_ENV ?? "development",
+      [ATTR_SERVICE_VERSION]: process.env.npm_package_version ?? "1.0.0",
     },
     instrumentationConfig: {
       // Monitoring third party APIs

@@ -28,7 +28,7 @@ const createPinoConfig = (): LoggerOptions => ({
         level: "info",
         options: {
           resourceAttributes: {
-            [ATTR_SERVICE_NAME]: env.OTEL_SERVICE_NAME,
+            [ATTR_SERVICE_NAME]: process.env.npm_package_name ?? "acme-app",
             [ATTR_SERVICE_VERSION]: process.env.npm_package_version ?? "1.0.0",
             [ATTR_DEPLOYMENT_ENVIRONMENT_NAME]: environment,
           },
