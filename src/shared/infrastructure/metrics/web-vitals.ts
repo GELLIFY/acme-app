@@ -52,30 +52,31 @@ export function initializeWebVitals() {
 
   // TODO: Sample metrics if your traffic is high
   const record = (metric: Metric) => {
-    const attrs = {
+    const metricEntry = {
+      ...metric,
       page: window.location.pathname,
-      rating: metric.rating,
+      context: {}, // Server will fill in trace context on the server side
     };
 
     switch (metric.name) {
       case "LCP": {
-        metrics.push({ ...metric, ...attrs });
+        metrics.push(metricEntry);
         break;
       }
       case "CLS": {
-        metrics.push({ ...metric, ...attrs });
+        metrics.push(metricEntry);
         break;
       }
       case "INP": {
-        metrics.push({ ...metric, ...attrs });
+        metrics.push(metricEntry);
         break;
       }
       case "TTFB": {
-        metrics.push({ ...metric, ...attrs });
+        metrics.push(metricEntry);
         break;
       }
       case "FCP": {
-        metrics.push({ ...metric, ...attrs });
+        metrics.push(metricEntry);
         break;
       }
       default: {
