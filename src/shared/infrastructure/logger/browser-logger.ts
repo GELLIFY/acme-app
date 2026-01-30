@@ -105,9 +105,9 @@ class BrowserLogger {
         const blob = new Blob([JSON.stringify(logsToSend)], {
           type: "application/json",
         });
-        navigator.sendBeacon("/api/otel/logs", blob);
+        navigator.sendBeacon("/api/logs", blob);
       } else {
-        fetch("/api/otel/logs", {
+        fetch("/api/logs", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
