@@ -32,9 +32,9 @@ export function initializeWebVitals() {
         const blob = new Blob([JSON.stringify(metricsToSend)], {
           type: "application/json",
         });
-        navigator.sendBeacon("/api/otel/metrics", blob);
+        navigator.sendBeacon("/api/rum/vitals", blob);
       } else {
-        fetch("/api/otel/metrics", {
+        fetch("/api/rum/vitals", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
