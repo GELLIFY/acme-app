@@ -203,8 +203,8 @@ importers:
         specifier: 0.3.15
         version: 0.3.15
       '@happy-dom/global-registrator':
-        specifier: 20.0.11
-        version: 20.0.11
+        specifier: 20.4.0
+        version: 20.4.0(bufferutil@4.0.9)
       '@react-email/preview-server':
         specifier: 5.1.1
         version: 5.1.1(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -872,8 +872,8 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
-  '@happy-dom/global-registrator@20.0.11':
-    resolution: {integrity: sha512-GqNqiShBT/lzkHTMC/slKBrvN0DsD4Di8ssBk4aDaVgEn+2WMzE6DXxq701ndSXj7/0cJ8mNT71pM7Bnrr6JRw==}
+  '@happy-dom/global-registrator@20.4.0':
+    resolution: {integrity: sha512-MX0CK+FuP+cIx/2Lq7csXL0czMsgppIKW0Sg4SqIbsQBiacoLXVm6MU+J+ZcS+UhS17VF5wClsZhkpWubYspVg==}
     engines: {node: '>=20.0.0'}
 
   '@hexagon/base64@1.1.28':
@@ -2553,9 +2553,6 @@ packages:
   '@types/cors@2.8.19':
     resolution: {integrity: sha512-mFNylyeyqN93lfe/9CSxOGREz8cpzAhH+E93xJ4xWQf62V8sQ/24reV2nyzUWM6H6Xji+GGHpkbLe7pVoUEskg==}
 
-  '@types/node@20.19.22':
-    resolution: {integrity: sha512-hRnu+5qggKDSyWHlnmThnUqg62l29Aj/6vcYgUaSFL9oc7DVjeWEQN3PRgdSc6F8d9QRMWkf36CLMch1Do/+RQ==}
-
   '@types/node@22.19.7':
     resolution: {integrity: sha512-MciR4AKGHWl7xwxkBa6xUGxQJ4VBOmPTF7sL+iGzuahOFaO0jHCsuEfS80pan1ef4gWId1oWOweIhrDEYLuaOw==}
 
@@ -3139,8 +3136,8 @@ packages:
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
 
-  happy-dom@20.0.11:
-    resolution: {integrity: sha512-QsCdAUHAmiDeKeaNojb1OHOPF7NjcWPBR7obdu3NwH2a/oyQaLg5d0aaCy/9My6CdPChYF07dvz5chaXBGaD4g==}
+  happy-dom@20.4.0:
+    resolution: {integrity: sha512-RDeQm3dT9n0A5f/TszjUmNCLEuPnMGv3Tv4BmNINebz/h17PA6LMBcxJ5FrcqltNBMh9jA/8ufgDdBYUdBt+eg==}
     engines: {node: '>=20.0.0'}
 
   help-me@5.0.0:
@@ -4540,10 +4537,13 @@ snapshots:
       protobufjs: 7.5.4
       yargs: 17.7.2
 
-  '@happy-dom/global-registrator@20.0.11':
+  '@happy-dom/global-registrator@20.4.0(bufferutil@4.0.9)':
     dependencies:
-      '@types/node': 20.19.22
-      happy-dom: 20.0.11
+      '@types/node': 22.19.7
+      happy-dom: 20.4.0(bufferutil@4.0.9)
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   '@hexagon/base64@1.1.28': {}
 
@@ -6212,10 +6212,6 @@ snapshots:
     dependencies:
       '@types/node': 22.19.7
 
-  '@types/node@20.19.22':
-    dependencies:
-      undici-types: 6.21.0
-
   '@types/node@22.19.7':
     dependencies:
       undici-types: 6.21.0
@@ -6696,11 +6692,17 @@ snapshots:
 
   graceful-fs@4.2.11: {}
 
-  happy-dom@20.0.11:
+  happy-dom@20.4.0(bufferutil@4.0.9):
     dependencies:
-      '@types/node': 20.19.22
+      '@types/node': 22.19.7
       '@types/whatwg-mimetype': 3.0.2
+      '@types/ws': 8.18.1
+      entities: 4.5.0
       whatwg-mimetype: 3.0.0
+      ws: 8.18.3(bufferutil@4.0.9)
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   help-me@5.0.0: {}
 
