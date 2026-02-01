@@ -133,7 +133,6 @@ Suggerimento: usa `wideEvent` per arricchire i log request-level, non per eventi
 ## Configurazione ENV (logs)
 
 ```
-OTEL_SERVICE_NAME=acme-app
 OTEL_EXPORTER_OTLP_LOGS_ENDPOINT=http://localhost:4318/v1/logs
 ```
 

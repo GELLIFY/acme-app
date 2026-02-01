@@ -22,13 +22,14 @@ coverageDir = "coverage"  # default "coverage"
 # Multiple patterns
 coveragePathIgnorePatterns = [
   "src/app/**",
+  "src/components/ui/**",
   "src/emails/**",
   "src/server/db/**",
   "src/shared/locales/**",
   "src/shared/infrastructure/**",
-  "src/components/ui/**",
   "src/tests/**",
   "src/instrumentation.ts",
-  "src/middleware.ts",
+  "src/instrumentation-client.ts",
+  "src/proxy.ts",
   "*.config.*",
 ]

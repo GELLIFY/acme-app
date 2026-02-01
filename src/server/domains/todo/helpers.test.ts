@@ -25,8 +25,12 @@ describe("shuffleTodos", () => {
     expect(shuffled).toHaveLength(todos.length);
 
     // All original items are present
-    const originalIds = todos.map((t) => t.id).sort();
-    const shuffledIds = shuffled.map((t) => t.id).sort();
+    const originalIds = todos
+      .map((t) => t.id)
+      .sort((a, b) => a.localeCompare(b));
+    const shuffledIds = shuffled
+      .map((t) => t.id)
+      .sort((a, b) => a.localeCompare(b));
     expect(shuffledIds).toEqual(originalIds);
   });
 

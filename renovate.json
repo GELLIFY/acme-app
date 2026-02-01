@@ -1,6 +1,10 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:best-practices", "schedule:nonOfficeHours"],
+  "extends": [
+    "config:best-practices",
+    "schedule:nonOfficeHours",
+    "customManagers:biomeVersions"
+  ],
   "enabled": true,
   "branchConcurrentLimit": 3,
   "rangeStrategy": "pin",

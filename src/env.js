@@ -15,7 +15,6 @@ export const env = createEnv({
     BETTER_AUTH_SECRET: z.string().min(1),
     RESEND_API_KEY: z.string().min(1),
 
-    OTEL_SERVICE_NAME: z.string().default("acme-app"),
     OTEL_EXPORTER_OTLP_ENDPOINT: z.string().default("http://localhost:4318"),
     OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: z
       .string()
