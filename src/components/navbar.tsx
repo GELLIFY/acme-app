@@ -132,6 +132,7 @@ export default async function Navbar() {
             <Button
               variant="ghost"
               size="sm"
+              nativeButton
               render={<Link href="/sign-in"> {t("signin.title")}</Link>}
             ></Button>
           )}

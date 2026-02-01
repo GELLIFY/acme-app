@@ -56,14 +56,7 @@ export function DeleteAccount() {
 
         <AlertDialog>
           <AlertDialogTrigger
-            render={
-              <Button
-                variant="destructive"
-                className="text-muted hover:bg-destructive"
-              >
-                Delete
-              </Button>
-            }
+            render={<Button variant="destructive">Delete</Button>}
           ></AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>

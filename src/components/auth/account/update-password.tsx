@@ -86,7 +86,7 @@ export function UpdatePassword() {
                       id="current_password"
                       aria-invalid={fieldState.invalid}
                       type="password"
-                      autoComplete="new-password"
+                      autoComplete="current-password"
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
