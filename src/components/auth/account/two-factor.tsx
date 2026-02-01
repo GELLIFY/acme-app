@@ -355,11 +355,13 @@ export function TwoFactor() {
           {t("info")} <ArrowUpRightIcon className="size-4" />
         </Link>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              {user?.twoFactorEnabled ? t("disable") : t("enable")}
-            </Button>
-          </DialogTrigger>
+          <DialogTrigger
+            render={
+              <Button>
+                {user?.twoFactorEnabled ? t("disable") : t("enable")}
+              </Button>
+            }
+          ></DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle className="text-left">Set up 2FA</DialogTitle>

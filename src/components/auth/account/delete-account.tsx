@@ -55,14 +55,9 @@ export function DeleteAccount() {
         <div />
 
         <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button
-              variant="destructive"
-              className="text-muted hover:bg-destructive"
-            >
-              Delete
-            </Button>
-          </AlertDialogTrigger>
+          <AlertDialogTrigger
+            render={<Button variant="destructive">Delete</Button>}
+          ></AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>{t("delete.confirm_title")}</AlertDialogTitle>

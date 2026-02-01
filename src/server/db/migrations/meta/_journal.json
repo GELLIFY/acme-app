@@ -85,6 +85,13 @@
       "when": 1764859423303,
       "tag": "0011_dark_wild_pack",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1769977297502,
+      "tag": "0012_milky_phalanx",
+      "breakpoints": true
     }
   ]
 }
