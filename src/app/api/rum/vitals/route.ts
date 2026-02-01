@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     // Log errors from the logging endpoint itself
     logger.error("Failed to process browser metrics", error as Error);
     return NextResponse.json(
-      { error: "Failed to process metrics" },
+      { error: "Failed to process browser metrics" },
       { status: 500 },
     );
   }

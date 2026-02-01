@@ -60,7 +60,8 @@ class BrowserLogger {
 
     // Console behavior (DX)
     if (!isProd) {
-      console[level](message, context, error);
+      if (error) console[level](message, error, { context });
+      else console[level](message, { context });
       return;
     }
 

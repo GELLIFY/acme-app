@@ -1,6 +1,5 @@
 import { ZoneContextManager } from "@opentelemetry/context-zone";
 import { registerInstrumentations } from "@opentelemetry/instrumentation";
-import { DocumentLoadInstrumentation } from "@opentelemetry/instrumentation-document-load";
 import { FetchInstrumentation } from "@opentelemetry/instrumentation-fetch";
 import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-base";
 import { WebTracerProvider } from "@opentelemetry/sdk-trace-web";
@@ -28,15 +27,7 @@ if (process.env.NODE_ENV === "production") {
 
   // Registering instrumentations / plugins
   registerInstrumentations({
-    instrumentations: [
-      new DocumentLoadInstrumentation(),
-      new FetchInstrumentation({
-        propagateTraceHeaderCorsUrls: [
-          /\/api\//, // API interne
-          // /your-domain\.com/, // se serve
-        ],
-      }),
-    ],
+    instrumentations: [new FetchInstrumentation()],
   });
 
   // Set up error tracking

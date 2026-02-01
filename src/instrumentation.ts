@@ -17,8 +17,7 @@ export async function register() {
       attributes: {
         // By default, @vercel/otel configures relevant Vercel attributes based on the environment
         // Any additional attributes will be merged with the default attributes.
-        [ATTR_DEPLOYMENT_ENVIRONMENT_NAME]:
-          process.env.NODE_ENV ?? "development",
+        [ATTR_DEPLOYMENT_ENVIRONMENT_NAME]: process.env.NODE_ENV,
         [ATTR_SERVICE_VERSION]: process.env.npm_package_version ?? "1.0.0",
       },
     });
