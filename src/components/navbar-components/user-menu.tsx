@@ -28,51 +28,64 @@ export function UserMenu({ user }: { user: User }) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild className="w-auto">
-        <Avatar className="h-8 w-8">
-          <AvatarImage src={user.image ?? ""} alt={`avatar of ${user.name}`} />
-          <AvatarFallback>{"ME"}</AvatarFallback>
-        </Avatar>
-      </DropdownMenuTrigger>
+      <DropdownMenuTrigger
+        nativeButton={false}
+        className="w-auto"
+        render={
+          <Avatar className="h-8 w-8">
+            <AvatarImage
+              src={user.image ?? ""}
+              alt={`avatar of ${user.name}`}
+            />
+            <AvatarFallback>{"ME"}</AvatarFallback>
+          </Avatar>
+        }
+      ></DropdownMenuTrigger>
       <DropdownMenuContent
         className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
         side="top"
         align="end"
         sideOffset={4}
       >
-        <DropdownMenuLabel className="p-0 font-normal">
-          <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={user.image ?? ""} alt={user.name} />
-              <AvatarFallback>ME</AvatarFallback>
-            </Avatar>
-            <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-medium">{user.name}</span>
-              <span className="truncate text-xs text-muted-foreground">
-                {user.email}
-              </span>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="p-0 font-normal">
+            <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={user.image ?? ""} alt={user.name} />
+                <AvatarFallback>ME</AvatarFallback>
+              </Avatar>
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-medium">{user.name}</span>
+                <span className="truncate text-xs text-muted-foreground">
+                  {user.email}
+                </span>
+              </div>
             </div>
-          </div>
-        </DropdownMenuLabel>
+          </DropdownMenuLabel>
+        </DropdownMenuGroup>
 
         <DropdownMenuSeparator />
 
         <DropdownMenuGroup>
           {user.role === "admin" && (
-            <DropdownMenuItem asChild>
-              <Link href="/admin">
-                <ShieldUserIcon />
-                Admin
-              </Link>
-            </DropdownMenuItem>
+            <DropdownMenuItem
+              render={
+                <Link href="/admin">
+                  <ShieldUserIcon />
+                  Admin
+                </Link>
+              }
+            ></DropdownMenuItem>
           )}
 
-          <DropdownMenuItem asChild>
-            <Link href="/account">
-              <UserIcon />
-              Account
-            </Link>
-          </DropdownMenuItem>
+          <DropdownMenuItem
+            render={
+              <Link href="/account">
+                <UserIcon />
+                Account
+              </Link>
+            }
+          ></DropdownMenuItem>
         </DropdownMenuGroup>
 
         <DropdownMenuSeparator />
