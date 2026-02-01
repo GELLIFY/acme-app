@@ -10,7 +10,7 @@
   "scripts": {
     "build": "next build --webpack",
     "clean": "git clean -xdf node_modules .next",
-    "auth:generate": "pnpm dlx @better-auth/cli@latest generate --config=src/shared/helpers/better-auth/auth.ts --output=src/server/db/schema/auth-schema-new.ts --yes",
+    "auth:generate": "pnpm dlx @better-auth/cli@latest generate --config=src/shared/infrastructure/better-auth/auth.ts --output=src/server/db/schema/auth-schema-new.ts --yes",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
