@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-export function WebVitalsProvider({ children }: { children: React.ReactNode }) {
+export function WebVitalsProvider() {
   useEffect(() => {
     void import("@/shared/infrastructure/metrics/web-vitals").then(
       ({ initializeWebVitals }) => {
@@ -10,5 +10,6 @@ export function WebVitalsProvider({ children }: { children: React.ReactNode }) {
       },
     );
   }, []);
-  return <>{children}</>;
+
+  return null;
 }

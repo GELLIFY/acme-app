@@ -81,6 +81,7 @@ export default function Home() {
         <div className="mx-auto max-w-3xl space-y-8 text-center">
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <Button
+              nativeButton={false}
               render={
                 <Link href="https://www.gellify.dev/docs/usage/first-steps">
                   {t("doc")}
@@ -88,6 +89,7 @@ export default function Home() {
               }
             ></Button>
             <Button
+              nativeButton={false}
               variant="outline"
               render={
                 <Link

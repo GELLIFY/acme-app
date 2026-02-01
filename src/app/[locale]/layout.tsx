@@ -1,7 +1,7 @@
 import "@/globals.css";
 
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { ImpersonationIndicator } from "@/components/auth/admin/impersonation-indicator";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -10,9 +10,16 @@ import { WebVitalsProvider } from "@/components/web-vitals-provider";
 import { TRPCReactProvider } from "@/shared/infrastructure/trpc/client";
 import { I18nProviderClient } from "@/shared/locales/client";
 
-const inter = Inter({
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
-  variable: "--font-sans",
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -24,33 +31,36 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   params,
   children,
-}: {
+}: Readonly<{
   params: Promise<{ locale: string }>;
   children: React.ReactNode;
-}) {
+}>) {
   const { locale } = await params;
 
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`font-sans ${inter.variable}`}>
-        <WebVitalsProvider>
-          <TRPCReactProvider>
-            <I18nProviderClient locale={locale}>
-              <NuqsAdapter>
-                <ThemeProvider
-                  attribute="class"
-                  defaultTheme="system"
-                  enableSystem
-                  disableTransitionOnChange
-                >
-                  {children}
-                  <Toaster />
-                  <ImpersonationIndicator />
-                </ThemeProvider>
-              </NuqsAdapter>
-            </I18nProviderClient>
-          </TRPCReactProvider>
-        </WebVitalsProvider>
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <TRPCReactProvider>
+          <I18nProviderClient locale={locale}>
+            <NuqsAdapter>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+              >
+                {children}
+                <Toaster />
+                <ImpersonationIndicator />
+
+                {/* Track web vitals on production */}
+                {process.env.NODE_ENV === "production" && <WebVitalsProvider />}
+              </ThemeProvider>
+            </NuqsAdapter>
+          </I18nProviderClient>
+        </TRPCReactProvider>
       </body>
     </html>
   );

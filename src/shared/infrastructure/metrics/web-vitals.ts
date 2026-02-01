@@ -6,8 +6,6 @@ let metrics: Metric[] = [];
 const flushInterval = 10000; // Flush every 10 seconds
 
 export function initializeWebVitals() {
-  if (typeof window === "undefined") return;
-
   setInterval(() => flush(), flushInterval);
   // Optional: Also flush when the page is hidden
   window.addEventListener("visibilitychange", () => {
@@ -17,7 +15,7 @@ export function initializeWebVitals() {
   });
 
   const flush = () => {
-    if (typeof window === "undefined" || metrics.length === 0) {
+    if (metrics.length === 0) {
       return;
     }
 
