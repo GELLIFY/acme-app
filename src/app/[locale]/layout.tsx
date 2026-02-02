@@ -6,7 +6,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { ImpersonationIndicator } from "@/components/auth/admin/impersonation-indicator";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { WebVitalsProvider } from "@/components/web-vitals-provider";
+import { WebVitals } from "@/components/web-vitals";
 import { TRPCReactProvider } from "@/shared/infrastructure/trpc/client";
 import { I18nProviderClient } from "@/shared/locales/client";
 
@@ -54,9 +54,7 @@ export default async function RootLayout({
                 {children}
                 <Toaster />
                 <ImpersonationIndicator />
-
-                {/* Track web vitals on production */}
-                {process.env.NODE_ENV === "production" && <WebVitalsProvider />}
+                <WebVitals />
               </ThemeProvider>
             </NuqsAdapter>
           </I18nProviderClient>

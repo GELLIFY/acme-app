@@ -1,29 +1,26 @@
 import { type NextRequest, NextResponse } from "next/server";
+import type { Metric } from "web-vitals";
 import { logger } from "@/shared/infrastructure/logger/logger";
-import { type MetricEntry, meter } from "@/shared/infrastructure/metrics/meter";
-import { initializeMetricsExporter } from "@/shared/infrastructure/metrics/metric-exporter";
+import {
+  exportMetricEntry,
+  initializeMetricsExporter,
+} from "@/shared/infrastructure/otel/metric-exporter";
 
 // Initialize the OTLP exporter when this route is first hit
 initializeMetricsExporter();
 
 export async function POST(request: NextRequest) {
   try {
-    const metrics = (await request.json()) as MetricEntry[];
-    if (!Array.isArray(metrics)) {
-      return NextResponse.json(
-        { error: "Invalid metrics payload" },
-        { status: 400 },
-      );
-    }
+    const data = (await request.json()) as {
+      metric: Metric;
+      device: UAParser.IDevice["type"];
+      page: string;
+    };
 
-    for (const metricEntry of metrics) {
-      // Extract the metric data and context
-      const { context, page, ...metric } = metricEntry;
-      // Use our server-side meter to forward the metric with client context
-      meter.record(metric, { ...context, page });
-    }
+    const { metric, device, page } = data;
+    exportMetricEntry(metric, { device, page });
 
-    return NextResponse.json({ success: true, processed: metrics.length });
+    return NextResponse.json({ success: true });
   } catch (error) {
     // Log errors from the logging endpoint itself
     logger.error("Failed to process browser metrics", error as Error);
