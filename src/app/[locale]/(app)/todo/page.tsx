@@ -54,10 +54,7 @@ export default async function TodoPage(props: TodoPageProps) {
           <CardContent>
             <CreateTodoForm />
             <TodoFilters />
-            <ErrorBoundary
-              fallbackRender={ErrorFallback}
-              onError={reportErrorStackTrace}
-            >
+            <ErrorBoundary fallbackRender={ErrorFallback}>
               <Suspense fallback={<TodoListLoading />}>
                 <TodoList />
               </Suspense>
