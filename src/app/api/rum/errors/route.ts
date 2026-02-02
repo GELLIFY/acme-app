@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     // Log errors from the logging endpoint itself
     logger.error("Failed to process browser error", error as Error);
     return NextResponse.json(
-      { error: "Failed to process error" },
+      { error: "Failed to process browser error" },
       { status: 500 },
     );
   }
