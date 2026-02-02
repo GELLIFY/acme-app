@@ -15,7 +15,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { reportErrorStackTrace } from "@/shared/infrastructure/otel/report-error-stack-trace";
 import {
   getQueryClient,
   HydrateClient,
