@@ -6,7 +6,6 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   deploy_preview:
@@ -24,7 +23,27 @@ jobs:
       pull-requests: write
       id-token: write
     steps:
+      - name: Get PR info (head ref + sha)
+        id: pr
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const prNumber = context.payload.issue.number;
+
+            const pr = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: prNumber
+            });
+
+            core.setOutput('number', String(pr.data.number));
+            core.setOutput('head_ref', pr.data.head.ref);
+            core.setOutput('head_sha', pr.data.head.sha);
+
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ steps.pr.outputs.head_sha }}
 
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
@@ -39,7 +58,7 @@ jobs:
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
           # parent: main # optional (defaults to your primary branch)
-          branch_name: preview/pr-${{ github.event.number }}-${{ steps.branch_name.outputs.current_branch }}
+          branch_name: preview/pr-${{ steps.pr.outputs.number }}-${{ steps.branch_name.outputs.current_branch }}
           database: neondb
           role: neondb_owner
           api_key: ${{ secrets.NEON_API_KEY }}
@@ -49,14 +68,13 @@ jobs:
           touch .env
           echo SKIP_ENV_VALIDATION=1 >> .env
           echo DATABASE_URL=${{ steps.create_branch.outputs.db_url_pooled }} >> .env
-          echo DIRECT_URL=${{ steps.create_branch.outputs.db_url }} >> .env
           pnpm run db:migrate
 
       - name: Post Schema Diff Comment to PR
         uses: neondatabase/schema-diff-action@80cfa8521628e890015b60f5291a7738926617dc # v1
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
-          compare_branch: preview/pr-${{ github.event.number }}-${{ steps.branch_name.outputs.current_branch }}
+          compare_branch: preview/pr-${{ steps.pr.outputs.number }}-${{ steps.branch_name.outputs.current_branch }}
           database: neondb
           github-token: ${{ secrets.GITHUB_TOKEN }}
           base_branch: main
