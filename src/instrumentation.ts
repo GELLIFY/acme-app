@@ -11,19 +11,18 @@ import { ATTR_DEPLOYMENT_ENVIRONMENT_NAME } from "@/shared/infrastructure/otel/s
  * Call this early in your application's lifecycle.
  */
 export async function register() {
-  if (process.env.NODE_ENV === "production") {
-    registerOTel({
-      serviceName: process.env.npm_package_name ?? "acme-app",
-      attributes: {
-        // By default, @vercel/otel configures relevant Vercel attributes based on the environment
-        // Any additional attributes will be merged with the default attributes.
-        [ATTR_DEPLOYMENT_ENVIRONMENT_NAME]: process.env.NODE_ENV,
-        [ATTR_SERVICE_VERSION]: process.env.npm_package_version ?? "1.0.0",
-      },
-    });
+  registerOTel({
+    serviceName: process.env.npm_package_name ?? "acme-app",
+    attributes: {
+      // By default, @vercel/otel configures relevant Vercel attributes based on the environment
+      // Any additional attributes will be merged with the default attributes.
+      [ATTR_DEPLOYMENT_ENVIRONMENT_NAME]:
+        process.env.VERCEL_TARGET_ENV || "production",
+      [ATTR_SERVICE_VERSION]: process.env.npm_package_version ?? "1.0.0",
+    },
+  });
 
-    if (process.env.NEXT_RUNTIME === "nodejs") {
-      initializeLogsExporter();
-    }
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    initializeLogsExporter();
   }
 }

@@ -54,7 +54,9 @@ export default async function RootLayout({
                 {children}
                 <Toaster />
                 <ImpersonationIndicator />
-                <WebVitals />
+
+                {/* Track web vitals only in remote environments */}
+                {process.env.NODE_ENV === "production" && <WebVitals />}
               </ThemeProvider>
             </NuqsAdapter>
           </I18nProviderClient>

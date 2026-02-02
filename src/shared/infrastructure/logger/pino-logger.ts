@@ -35,7 +35,8 @@ const createPinoConfig = (): LoggerOptions => ({
                     process.env.npm_package_name ?? "acme-app",
                   [ATTR_SERVICE_VERSION]:
                     process.env.npm_package_version ?? "1.0.0",
-                  [ATTR_DEPLOYMENT_ENVIRONMENT_NAME]: environment,
+                  [ATTR_DEPLOYMENT_ENVIRONMENT_NAME]:
+                    process.env.VERCEL_TARGET_ENV || environment,
                 },
               },
             },
@@ -67,8 +68,9 @@ const createPinoConfig = (): LoggerOptions => ({
     const span = trace.getActiveSpan();
     const ctx = span?.spanContext();
     return {
-      traceId: ctx?.traceId,
-      spanId: ctx?.spanId,
+      trace_id: ctx?.traceId,
+      span_id: ctx?.spanId,
+      source: "server",
     };
   },
 });
@@ -79,14 +81,7 @@ export class PinoLogger {
   constructor(private readonly logger = pinoLogger) {}
 
   private enrich(context: LogContext = {}): LogContext {
-    const span = trace.getActiveSpan();
-    const ctx = span?.spanContext();
-    return {
-      traceId: ctx?.traceId,
-      spanId: ctx?.spanId,
-      source: "server",
-      ...context,
-    };
+    return { ...context };
   }
 
   info(message: string, context?: LogContext) {

@@ -1,5 +1,5 @@
-import { trace } from "@opentelemetry/api";
 import { exportLogEntry } from "@/shared/infrastructure/logger/log-exporter";
+import { getTraceContext } from "../otel/get-trace-context";
 
 export interface LogContext {
   traceId?: string;
@@ -17,13 +17,6 @@ export interface LogEntry {
 }
 
 class Logger {
-  private getTraceContext(): Pick<LogContext, "traceId" | "spanId"> {
-    const span = trace.getActiveSpan();
-    if (!span) return {};
-    const { traceId, spanId } = span.spanContext();
-    return { traceId, spanId };
-  }
-
   private log(
     level: "debug" | "info" | "warn" | "error",
     message: string,
@@ -35,7 +28,7 @@ class Logger {
       timestamp: new Date().toISOString(),
       level,
       message,
-      context: { ...this.getTraceContext(), ...context },
+      context: { ...getTraceContext(), ...context },
       error,
     };
 
