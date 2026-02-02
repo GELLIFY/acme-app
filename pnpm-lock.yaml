@@ -153,8 +153,8 @@ importers:
         specifier: 19.2.4
         version: 19.2.4(react@19.2.4)
       react-error-boundary:
-        specifier: 6.0.2
-        version: 6.0.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        specifier: 6.1.0
+        version: 6.1.0(react@19.2.4)
       react-hook-form:
         specifier: 7.70.0
         version: 7.70.0(react@19.2.4)
@@ -3803,11 +3803,10 @@ packages:
     engines: {node: '>=20.0.0'}
     hasBin: true
 
-  react-error-boundary@6.0.2:
-    resolution: {integrity: sha512-yvWErn55ag/ywZEFqYpXYX9rxIDPIabXIX25F184KY3F5Szk2x/cVieOflw5R47ltN3KzWOw82Lmlb4vNjyn9A==}
+  react-error-boundary@6.1.0:
+    resolution: {integrity: sha512-02k9WQ/mUhdbXir0tC1NiMesGzRPaCsJEWU/4bcFrbY1YMZOtHShtZP6zw0SJrBWA/31H0KT9/FgdL8+sPKgHA==}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
-      react-dom: ^18.0.0 || ^19.0.0
 
   react-hook-form@7.70.0:
     resolution: {integrity: sha512-COOMajS4FI3Wuwrs3GPpi/Jeef/5W1DRR84Yl5/ShlT3dKVFUfoGiEZ/QE6Uw8P4T2/CLJdcTVYKvWBMQTEpvw==}
@@ -7558,10 +7557,9 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  react-error-boundary@6.0.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+  react-error-boundary@6.1.0(react@19.2.4):
     dependencies:
       react: 19.2.4
-      react-dom: 19.2.4(react@19.2.4)
 
   react-hook-form@7.70.0(react@19.2.4):
     dependencies:
