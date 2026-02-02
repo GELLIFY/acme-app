@@ -9,6 +9,41 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
+  cancel_pending_deploy:
+    name: Cancel Deploy Preview
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v8
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pr = context.payload.pull_request;
+            const headRef = pr.head.ref;
+            const workflowFile = "deploy-preview.yml";
+
+            const runs = await github.paginate(
+              github.rest.actions.listWorkflowRunsForWorkflow,
+              {
+                owner,
+                repo,
+                workflow_id: workflowFile,
+                per_page: 100
+              }
+            );
+
+            const candidates = runs.filter(r =>
+              r.head_branch === headRef &&
+              ["queued", "in_progress", "waiting"].includes(r.status) &&
+              r.conclusion === null
+            );
+
+            core.info(`Found ${candidates.length} runs to cancel for branch ${headRef}`);
+
+            for (const run of candidates) {
+              core.info(`Cancelling run ${run.id} (${run.status})`);
+              await github.rest.actions.cancelWorkflowRun({ owner, repo, run_id: run.id });
+            }
+
   delete_neon_branch:
     name: Delete Neon Branch
     runs-on: ubuntu-latest
