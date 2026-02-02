@@ -41,9 +41,7 @@ function createLoggerProvider() {
 }
 
 export function initializeLogsExporter() {
-  if (typeof window !== "undefined" || isInitialized) {
-    return;
-  }
+  if (isInitialized) return;
 
   loggerProvider = createLoggerProvider();
   logs.setGlobalLoggerProvider(loggerProvider);
@@ -52,7 +50,6 @@ export function initializeLogsExporter() {
 }
 
 export function exportLogEntry(entry: LogEntry) {
-  if (typeof window !== "undefined") return;
   if (!isInitialized) initializeLogsExporter();
   if (!loggerProvider) return;
 
@@ -74,29 +71,12 @@ export function exportLogEntry(entry: LogEntry) {
   const logRecord: LogRecord = {
     body: entry.message,
     timestamp: Date.now(),
-    observedTimestamp: Date.now(),
-    severityNumber: getSeverityNumber(entry.level),
     severityText: entry.level.toUpperCase(),
     // @ts-expect-error it's ok
     attributes,
   };
 
   logger.emit(logRecord);
-}
-
-function getSeverityNumber(level: LogEntry["level"]): number {
-  switch (level) {
-    case "debug":
-      return 5;
-    case "info":
-      return 9;
-    case "warn":
-      return 13;
-    case "error":
-      return 17;
-    default:
-      return 9;
-  }
 }
 
 export function shutdownLogsExporter() {

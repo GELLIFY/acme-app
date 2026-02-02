@@ -1,31 +1,43 @@
 "use client";
 
-import { trace } from "@opentelemetry/api";
-import type { LogContext } from "./logger";
+import { getTraceContext } from "../otel/get-trace-context";
 
-// A simplified LogEntry type for the browser
+type LogLevel = "debug" | "info" | "warn" | "error";
+
 interface BrowserLogEntry {
-  timestamp: string;
-  level: "debug" | "info" | "warn" | "error";
+  ts: string;
+  level: LogLevel;
   message: string;
-  context: LogContext;
+  traceId?: string;
+  spanId?: string;
+  sessionId: string;
+  url: string;
   error?: {
     name: string;
     message: string;
     stack?: string;
   };
+  // custom attributes
+  [key: string]: unknown;
 }
 
+const FLUSH_INTERVAL = 10_000;
+const MAX_BUFFER_SIZE = 50;
+
 class BrowserLogger {
-  private logs: BrowserLogEntry[] = [];
-  private readonly flushInterval = 10000; // Flush every 10 seconds
-  private sessionId = this.generateSessionId();
+  private buffer: BrowserLogEntry[] = [];
+  private sessionId = crypto.randomUUID();
 
   constructor() {
-    if (typeof window === "undefined") return;
+    if (
+      typeof window === "undefined" ||
+      process.env.NODE_ENV !== "production"
+    ) {
+      return;
+    }
 
-    setInterval(() => this.flush(), this.flushInterval);
-    // Optional: Also flush when the page is hidden
+    setInterval(() => this.flush(), FLUSH_INTERVAL);
+
     window.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "hidden") {
         this.flush();
@@ -33,108 +45,86 @@ class BrowserLogger {
     });
   }
 
-  private generateSessionId() {
-    return (
-      "session_" +
-      (Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15))
-    );
-  }
-
-  private getSessionId() {
-    return this.sessionId;
-  }
-
-  private enrich(context: LogContext = {}): LogContext {
-    const span = trace.getActiveSpan();
-    const ctx = span?.spanContext();
-    return {
-      traceId: ctx?.traceId ?? "no-trace",
-      spanId: ctx?.spanId ?? "no-span",
-      sessionId: this.getSessionId(),
-      url: window.location.href,
-      userAgent: navigator.userAgent,
-      ...context,
-    };
+  private push(entry: BrowserLogEntry) {
+    if (this.buffer.length >= MAX_BUFFER_SIZE) return;
+    this.buffer.push(entry);
   }
 
   private log(
-    level: "debug" | "info" | "warn" | "error",
+    level: LogLevel,
     message: string,
-    context?: LogContext,
+    context?: Record<string, unknown>,
     error?: Error,
   ) {
-    if (typeof window === "undefined") return;
+    const isProd = process.env.NODE_ENV === "production";
 
-    const entry: BrowserLogEntry = {
-      timestamp: new Date().toISOString(),
-      level,
-      message,
-      context: this.enrich(context),
-    };
-
-    if (error) {
-      entry.error = {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-      };
-    }
-
-    // Also log to console in development
-    if (process.env.NODE_ENV === "development") {
-      console[level](message, entry);
-    }
-
-    this.logs.push(entry);
-  }
-
-  private flush() {
-    if (typeof window === "undefined" || this.logs.length === 0) {
+    // Console behavior (DX)
+    if (!isProd) {
+      if (error) console[level](message, error, { context });
+      else console[level](message, { context });
       return;
     }
 
-    const logsToSend = this.logs;
-    this.logs = [];
+    const { traceId, spanId } = getTraceContext();
 
-    // Use navigator.sendBeacon if available for reliability,
-    // especially on page unload.
-    // Note: sendBeacon only supports POST and specific data types.
+    this.push({
+      ts: new Date().toISOString(),
+      level,
+      message,
+      traceId,
+      spanId,
+      sessionId: this.sessionId,
+      url: window.location.pathname,
+      error: error
+        ? {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+          }
+        : undefined,
+    });
+  }
+
+  debug(message: string, context?: Record<string, unknown>) {
+    this.log("debug", message, context);
+  }
+  info(message: string, context?: Record<string, unknown>) {
+    this.log("info", message, context);
+  }
+  warn(message: string, context?: Record<string, unknown>) {
+    this.log("warn", message, context);
+  }
+  error(message: string, error: Error, context?: Record<string, unknown>) {
+    this.log("error", message, context, error);
+  }
+
+  private flush() {
+    if (this.buffer.length === 0) return;
+
+    const payload = this.buffer;
+    this.buffer = [];
+
     try {
       if (navigator.sendBeacon) {
-        const blob = new Blob([JSON.stringify(logsToSend)], {
-          type: "application/json",
-        });
-        navigator.sendBeacon("/api/otel/logs", blob);
+        navigator.sendBeacon(
+          "/api/logs",
+          new Blob([JSON.stringify(payload)], {
+            type: "application/json",
+          }),
+        );
       } else {
-        fetch("/api/otel/logs", {
+        fetch("/api/logs", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(logsToSend),
-          keepalive: true, // Important for reliability
+          body: JSON.stringify(payload),
+          headers: { "Content-Type": "application/json" },
+          keepalive: true,
         });
       }
     } catch (error) {
-      console.error("Failed to send browser logs", error);
       // If sending fails, put logs back in the queue
-      this.logs = logsToSend.concat(this.logs);
+      console.error("Failed to send browser logs", error);
+      for (const entry of payload) this.push(entry);
     }
-  }
-
-  // --- Public API ---
-  info(message: string, context?: LogContext) {
-    this.log("info", message, context);
-  }
-  debug(message: string, context?: LogContext) {
-    this.log("debug", message, context);
-  }
-  warn(message: string, context?: LogContext) {
-    this.log("warn", message, context);
-  }
-  error(message: string, error: Error, context?: LogContext) {
-    this.log("error", message, context, error);
   }
 }
 

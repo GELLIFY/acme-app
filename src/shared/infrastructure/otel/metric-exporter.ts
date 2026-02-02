@@ -1,6 +1,6 @@
 "server-only";
 
-import { metrics } from "@opentelemetry/api";
+import { type Attributes, metrics } from "@opentelemetry/api";
 import { OTLPMetricExporter } from "@opentelemetry/exporter-metrics-otlp-http";
 import { resourceFromAttributes } from "@opentelemetry/resources";
 import {
@@ -11,8 +11,8 @@ import {
   ATTR_SERVICE_NAME,
   ATTR_SERVICE_VERSION,
 } from "@opentelemetry/semantic-conventions";
+import type { Metric } from "web-vitals";
 import { env } from "@/env";
-import type { MetricEntry } from "./meter";
 
 let isInitialized = false;
 let meterProvider: MeterProvider | null = null;
@@ -28,7 +28,6 @@ function createMeterProvider() {
     exporter: new OTLPMetricExporter({
       url: env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT,
     }),
-    exportIntervalMillis: 10000, // Export metrics every 10 seconds.
   });
 
   // Initialize a MeterProvider with the above configurations.
@@ -39,9 +38,7 @@ function createMeterProvider() {
 }
 
 export function initializeMetricsExporter() {
-  if (typeof window !== "undefined" || isInitialized) {
-    return;
-  }
+  if (isInitialized) return;
 
   meterProvider = createMeterProvider();
   metrics.setGlobalMeterProvider(meterProvider);
@@ -49,8 +46,7 @@ export function initializeMetricsExporter() {
   console.log("✅ OpenTelemetry metrics exporter initialized");
 }
 
-export function exportMetricEntry(entry: MetricEntry) {
-  if (typeof window !== "undefined") return;
+export function exportMetricEntry(metric: Metric, attrs?: Attributes) {
   if (!isInitialized) initializeMetricsExporter();
   if (!meterProvider) return;
 
@@ -62,34 +58,28 @@ export function exportMetricEntry(entry: MetricEntry) {
   const ttfb = meter.createHistogram("web_vitals_ttfb", { unit: "ms" });
   const fcp = meter.createHistogram("web_vitals_fcp", { unit: "ms" });
 
-  const attrs = {
-    ...entry.context,
-    page: entry.page,
-    rating: entry.rating,
-  };
-
-  switch (entry.name) {
+  switch (metric.name) {
     case "LCP": {
-      lcp.record(entry.value, attrs);
+      lcp.record(metric.value, attrs);
       break;
     }
     case "CLS": {
       cls.addCallback((result) => {
-        result.observe(entry.value, attrs);
+        result.observe(metric.value, attrs);
       });
       break;
     }
     case "INP": {
-      inp.record(entry.value, attrs);
+      inp.record(metric.value, attrs);
       break;
     }
     case "TTFB": {
-      ttfb.record(entry.value, attrs);
+      ttfb.record(metric.value, attrs);
 
       break;
     }
     case "FCP": {
-      fcp.record(entry.value, attrs);
+      fcp.record(metric.value, attrs);
       break;
     }
     default: {

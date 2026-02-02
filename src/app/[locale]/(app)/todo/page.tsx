@@ -15,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { reportErrorStackTrace } from "@/shared/infrastructure/otel/report-error-stack-trace";
 import {
   getQueryClient,
   HydrateClient,
@@ -53,7 +54,10 @@ export default async function TodoPage(props: TodoPageProps) {
           <CardContent>
             <CreateTodoForm />
             <TodoFilters />
-            <ErrorBoundary fallbackRender={ErrorFallback}>
+            <ErrorBoundary
+              fallbackRender={ErrorFallback}
+              onError={reportErrorStackTrace}
+            >
               <Suspense fallback={<TodoListLoading />}>
                 <TodoList />
               </Suspense>

@@ -1,13 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { initializeLogsExporter } from "@/shared/infrastructure/logger/log-exporter";
-import { logger } from "@/shared/infrastructure/logger/logger";
+import { type LogEntry, logger } from "@/shared/infrastructure/logger/logger";
 
 // Initialize the OTLP exporter when this route is first hit
 initializeLogsExporter();
 
 export async function POST(request: NextRequest) {
   try {
-    const logs = await request.json();
+    const logs = (await request.json()) as LogEntry[];
     if (!Array.isArray(logs)) {
       return NextResponse.json(
         { error: "Invalid logs payload" },
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     // Log errors from the logging endpoint itself
     logger.error("Failed to process browser logs", error as Error);
     return NextResponse.json(
-      { error: "Failed to process logs" },
+      { error: "Failed to process browser logs" },
       { status: 500 },
     );
   }

@@ -75,7 +75,10 @@ export function shouldSample(event: LogContext): boolean {
   if (event.feature_flags) return true;
 
   // Random sample the rest at 5%
-  return Math.random() < (env.NODE_ENV === "development" ? 1 : 0.05);
+  return (
+    Math.random() <
+    (env.NODE_ENV === "development" ? 1 : Number(env.OTEL_TRACES_SAMPLER_ARG))
+  );
 }
 
 export function createWideEvent(requestId: string): LogContext {
@@ -86,7 +89,7 @@ export function createWideEvent(requestId: string): LogContext {
     trace_id: traceCtx.traceId,
     span_id: traceCtx.spanId,
     timestamp: new Date().toISOString(),
-    environment: env.NODE_ENV,
+    environment: process.env.VERCEL_TARGET_ENV || env.NODE_ENV,
     duration_ms: 0, // real value at the end of the request
   };
 }
