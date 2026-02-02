@@ -2,12 +2,12 @@
 
 ## Scopo e flusso
 
-Questa app usa OpenTelemetry per tracce, log e metriche e invia tutto a un **OTel Collector generico** (non legato a SigNoz). Il collector puo poi inoltrare verso SigNoz, Grafana, Tempo, Datadog, ecc.
+Questa app usa OpenTelemetry per trace, log e metrics e invia tutto a un **OTel Collector generico** (non legato a SigNoz). Il collector può poi inoltrare verso SigNoz, Grafana, Tempo, Datadog, ecc.
 
 Flusso tipico:
 
 ```
-App (Next.js) -> OTel Collector (OTLP HTTP) -> Backend osservabilita
+App (Next.js) -> OTel Collector (OTLP HTTP) -> Backend osservabilità
 ```
 
 ## Dove si inizializza
@@ -20,8 +20,10 @@ App (Next.js) -> OTel Collector (OTLP HTTP) -> Backend osservabilita
 
 Queste variabili sono standard OTel e configurano il collector e il sampling:
 
-```
+```sh
 OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
+OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=http://localhost:4318/v1/metrics
+OTEL_EXPORTER_OTLP_LOGS_ENDPOINT=http://localhost:4318/v1/logs
 OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4318/v1/traces
 OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=http/protobuf
 OTEL_TRACES_SAMPLER=parentbased_traceidratio
@@ -84,9 +86,8 @@ Puoi ispirarti agli esempi SigNoz solo per la parte OTel/Next.js; il backend e i
 - `src/instrumentation.ts`
 - `src/instrumentation-client.ts`
 - `src/server/api/trpc/middleware/otel-plugin.ts`
-- `src/server/db/index.ts`
 - `src/shared/infrastructure/otel/otel-better-auth.ts`
-- `src/shared/infrastructure/resend/index.ts`
+- `src/global-error.tsx`
 - `src/env.js`
 
 ## Referenze

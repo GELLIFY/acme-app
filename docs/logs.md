@@ -24,7 +24,7 @@ Server  -> pino-opentelemetry-transport -> OTLP logs -> Collector
 - Livelli:
   - `production`: `info`
   - `development`: `debug` (con `pino-pretty` su console)
-- Aggiunge `traceId` e `spanId` dal contesto OTel corrente.
+- Aggiunge `trace_id` e `span_id` dal contesto OTel corrente.
 - Redazione automatica di campi sensibili in produzione.
 
 Esempio:
@@ -42,12 +42,12 @@ L'approccio e "event-first": log strutturati, non testo libero. Ogni log dovrebb
 
 - Un **nome evento** chiaro (es. `user_created`, `db_error`, `wide_event`).
 - Un **contesto** strutturato (oggetto), con campi consistenti.
-- Campi OTel (`traceId`, `spanId`) per correlazione con le tracce.
+- Campi OTel (`trace_id`, `span_id`) per correlazione con le tracce.
 
 Nel codice:
 
 - `LogContext` e la forma base del contesto (file: `src/shared/infrastructure/logger/logger.ts`).
-- `serverLogger` arricchisce automaticamente il contesto con `traceId` e `spanId`.
+- `serverLogger` arricchisce automaticamente il contesto con `trace_id` e `span_id`.
 - `browserLogger` aggiunge `sessionId`, `url`, `userAgent` lato client.
 
 Esempio consigliato:
@@ -99,6 +99,7 @@ browserLogger.info("ui_action", { action: "click", target: "save" });
 ## Logging di errori globali (client)
 
 - `src/instrumentation-client.ts` aggancia `window.onerror` e `window.onunhandledrejection`.
+- `src/global-error.tsx` invia errori globali a `/api/rum/errors` per tracciarli come custom span.
 
 ## Wide events (log strutturati per request)
 
