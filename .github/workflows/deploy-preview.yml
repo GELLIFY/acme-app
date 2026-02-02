@@ -1,22 +1,22 @@
 name: Deploy Preview
 
 on:
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
+  issue_comment:
+    types: [created]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  code_quality:
-    name: Code quality
-    uses: ./.github/workflows/ci.yml
-
   deploy_preview:
     name: Deploy Preview
+    if: |
+      github.event.issue.pull_request &&
+      github.event.comment.body == '/deploy-preview' &&
+      (github.event.comment.author_association == 'OWNER' ||
+       github.event.comment.author_association == 'MEMBER' ||
+       github.event.comment.author_association == 'COLLABORATOR')
     environment: Preview
     runs-on: ubuntu-latest
     permissions:
