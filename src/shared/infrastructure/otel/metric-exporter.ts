@@ -13,6 +13,7 @@ import {
 } from "@opentelemetry/semantic-conventions";
 import type { Metric } from "web-vitals";
 import { env } from "@/env";
+import { serverLogger } from "../logger/pino-logger";
 
 let isInitialized = false;
 let meterProvider: MeterProvider | null = null;
@@ -83,7 +84,7 @@ export function exportMetricEntry(metric: Metric, attrs?: Attributes) {
       break;
     }
     default: {
-      console.log("unexpected metric name");
+      serverLogger.warn("unexpected metric name", metric.name);
     }
   }
 }
