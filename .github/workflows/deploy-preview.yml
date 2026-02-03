@@ -12,6 +12,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  code_quality:
+    name: Code quality
+    uses: ./.github/workflows/ci.yml
+
   deploy_preview:
     name: Deploy Preview
     environment: Preview
