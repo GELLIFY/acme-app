@@ -22,13 +22,15 @@ const resetPasswordSearchParams = {
   token: parseAsString,
 };
 
-type PageProps = {
+type PageProps = Readonly<{
   searchParams: Promise<SearchParams>;
-};
+}>;
 
 export default async function ResetPasswordPage(props: PageProps) {
-  const t = await getScopedI18n("auth.reset_password");
-  const searchParams = await props.searchParams;
+  const [t, searchParams] = await Promise.all([
+    getScopedI18n("auth.reset_password"),
+    props.searchParams,
+  ]);
 
   const loadParams = createLoader(resetPasswordSearchParams);
   const params = loadParams(searchParams);

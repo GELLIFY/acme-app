@@ -1,5 +1,4 @@
 import { HomeIcon, LayersIcon } from "lucide-react";
-import { headers } from "next/headers";
 import Link from "next/link";
 import Logo from "@/components/navbar-components/logo";
 import { Button } from "@/components/ui/button";
@@ -14,7 +13,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { auth } from "@/shared/infrastructure/better-auth/auth";
+import { getCachedSession } from "@/shared/infrastructure/better-auth/get-cached-session";
 import { getScopedI18n } from "@/shared/locales/server";
 import LanguageSelector from "./navbar-components/language-selector";
 import { UserMenu } from "./navbar-components/user-menu";
@@ -26,8 +25,10 @@ const navigationLinks = [
 ];
 
 export default async function Navbar() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  const t = await getScopedI18n("auth");
+  const [session, t] = await Promise.all([
+    getCachedSession(),
+    getScopedI18n("auth"),
+  ]);
 
   return (
     <header className="border-b px-4 md:px-6">
@@ -132,7 +133,7 @@ export default async function Navbar() {
             <Button
               variant="ghost"
               size="sm"
-              nativeButton
+              nativeButton={false}
               render={<Link href="/sign-in"> {t("signin.title")}</Link>}
             ></Button>
           )}

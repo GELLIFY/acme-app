@@ -1,3 +1,4 @@
+import { all } from "better-all";
 import { KeyIcon, LockIcon, TriangleAlertIcon, UserIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
@@ -13,6 +14,7 @@ import { UpdatePassword } from "@/components/auth/account/update-password";
 import { UserAvatar } from "@/components/auth/account/user-avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { auth } from "@/shared/infrastructure/better-auth/auth";
+import { getCachedSession } from "@/shared/infrastructure/better-auth/get-cached-session";
 import {
   getQueryClient,
   HydrateClient,
@@ -25,21 +27,31 @@ export const metadata: Metadata = {
 };
 
 export default async function AccountPage() {
-  const headersList = await headers();
-
-  const session = await auth.api.getSession({ headers: headersList });
+  const session = await getCachedSession();
   if (!session) return redirect("/sign-in");
 
-  const t = await getScopedI18n("account");
-
+  // prefetch user
   const queryClient = getQueryClient();
   await queryClient.prefetchQuery(trpc.user.me.queryOptions());
 
-  const [sessions, passkeys, apiKeys] = await Promise.all([
-    auth.api.listSessions({ headers: headersList }),
-    auth.api.listPasskeys({ headers: headersList }),
-    auth.api.listApiKeys({ headers: headersList }),
-  ]);
+  // parallel get user data
+  const { sessions, passkeys, apiKeys } = await all({
+    async headersList() {
+      return await headers();
+    },
+    async sessions() {
+      return auth.api.listSessions({ headers: await this.$.headersList });
+    },
+    async passkeys() {
+      return auth.api.listPasskeys({ headers: await this.$.headersList });
+    },
+    async apiKeys() {
+      return auth.api.listApiKeys({ headers: await this.$.headersList });
+    },
+  });
+
+  // get translations
+  const t = await getScopedI18n("account");
 
   return (
     <HydrateClient>

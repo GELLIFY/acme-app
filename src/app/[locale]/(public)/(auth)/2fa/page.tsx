@@ -1,4 +1,3 @@
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { BackupCodeForm } from "@/components/auth/backup-code-form";
 import { VerifyTotpForm } from "@/components/auth/verify-totp-form";
@@ -10,11 +9,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { auth } from "@/shared/infrastructure/better-auth/auth";
+import { getCachedSession } from "@/shared/infrastructure/better-auth/get-cached-session";
 import { getScopedI18n } from "@/shared/locales/server";
 
 export default async function TwoFactorPage() {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getCachedSession();
   if (session) return redirect("/");
 
   const t = await getScopedI18n("account.security.two_factor");

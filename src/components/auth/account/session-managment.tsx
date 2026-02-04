@@ -3,6 +3,7 @@
 import type { Session } from "better-auth";
 import { LaptopIcon, SmartphoneIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 import { toast } from "sonner";
 import { UAParser } from "ua-parser-js";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,15 @@ export function SessionManagement({
   const t = useScopedI18n("account");
   const router = useRouter();
 
+  const sessionsWithUserAgent = useMemo(
+    () =>
+      sessions.map((session) => ({
+        session,
+        userAgentInfo: session.userAgent ? UAParser(session.userAgent) : null,
+      })),
+    [sessions],
+  );
+
   function revokeSession(session: Session) {
     return authClient.revokeSession(
       {
@@ -60,11 +70,7 @@ export function SessionManagement({
         <CardDescription>{t("session.description")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {sessions?.map((session) => {
-          const userAgentInfo = session.userAgent
-            ? UAParser(session.userAgent)
-            : null;
-
+        {sessionsWithUserAgent.map(({ session, userAgentInfo }) => {
           return (
             <Item variant="outline" key={session.id}>
               <ItemMedia variant="icon">

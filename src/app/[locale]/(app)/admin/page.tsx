@@ -1,3 +1,4 @@
+import { all } from "better-all";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -5,6 +6,7 @@ import { CreateUserDialog } from "@/components/auth/admin/create-user-dialog";
 import { DataTable } from "@/components/auth/admin/data-table";
 import { Filters } from "@/components/auth/admin/filters";
 import { auth } from "@/shared/infrastructure/better-auth/auth";
+import { getCachedSession } from "@/shared/infrastructure/better-auth/get-cached-session";
 import { loadFilters } from "./search-params";
 
 export const metadata: Metadata = {
@@ -15,22 +17,29 @@ export const metadata: Metadata = {
 export default async function AdminPage({
   searchParams,
 }: PageProps<"/[locale]/admin">) {
-  const headersList = await headers();
-  const [session, hasAccess] = await Promise.all([
-    auth.api.getSession({ headers: headersList }),
-    auth.api.userHasPermission({
-      headers: headersList,
-      body: { permission: { user: ["list"] } },
-    }),
-  ]);
+  // parallel get session and user permission
+  const { headersList, session, userHasPermission } = await all({
+    async headersList() {
+      return await headers();
+    },
+    async session() {
+      return getCachedSession();
+    },
+    async userHasPermission() {
+      return auth.api.userHasPermission({
+        headers: await this.$.headersList,
+        body: { permission: { user: ["list"] } },
+      });
+    },
+  });
 
   if (!session) return redirect("/sign-in");
-  if (!hasAccess.success) return redirect("/");
+  if (!userHasPermission.success) return redirect("/");
 
   const filters = await loadFilters(searchParams);
 
   const users = await auth.api.listUsers({
-    headers: await headers(),
+    headers: headersList,
     query: {
       limit: 100,
       sortBy: "createdAt",

@@ -23,16 +23,16 @@ import {
 import { getScopedI18n } from "@/shared/locales/server";
 import { todoFilterParamsSchema } from "@/shared/validators/todo.schema";
 
-type TodoPageProps = {
+type TodoPageProps = Readonly<{
   searchParams: Promise<SearchParams>;
-};
+}>;
 
 export default async function TodoPage(props: TodoPageProps) {
   // Get scoped translations for i18n
-  const t = await getScopedI18n("todo");
-
-  // Load search parameters
-  const searchParams = await props.searchParams;
+  const [t, searchParams] = await Promise.all([
+    getScopedI18n("todo"),
+    props.searchParams,
+  ]);
   const loadTodoFilterParams = createLoader(todoFilterParamsSchema);
   const filter = loadTodoFilterParams(searchParams);
 
