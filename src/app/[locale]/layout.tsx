@@ -1,12 +1,12 @@
 import "@/globals.css";
 
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { ImpersonationIndicator } from "@/components/auth/admin/impersonation-indicator";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { WebVitals } from "@/components/web-vitals";
 import { TRPCReactProvider } from "@/shared/infrastructure/trpc/client";
 import { I18nProviderClient } from "@/shared/locales/client";
 
@@ -27,6 +27,10 @@ export const metadata: Metadata = {
   description: "Bolierplate for GELLIFY App",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
+
+const WebVitals = dynamic(() =>
+  import("@/components/web-vitals").then((m) => m.WebVitals),
+);
 
 export default async function RootLayout({
   params,
