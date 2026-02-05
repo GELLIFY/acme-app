@@ -3,8 +3,8 @@ set -a
 . .env
 set +a
 
-# setup
-docker-compose up -d --wait db neon-proxy
+# setup - replaced by devcontainer
+# docker-compose up -d --wait db neon-proxy 
 
 # db
 pnpm db:push

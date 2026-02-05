@@ -7,8 +7,8 @@ The GELLIFY Stack is a modern web development stack designed for simplicity, mod
 Before you begin, make sure you have the following:
 
 - `docker` ➡️ localstack for local development
-- `fnm` ➡️ node version manager
-- `bun` ➡️ test runner
+<!-- - `fnm` ➡️ node version manager -->
+<!-- - `bun` ➡️ test runner -->
 
 ## Getting started
 
@@ -19,6 +19,19 @@ cp .env.example .env
 ```
 
 Then follow the instruction below to fill the `.env` with the required pieces to get you started.
+
+## Devcontainer
+
+Start the `devcontainer` with [VSCode](https://code.visualstudio.com/docs/devcontainers/tutorial#_install-the-extension) or [IntelliJ](https://www.jetbrains.com/help/idea/start-dev-container-inside-ide.html)
+
+Once the `devcontainer` is started, run:
+
+```sh
+pnpm install
+```
+
+To install the dependencies.
+
 
 ### Database
 

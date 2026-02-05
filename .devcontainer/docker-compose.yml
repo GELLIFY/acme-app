@@ -1,0 +1,54 @@
+services:
+  app:
+    volumes:
+      - ..:/workspaces/acme-app
+    build: .
+    working_dir: /workspaces/acme-app
+    environment:
+      NODE_ENV: "development"
+    command: sleep infinity
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:17@sha256:7352e0c4d62bbac8aa69d95e40220a60967c4a19f9c4f65b4d118175f7ce9e3b
+    command: "-d 1"
+    environment:
+      POSTGRES_DB: main
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - type: volume
+        source: postgres_data
+        target: /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "local"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  neon-proxy:
+    image: ghcr.io/timowilhelm/local-neon-http-proxy:main@sha256:19b528f4565b4d9b282bc64a8fb9d0b3a7f0ca7cd1b56d21e122ac7e0927a091
+    environment:
+      - PG_CONNECTION_STRING=postgres://postgres:postgres@db:5432/main
+    ports:
+      - "4444:4444"
+    logging:
+      driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

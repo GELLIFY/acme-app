@@ -1,0 +1,29 @@
+{
+  "name": "acme-app",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/acme-app",
+  "shutdownAction": "stopCompose",
+  "customizations": {
+    "vscode": {
+      "settings": {},
+      "extensions": [
+        "biomejs.biome",
+        "yoavbls.pretty-ts-errors",
+        "bradlc.vscode-tailwindcss",
+        "ms-vscode-remote.remote-containers"
+      ]
+    },
+    "jetbrains": {
+      "plugins": [
+        "com.github.biomejs.intellijbiome",
+        "com.intellij.tailwindcss"
+      ]
+    }
+  },
+  "forwardPorts": [
+    3000,
+    4444,
+    5432
+  ]
+}
