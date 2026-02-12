@@ -2,8 +2,10 @@ import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
 import { createI18nMiddleware } from "next-international/middleware";
 
+const LOCALES = ["en", "it"] as const;
+
 const I18nMiddleware = createI18nMiddleware({
-  locales: ["en", "it"],
+  locales: LOCALES,
   defaultLocale: "it",
   urlMappingStrategy: "rewrite",
 });
@@ -16,17 +18,20 @@ const AUTH_ROUTES = [
   "/2fa",
 ];
 
-const PUBLIC_ROUTES = ["/", "/privacy", "/terms", ...AUTH_ROUTES];
+const PUBLIC_ROUTES = ["/", "/policy", "/terms", ...AUTH_ROUTES];
 
 export async function proxy(request: NextRequest) {
   const response = I18nMiddleware(request);
   const sessionCookie = getSessionCookie(request);
   const nextUrl = request.nextUrl;
-  const pathnameLocale = nextUrl.pathname.split("/", 2)?.[1];
+  const [, pathnameFirstSegment = ""] = nextUrl.pathname.split("/", 2);
+  const hasLocalePrefix = LOCALES.includes(
+    pathnameFirstSegment as (typeof LOCALES)[number],
+  );
 
   // Remove the locale from the pathname
-  const pathnameWithoutLocale = pathnameLocale
-    ? nextUrl.pathname.slice(pathnameLocale.length + 1)
+  const pathnameWithoutLocale = hasLocalePrefix
+    ? nextUrl.pathname.slice(pathnameFirstSegment.length + 1)
     : nextUrl.pathname;
 
   // Create a new URL without the locale in the pathname
