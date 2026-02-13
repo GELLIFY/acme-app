@@ -8,7 +8,7 @@
   },
   "packageManager": "pnpm@9.15.9",
   "scripts": {
-    "build": "next build --webpack",
+    "build": "next build",
     "clean": "git clean -xdf node_modules .next",
     "auth:generate": "pnpm dlx @better-auth/cli@latest generate --config=src/shared/infrastructure/better-auth/auth.ts --output=src/server/db/schema/auth-schema-new.ts --yes",
     "db:generate": "drizzle-kit generate",
