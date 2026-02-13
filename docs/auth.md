@@ -30,7 +30,7 @@ Use `auth.api.*` with request headers in Server Components or route handlers.
 
 ```ts
 import { headers } from "next/headers";
-import { auth } from "@/shared/infrastructure/better-auth/auth";
+import { auth } from "@/libs/better-auth/auth";
 
 const headersList = await headers();
 const session = await auth.api.getSession({ headers: headersList });
@@ -44,7 +44,7 @@ Admin checks and other server calls follow the same pattern. See:
 The client helper is created in `src/shared/infrastructure/better-auth/auth-client.ts`.
 
 ```ts
-import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
+import { authClient } from "@/libs/better-auth/auth-client";
 
 const { data, error } = await authClient.signIn.email({
   email,

@@ -1,7 +1,7 @@
 import "dotenv/config";
 
 import { reset, seed } from "drizzle-seed";
-import { auth } from "@/shared/infrastructure/better-auth/auth";
+import { auth } from "@/libs/better-auth/auth";
 import { db } from ".";
 import { schema } from "./schema";
 import { account, user } from "./schema/auth-schema";

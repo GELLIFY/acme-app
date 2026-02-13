@@ -4,7 +4,7 @@ import { LaptopIcon, MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/utils";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();

@@ -11,7 +11,7 @@ import { initTRPC } from "@trpc/server";
 import { cache } from "react";
 import superjson from "superjson";
 import * as z from "zod";
-import { auth } from "@/shared/infrastructure/better-auth/auth";
+import { auth } from "@/libs/better-auth/auth";
 import { db } from "../../db";
 import { adminPlugin } from "./middleware/admin-plugin";
 import { authPlugin } from "./middleware/auth-plugin";

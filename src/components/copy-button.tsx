@@ -3,7 +3,7 @@
 import { CopyCheckIcon, CopyIcon } from "lucide-react";
 import type * as React from "react";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/utils";
 import { Button } from "./ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 

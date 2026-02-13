@@ -5,7 +5,7 @@ import { Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 
 import { useTodoFilterParams } from "@/hooks/use-todo-filter-params";
-import { useTRPC } from "@/shared/infrastructure/trpc/client";
+import { useTRPC } from "@/libs/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";

@@ -1,6 +1,6 @@
 import { createRoute, z } from "@hono/zod-openapi";
+import { serverLogger } from "@/infrastructure/logger/pino-logger";
 import { checkHealth } from "@/server/services/health-service";
-import { serverLogger } from "@/shared/infrastructure/logger/pino-logger";
 import { createRouter } from "../utils/create-router";
 
 const tags = ["Health"];

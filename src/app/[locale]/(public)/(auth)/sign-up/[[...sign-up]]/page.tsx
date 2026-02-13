@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getCachedSession } from "@/shared/infrastructure/better-auth/get-cached-session";
+import { getCachedSession } from "@/libs/better-auth/get-cached-session";
 import { getScopedI18n } from "@/shared/locales/server";
 
 export const metadata: Metadata = {

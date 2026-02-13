@@ -68,9 +68,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
-import type { auth } from "@/shared/infrastructure/better-auth/auth";
-import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
-import { browserLogger as logger } from "@/shared/infrastructure/logger/browser-logger";
+import { browserLogger as logger } from "@/infrastructure/logger/browser-logger";
+import type { auth } from "@/libs/better-auth/auth";
+import { authClient } from "@/libs/better-auth/auth-client";
 import { useScopedI18n } from "@/shared/locales/client";
 
 type ApiKey = Awaited<ReturnType<typeof auth.api.listApiKeys>>[number];

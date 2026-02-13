@@ -30,7 +30,7 @@ Server  -> pino-opentelemetry-transport -> OTLP logs -> Collector
 Esempio:
 
 ```ts
-import { serverLogger } from "@/shared/infrastructure/logger/pino-logger";
+import { serverLogger } from "@/infrastructure/logger/pino-logger";
 
 serverLogger.info("user_created", { userId: "123" });
 serverLogger.error("db_error", new Error("timeout"), { query: "select" });
@@ -76,7 +76,7 @@ serverLogger.info("User 123 created with plan pro");
 Esempio:
 
 ```ts
-import { logger } from "@/shared/infrastructure/logger/logger";
+import { logger } from "@/infrastructure/logger/logger";
 
 logger.info("cache_warm", { key: "todos" });
 logger.warn("rate_limited", { ip: "1.2.3.4" });
@@ -91,7 +91,7 @@ logger.warn("rate_limited", { ip: "1.2.3.4" });
 Esempio:
 
 ```ts
-import { browserLogger } from "@/shared/infrastructure/logger/browser-logger";
+import { browserLogger } from "@/infrastructure/logger/browser-logger";
 
 browserLogger.info("ui_action", { action: "click", target: "save" });
 ```

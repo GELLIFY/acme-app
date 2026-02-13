@@ -6,6 +6,7 @@ import { apiKey, lastLoginMethod, openAPI } from "better-auth/plugins";
 import type { Statements } from "better-auth/plugins/access";
 import { admin } from "better-auth/plugins/admin";
 import { twoFactor } from "better-auth/plugins/two-factor";
+import { instrumentBetterAuth } from "@/infrastructure/otel/otel-better-auth";
 import { db } from "@/server/db";
 import { schema } from "@/server/db/schema";
 import {
@@ -14,7 +15,6 @@ import {
   sendEmailVerificationEmail,
   sendResetPasswordEmail,
 } from "@/server/services/email-service";
-import { instrumentBetterAuth } from "../otel/otel-better-auth";
 import { ac, adminRole, userRole } from "./permissions";
 
 export const auth = instrumentBetterAuth(

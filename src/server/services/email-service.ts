@@ -2,8 +2,8 @@ import ChangeEmailConfirmationEmail from "@/emails/change-email-confirmation-ema
 import DeleteAccountVerificationEmail from "@/emails/delete-account-verification-email";
 import EmailVerificationEmail from "@/emails/email-verification-email";
 import ResetPasswordEmail from "@/emails/reset-password-email";
-import { logger } from "@/shared/infrastructure/logger/logger";
-import { resend } from "@/shared/infrastructure/resend";
+import { logger } from "@/infrastructure/logger/logger";
+import { resend } from "@/libs/resend";
 
 type ResetPasswordEmailParams = {
   user: { email: string };

@@ -1,7 +1,7 @@
 import { ATTR_SERVICE_VERSION } from "@opentelemetry/semantic-conventions";
 import { registerOTel } from "@vercel/otel";
-import { initializeLogsExporter } from "@/shared/infrastructure/logger/log-exporter";
-import { ATTR_DEPLOYMENT_ENVIRONMENT_NAME } from "@/shared/infrastructure/otel/semantic-conventions";
+import { initializeLogsExporter } from "@/infrastructure/logger/log-exporter";
+import { ATTR_DEPLOYMENT_ENVIRONMENT_NAME } from "@/infrastructure/otel/semantic-conventions";
 
 /**
  * Registers application instrumentation.

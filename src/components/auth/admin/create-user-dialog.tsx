@@ -29,9 +29,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
-import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
-import { ROLES } from "@/shared/infrastructure/better-auth/permissions";
-import { browserLogger as logger } from "@/shared/infrastructure/logger/browser-logger";
+import { browserLogger as logger } from "@/infrastructure/logger/browser-logger";
+import { authClient } from "@/libs/better-auth/auth-client";
+import { ROLES } from "@/libs/better-auth/permissions";
 
 const formSchema = z.object({
   firstName: z.string().min(1),

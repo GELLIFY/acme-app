@@ -1,6 +1,6 @@
 import { SpanStatusCode, trace } from "@opentelemetry/api";
 import { type NextRequest, NextResponse } from "next/server";
-import { logger } from "@/shared/infrastructure/logger/logger";
+import { logger } from "@/infrastructure/logger/logger";
 
 export async function POST(request: NextRequest) {
   try {

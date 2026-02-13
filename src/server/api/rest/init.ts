@@ -3,9 +3,9 @@ import { Scalar } from "@scalar/hono-api-reference";
 import { cors } from "hono/cors";
 import { type RequestIdVariables, requestId } from "hono/request-id";
 import { secureHeaders } from "hono/secure-headers";
+import type { Permissions } from "@/libs/better-auth/permissions";
 import type { db } from "@/server/db";
 import { getBaseUrl } from "@/shared/helpers/get-url";
-import type { Permissions } from "@/shared/infrastructure/better-auth/permissions";
 import { routers } from "./routers/_app";
 
 export type Context = {

@@ -56,8 +56,8 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import { Spinner } from "@/components/ui/spinner";
-import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
-import { browserLogger as logger } from "@/shared/infrastructure/logger/browser-logger";
+import { browserLogger as logger } from "@/infrastructure/logger/browser-logger";
+import { authClient } from "@/libs/better-auth/auth-client";
 import { useScopedI18n } from "@/shared/locales/client";
 
 const passkeySchema = z.object({

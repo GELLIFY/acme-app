@@ -1,5 +1,5 @@
 import type z from "zod";
-import { auth } from "@/shared/infrastructure/better-auth/auth";
+import { auth } from "@/libs/better-auth/auth";
 import type {
   changePasswordSchema,
   updateUserSchema,

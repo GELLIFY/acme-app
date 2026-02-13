@@ -4,7 +4,7 @@ import { NuqsTestingAdapter } from "nuqs/adapters/testing";
 import type React from "react";
 import type { ReactElement } from "react";
 import { Toaster } from "@/components/ui/sonner";
-import { TRPCReactProvider } from "@/shared/infrastructure/trpc/client";
+import { TRPCReactProvider } from "@/libs/trpc/client";
 import { I18nProviderClient } from "@/shared/locales/client";
 
 // const url = `http://localhost:3000/api/trpc`;

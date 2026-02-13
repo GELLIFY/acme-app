@@ -1,12 +1,9 @@
 import { describe, expect, expectTypeOf, test } from "bun:test";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { testClient } from "hono/testing";
+import { expandRoles, type Permissions } from "@/libs/better-auth/permissions";
 import { db } from "@/server/db";
 import { todoTable } from "@/server/db/schema/todos";
-import {
-  expandRoles,
-  type Permissions,
-} from "@/shared/infrastructure/better-auth/permissions";
 import type { Context } from "../init";
 import { todosRouter } from "./todos-routes";
 

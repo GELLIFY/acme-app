@@ -13,13 +13,9 @@ import { TwoFactor } from "@/components/auth/account/two-factor";
 import { UpdatePassword } from "@/components/auth/account/update-password";
 import { UserAvatar } from "@/components/auth/account/user-avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { auth } from "@/shared/infrastructure/better-auth/auth";
-import { getCachedSession } from "@/shared/infrastructure/better-auth/get-cached-session";
-import {
-  getQueryClient,
-  HydrateClient,
-  trpc,
-} from "@/shared/infrastructure/trpc/server";
+import { auth } from "@/libs/better-auth/auth";
+import { getCachedSession } from "@/libs/better-auth/get-cached-session";
+import { getQueryClient, HydrateClient, trpc } from "@/libs/trpc/server";
 import { getScopedI18n } from "@/shared/locales/server";
 
 export const metadata: Metadata = {

@@ -15,11 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  getQueryClient,
-  HydrateClient,
-  trpc,
-} from "@/shared/infrastructure/trpc/server";
+import { getQueryClient, HydrateClient, trpc } from "@/libs/trpc/server";
 import { getScopedI18n } from "@/shared/locales/server";
 import { todoFilterParamsSchema } from "@/shared/validators/todo.schema";
 

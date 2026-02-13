@@ -13,7 +13,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { getCachedSession } from "@/shared/infrastructure/better-auth/get-cached-session";
+import { getCachedSession } from "@/libs/better-auth/get-cached-session";
 import { getScopedI18n } from "@/shared/locales/server";
 import LanguageSelector from "./navbar-components/language-selector";
 import { UserMenu } from "./navbar-components/user-menu";

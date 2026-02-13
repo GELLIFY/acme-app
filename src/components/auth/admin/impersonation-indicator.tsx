@@ -3,7 +3,7 @@
 import { UserXIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
+import { authClient } from "@/libs/better-auth/auth-client";
 
 export function ImpersonationIndicator() {
   const router = useRouter();

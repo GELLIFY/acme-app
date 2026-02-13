@@ -1,4 +1,4 @@
-import { exportLogEntry } from "@/shared/infrastructure/logger/log-exporter";
+import { exportLogEntry } from "@/infrastructure/logger/log-exporter";
 import { getTraceContext } from "../otel/get-trace-context";
 
 export interface LogContext {

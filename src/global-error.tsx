@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { reportErrorStackTrace } from "@/shared/infrastructure/otel/report-error-stack-trace";
+import { reportErrorStackTrace } from "@/infrastructure/otel/report-error-stack-trace";
 
 export default function GlobalError({
   error,

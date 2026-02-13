@@ -41,11 +41,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { authClient } from "@/shared/infrastructure/better-auth/auth-client";
-import {
-  ROLES,
-  type Role,
-} from "@/shared/infrastructure/better-auth/permissions";
+import { authClient } from "@/libs/better-auth/auth-client";
+import { ROLES, type Role } from "@/libs/better-auth/permissions";
 
 export const columns: ColumnDef<UserWithRole>[] = [
   {

@@ -5,8 +5,8 @@ import { redirect } from "next/navigation";
 import { CreateUserDialog } from "@/components/auth/admin/create-user-dialog";
 import { DataTable } from "@/components/auth/admin/data-table";
 import { Filters } from "@/components/auth/admin/filters";
-import { auth } from "@/shared/infrastructure/better-auth/auth";
-import { getCachedSession } from "@/shared/infrastructure/better-auth/get-cached-session";
+import { auth } from "@/libs/better-auth/auth";
+import { getCachedSession } from "@/libs/better-auth/get-cached-session";
 import { loadFilters } from "./search-params";
 
 export const metadata: Metadata = {

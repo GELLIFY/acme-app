@@ -1,9 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import {
-  adminRole,
-  ROLES,
-  userRole,
-} from "@/shared/infrastructure/better-auth/permissions";
+import { adminRole, ROLES, userRole } from "@/libs/better-auth/permissions";
 import { expandRoles } from "./permissions";
 
 describe("expandRoles", () => {
