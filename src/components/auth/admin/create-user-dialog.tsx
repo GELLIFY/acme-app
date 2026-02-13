@@ -37,7 +37,7 @@ const formSchema = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),
   email: z.email(),
-  password: z.string().min(8).max(32),
+  password: z.string().min(8).max(128),
   role: z.enum(ROLES),
 });
 

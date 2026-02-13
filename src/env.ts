@@ -12,7 +12,8 @@ export const env = createEnv({
       .enum(["development", "test", "production"])
       .default("development"),
 
-    BETTER_AUTH_SECRET: z.string().min(1),
+    BETTER_AUTH_SECRET: z.string().min(32),
+    BETTER_AUTH_URL: z.url(),
     RESEND_API_KEY: z.string().min(1),
 
     OTEL_EXPORTER_OTLP_ENDPOINT: z.string().default("http://localhost:4318"),

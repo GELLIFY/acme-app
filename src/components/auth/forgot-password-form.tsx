@@ -35,7 +35,10 @@ export const ForgotPasswordForm = () => {
       try {
         const { data, error } = await authClient.requestPasswordReset({
           email: values.email, // Email to which the reset password link should be sent.
-          redirectTo: "/reset-password", // URL to redirect the user after resetting the password.
+          redirectTo: new URL(
+            "/reset-password",
+            window.location.origin,
+          ).toString(), // URL to redirect the user after resetting the password.
         });
 
         if (error) {

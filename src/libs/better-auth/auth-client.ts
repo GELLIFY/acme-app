@@ -24,7 +24,11 @@ export const authClient = createAuthClient({
     apiKeyClient(),
     lastLoginMethodClient(),
     passkeyClient(),
-    twoFactorClient(),
+    twoFactorClient({
+      onTwoFactorRedirect() {
+        window.location.href = "/2fa";
+      },
+    }),
     inferAdditionalFields<typeof auth>(),
   ],
   fetchOptions: {

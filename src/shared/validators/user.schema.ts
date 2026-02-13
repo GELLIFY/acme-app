@@ -16,11 +16,11 @@ export const changePasswordSchema = z
     currentPassword: z
       .string() // check if it is string type
       .min(8, { message: "Password must be at least 8 characters long" }) // checks for character length
-      .max(20, { message: "Password must be at most 20 characters long" }),
+      .max(128, { message: "Password must be at most 128 characters long" }),
     newPassword: z
       .string()
       .min(8, { message: "Password must be at least 8 characters long" })
-      .max(20, { message: "Password must be at most 20 characters long" }),
+      .max(128, { message: "Password must be at most 128 characters long" }),
     revokeOtherSessions: z.boolean(),
   })
   .refine((data) => data.currentPassword !== data.newPassword, {
@@ -32,8 +32,7 @@ export const twoFactorSchema = z.object({
   password: z
     .string()
     .min(8, { message: "Password must be at least 8 characters long" }) // checks for character length
-    .max(20, { message: "Password must be at most 20 characters long" }),
-  issuer: z.string().optional(),
+    .max(128, { message: "Password must be at most 128 characters long" }),
 });
 
 export const verifyTotpSchema = z.object({

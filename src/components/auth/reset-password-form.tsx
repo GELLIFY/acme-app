@@ -20,11 +20,11 @@ const formSchema = z
     password: z
       .string() // check if it is string type
       .min(8, { message: "Password must be at least 8 characters long" }) // checks for character length
-      .max(20, { message: "Password must be at most 20 characters long" }),
+      .max(128, { message: "Password must be at most 128 characters long" }),
     passwordConfirmation: z
       .string()
       .min(8, { message: "Password must be at least 8 characters long" })
-      .max(20, { message: "Password must be at most 20 characters long" }),
+      .max(128, { message: "Password must be at most 128 characters long" }),
   })
   .refine((data) => data.password === data.passwordConfirmation, {
     message: "Passwords do not match",

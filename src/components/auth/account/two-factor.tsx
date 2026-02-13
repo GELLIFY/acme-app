@@ -86,7 +86,6 @@ function TwoFactorAuthForm({
     resolver: zodResolver(twoFactorSchema),
     defaultValues: {
       password: "",
-      issuer: "acme-app",
     },
   });
 
@@ -121,7 +120,6 @@ function TwoFactorAuthForm({
     const result = await authClient.twoFactor.enable(
       {
         password: data.password,
-        issuer: data.issuer,
       },
       {
         onRequest: () => {

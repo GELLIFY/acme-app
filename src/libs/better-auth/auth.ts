@@ -19,6 +19,7 @@ import { ac, adminRole, userRole } from "./permissions";
 
 export const auth = instrumentBetterAuth(
   betterAuth({
+    appName: "Acme App",
     experimental: {
       joins: true,
     },
@@ -33,6 +34,8 @@ export const auth = instrumentBetterAuth(
     }),
     emailAndPassword: {
       enabled: true,
+      requireEmailVerification: false,
+      revokeSessionsOnPasswordReset: true,
       sendResetPassword: async ({ url, user }) => {
         await sendResetPasswordEmail({ url, user });
       },
@@ -86,7 +89,9 @@ export const auth = instrumentBetterAuth(
       }),
       lastLoginMethod(),
       passkey(),
-      twoFactor(),
+      twoFactor({
+        issuer: "Acme App",
+      }),
       openAPI({ disableDefaultReference: true }),
       nextCookies(),
     ],
