@@ -1,11 +1,7 @@
-/**
- * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
- * for Docker builds.
- */
-import "./src/env.js";
+import type { NextConfig } from "next";
+import "./src/env";
 
-/** @type {import("next").NextConfig} */
-const config = {
+const nextConfig: NextConfig = {
   // Recommended: this will reduce output
   // Docker image size by 80%+
   output: "standalone",
@@ -46,4 +42,4 @@ const config = {
   // swrDelta: 3600 // seconds
 };
 
-export default config;
+export default nextConfig;
