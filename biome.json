@@ -12,7 +12,7 @@
       "!src/components/ui",
       "public/**",
       "drizzle.config.ts",
-      "next.config.js",
+      "next.config.ts",
       "postcss.config.cjs",
       "components.json",
       "package.json",

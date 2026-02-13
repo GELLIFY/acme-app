@@ -12,8 +12,8 @@ export function ThemeToggle() {
   return (
     <ToggleGroup
       className="border rounded-full h-8 [&>button]:rounded-full! [&>button]:size-8 [&>button]:p-0 [&>button]:text-muted-foreground [&>button]:hover:bg-transparent [&>button]:hover:text-primary [&>button]:data-[state=on]:bg-transparent"
-      value={[theme]}
-      onValueChange={(value) => setTheme(value[0])}
+      value={[theme!]}
+      onValueChange={(value) => setTheme(value[0]!)}
     >
       <ToggleGroupItem
         value="system"
