@@ -92,7 +92,7 @@
     "zod": "4.3.6"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.13",
+    "@biomejs/biome": "2.3.14",
     "@electric-sql/pglite": "0.3.15",
     "@happy-dom/global-registrator": "20.4.0",
     "@react-email/preview-server": "5.2.5",
