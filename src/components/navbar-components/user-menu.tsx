@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Building2Icon,
   LogOutIcon,
   ShieldUserIcon,
   SunMoonIcon,
@@ -19,12 +20,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/libs/better-auth/auth-client";
+import { useScopedI18n } from "@/shared/locales/client";
 import { ThemeToggle } from "./theme-toggle";
 
 type User = typeof authClient.$Infer.Session.user;
 
 export function UserMenu({ user }: { user: User }) {
   const router = useRouter();
+  const t = useScopedI18n("organization");
 
   return (
     <DropdownMenu>
@@ -77,6 +80,15 @@ export function UserMenu({ user }: { user: User }) {
               }
             ></DropdownMenuItem>
           )}
+
+          <DropdownMenuItem
+            render={
+              <Link href="/organization">
+                <Building2Icon />
+                {t("menu")}
+              </Link>
+            }
+          ></DropdownMenuItem>
 
           <DropdownMenuItem
             render={

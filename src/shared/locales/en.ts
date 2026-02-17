@@ -205,6 +205,116 @@ export default {
   "account.delete.confirm_cancel": "Cancel",
   "account.delete.confirm_continue": "Continue",
 
+  organization: {
+    menu: "Organization",
+    title: "Organization",
+    description:
+      "Manage organizations, members, and invitation links without affecting existing app flows.",
+    no_active: {
+      title: "No Active Organization",
+      description:
+        "Create your first organization or select one from the switcher to start collaborating.",
+    },
+    common: {
+      cancel: "Cancel",
+    },
+    create: {
+      title: "Create organization",
+      description:
+        "Create a new organization and automatically set it as active for your account.",
+      open: "New Organization",
+      name: "Name",
+      slug: "Slug",
+      logo: "Logo (optional)",
+      logo_description: "Upload an organization logo.",
+      logo_upload: "Upload logo",
+      submit: "Create organization",
+      hint: "Use lowercase slugs with dashes (for example: acme-inc).",
+    },
+    summary: {
+      members: "{count} members",
+    },
+    switcher: {
+      title: "Active organization",
+      description:
+        "Switch the active organization used by scoped organization APIs.",
+      label: "Organization",
+      placeholder: "Select an organization",
+      submit: "Set active organization",
+      current: "Current active organization selected.",
+      none: "No active organization selected.",
+      empty: {
+        title: "No organizations yet",
+        description:
+          "Create your first organization to unlock member and invitation management.",
+      },
+    },
+    members: {
+      title: "Members",
+      description: "Read-only list of members in the active organization.",
+      me: "You",
+      member: "Organization member",
+      empty: {
+        title: "No members",
+        description: "This organization currently has no members.",
+      },
+    },
+    invite: {
+      title: "Invite members",
+      description: "Invite users and share invitation links directly.",
+      email: "Member email",
+      role: "Role",
+      role_member: "Member",
+      role_admin: "Admin",
+      submit: "Invite member",
+      no_permission: "You can't invite members to this organization.",
+      link_label: "Shareable invitation link",
+      copy: "Copy link",
+      pending: "Pending invitations",
+      pending_empty: "No pending invitations.",
+      cancel_title: "Cancel invitation?",
+      cancel_description:
+        "This will invalidate the invitation link for this user.",
+      cancel_confirm: "Cancel invitation",
+    },
+    incoming: {
+      title: "Incoming invitations",
+      description:
+        "Review and accept or reject invitations sent to your email.",
+      from_link: "Invitation from URL",
+      invalid_link:
+        "The invitation in the URL is invalid, expired, or not addressed to your user.",
+      accept: "Accept",
+      reject: "Reject",
+      empty: {
+        title: "No invitations",
+        description: "You have no pending organization invitations.",
+      },
+    },
+    messages: {
+      created: "Organization created.",
+      active_set: "Active organization updated.",
+      invited: "Invitation created successfully.",
+      accepted: "Invitation accepted.",
+      rejected: "Invitation rejected.",
+      canceled: "Invitation canceled.",
+      error: "Organization action failed.",
+    },
+
+    // delete
+    delete: {
+      title: "Delete Organization",
+      description:
+        "Remove your organization and all its contents permanently. This action cannot be reversed, so proceed with caution.",
+      confirm_title: "Are you absolutely sure?",
+      confirm_description:
+        "This action cannot be undone. This will permanently delete your organization and remove your data from our servers.",
+      confirm_type: "Type 'DELETE' to confirm.",
+      confirm_cancel: "Cancel",
+      confirm_continue: "Continue",
+    },
+  },
+
   // todo feature
   "todo.title": "Todo list",
   "todo.subtitle": "Manage your tasks efficiently",

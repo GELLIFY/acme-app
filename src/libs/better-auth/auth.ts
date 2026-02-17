@@ -2,7 +2,12 @@ import { passkey } from "@better-auth/passkey";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
-import { apiKey, lastLoginMethod, openAPI } from "better-auth/plugins";
+import {
+  apiKey,
+  lastLoginMethod,
+  openAPI,
+  organization,
+} from "better-auth/plugins";
 import type { Statements } from "better-auth/plugins/access";
 import { admin } from "better-auth/plugins/admin";
 import { twoFactor } from "better-auth/plugins/two-factor";
@@ -73,6 +78,11 @@ export const auth = instrumentBetterAuth(
           user: userRole,
         },
       }),
+      organization({
+        organizationLimit: 5,
+        cancelPendingInvitationsOnReInvite: true,
+        disableOrganizationDeletion: true,
+      }),
       apiKey({
         permissions: {
           defaultPermissions: async (_userId) => {
@@ -97,3 +107,8 @@ export const auth = instrumentBetterAuth(
     ],
   }),
 );
+
+export type Session = typeof auth.$Infer.Session;
+export type ActiveOrganization = typeof auth.$Infer.ActiveOrganization;
+export type Organization = typeof auth.$Infer.Organization;
+export type OrganizationRole = ActiveOrganization["members"][number]["role"];

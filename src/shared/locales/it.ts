@@ -212,6 +212,116 @@ export default {
   "account.delete.confirm_cancel": "Annulla",
   "account.delete.confirm_continue": "Continua",
 
+  organization: {
+    menu: "Organizzazione",
+    title: "Organizzazioni",
+    description:
+      "Creata una nuova organizzazione per collaborare con il tuo team.",
+    no_active: {
+      title: "Nessuna organizzazione attiva",
+      description:
+        "Crea la tua prima organizzazione o selezionane una dallo switcher.",
+    },
+    common: {
+      cancel: "Annulla",
+    },
+    create: {
+      title: "Crea organizzazione",
+      description: "Create a new organization to collaborate with your team.",
+      open: "Nuova Organizzazione",
+      name: "Nome",
+      slug: "Slug",
+      logo: "Logo (opzionale)",
+      logo_description: "Carica un logo per l'organizzazione.",
+      logo_upload: "Carica logo",
+      submit: "Crea organizzazione",
+      hint: "Usa slug in minuscolo con trattini (esempio: acme-inc).",
+    },
+    summary: {
+      members: "{count} membri",
+    },
+    switcher: {
+      title: "Organization attiva",
+      description:
+        "Cambia la organization attiva usata dalle API organization-scoped.",
+      label: "Organization",
+      placeholder: "Personal",
+      submit: "Imposta organization attiva",
+      current: "Organization attiva selezionata.",
+      none: "Nessuna organization attiva selezionata.",
+      empty: {
+        title: "Nessuna organization",
+        description:
+          "Crea la tua prima organization per gestire membri e inviti.",
+      },
+    },
+    members: {
+      title: "Membri",
+      description:
+        "Lista in sola lettura dei membri della organization attiva.",
+      me: "Tu",
+      member: "Membro organization",
+      empty: {
+        title: "Nessun membro",
+        description: "Questa organization non ha ancora membri.",
+      },
+    },
+    invite: {
+      title: "Invita membri",
+      description: "Invita utenti e condividi direttamente il link di invito.",
+      email: "Email membro",
+      role: "Ruolo",
+      role_member: "Membro",
+      role_admin: "Admin",
+      submit: "Invita membro",
+      no_permission: "Non puoi invitare membri in questa organization.",
+      link_label: "Link invito condivisibile",
+      copy: "Copia link",
+      pending: "Inviti pendenti",
+      pending_empty: "Nessun invito pendente.",
+      cancel_title: "Annullare l'invito?",
+      cancel_description:
+        "Questo invaliderà il link di invito per questo utente.",
+      cancel_confirm: "Annulla invito",
+    },
+    incoming: {
+      title: "Inviti ricevuti",
+      description:
+        "Controlla e accetta o rifiuta gli inviti ricevuti sulla tua email.",
+      from_link: "Invito da URL",
+      invalid_link:
+        "L'invito nell'URL non è valido, è scaduto, o non è destinato al tuo utente.",
+      accept: "Accetta",
+      reject: "Rifiuta",
+      empty: {
+        title: "Nessun invito",
+        description: "Non hai inviti organization pendenti.",
+      },
+    },
+    messages: {
+      created: "Organization creata.",
+      active_set: "Organization attiva aggiornata.",
+      invited: "Invito creato con successo.",
+      accepted: "Invito accettato.",
+      rejected: "Invito rifiutato.",
+      canceled: "Invito annullato.",
+      error: "Azione organization non riuscita.",
+    },
+
+    // delete
+    delete: {
+      title: "Elimina account",
+      description:
+        "Rimuovi definitivamente il tuo account personale e tutti i suoi contenuti. Questa azione non è reversibile, quindi procedi con cautela.",
+      confirm_title: "Sei assolutamente sicuro?",
+      confirm_description:
+        "Questa azione non può essere annullata. Questo eliminerà definitivamente il tuo account e rimuoverà i tuoi dati dai nostri server.",
+      confirm_type: "Digita 'DELETE' per confermare.",
+      confirm_cancel: "Annulla",
+      confirm_continue: "Continua",
+    },
+  },
+
   // todo feature
   "todo.title": "List todo",
   "todo.subtitle": "Gestisci i tuoi task in modo efficiente",
