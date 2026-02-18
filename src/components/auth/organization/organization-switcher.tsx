@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,30 +11,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Organization } from "@/libs/better-auth/auth";
+import { useOrganizationQuery } from "@/hooks/use-organization";
+import { useUserQuery } from "@/hooks/use-user";
 import { authClient } from "@/libs/better-auth/auth-client";
+import { useTRPC } from "@/libs/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 
-export function OrganizationSwitcher({
-  organizations,
-  activeOrganizationId,
-}: {
-  organizations: Organization[];
-  activeOrganizationId: string | null;
-}) {
+export function OrganizationSwitcher() {
   const t = useScopedI18n("organization");
   const [isPending, startTransition] = useTransition();
-  const [selectedOrganizationId, setSelectedOrganizationId] =
-    useState(activeOrganizationId);
+  const [selectedOrganizationId, setSelectedOrganizationId] = useState<
+    string | null
+  >(null);
+
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  const { data: user } = useUserQuery();
+  const { data: activeOrganization } = useOrganizationQuery();
+  const { data: organizations } = useQuery({
+    ...trpc.organization.list.queryOptions(),
+    initialData: [],
+  });
 
   useEffect(() => {
-    setSelectedOrganizationId(activeOrganizationId);
-  }, [activeOrganizationId]);
+    setSelectedOrganizationId(activeOrganization?.id ?? null);
+  }, [activeOrganization]);
 
   const onValueChange = (organizationId: string | null) => {
     setSelectedOrganizationId(organizationId);
-
-    if (!organizationId || organizationId === activeOrganizationId) return;
 
     startTransition(async () => {
       const { error } = await authClient.organization.setActive({
@@ -45,13 +51,13 @@ export function OrganizationSwitcher({
         return;
       }
 
+      queryClient.invalidateQueries({
+        queryKey: trpc.organization.active.queryKey(),
+      });
+
       toast.success(t("messages.active_set"));
     });
   };
-
-  const activeOrganization = organizations.find(
-    (org) => org.id === selectedOrganizationId,
-  );
 
   return (
     <Select
@@ -65,28 +71,21 @@ export function OrganizationSwitcher({
     >
       <SelectTrigger className="w-full">
         <SelectValue placeholder={t("switcher.placeholder")}>
-          {activeOrganization ? (
-            <>
-              <Avatar size="sm">
-                <AvatarImage
-                  src={activeOrganization?.logo ?? ""}
-                  alt={`${activeOrganization.name} logo`}
-                />
-                <AvatarFallback>
-                  {activeOrganization.name.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              {activeOrganization.name}
-            </>
-          ) : (
-            <span className="text-muted-foreground">
-              {t("switcher.placeholder")}
-            </span>
-          )}
+          <Avatar size="sm">
+            <AvatarImage
+              src={activeOrganization?.logo ?? user.image ?? ""}
+              alt={`${activeOrganization?.name ?? user.name} logo`}
+            />
+            <AvatarFallback>
+              {activeOrganization?.name.charAt(0).toUpperCase() ??
+                user.name.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          {activeOrganization?.name ?? user.name}
         </SelectValue>
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value={t("switcher.placeholder")}>Personal</SelectItem>
+        <SelectItem value={null}>Personal</SelectItem>
         {organizations.map((organization) => (
           <SelectItem key={organization.id} value={organization.id}>
             {organization.name}

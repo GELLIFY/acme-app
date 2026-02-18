@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTransition } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { useOrganizationQuery } from "@/hooks/use-organization";
 import { browserLogger as logger } from "@/infrastructure/logger/browser-logger";
-import { authClient } from "@/libs/better-auth/auth-client";
+import { useTRPC } from "@/libs/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 
 const formSchema = z.object({
@@ -27,31 +27,39 @@ const formSchema = z.object({
 });
 
 export function OrganizationName() {
-  const [isPending, starTransition] = useTransition();
   const t = useScopedI18n("organization");
 
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
   const { data: organization } = useOrganizationQuery();
+
+  const updateOrganizationMutation = useMutation(
+    trpc.organization.update.mutationOptions({
+      onError: (error) => {
+        toast.error(error.message);
+        logger.error(error.message, new Error(error.message));
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.organization.active.queryKey(),
+        });
+
+        toast.success("Organization updated");
+      },
+    }),
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: organization?.name ?? undefined,
+      name: organization?.name,
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    starTransition(async () => {
-      const { data, error } = await authClient.updateUser({
-        name: values.name,
-      });
-
-      if (error) {
-        toast.error(error.message || "Error updating user");
-        logger.error(error.statusText, new Error(error.message), error);
-        return;
-      }
-
-      if (data.status) toast.success("User updated");
+    await updateOrganizationMutation.mutateAsync({
+      name: values.name,
     });
   };
 
@@ -59,7 +67,7 @@ export function OrganizationName() {
     <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
       <Card>
         <CardHeader>
-          <CardTitle>{t("name")}</CardTitle>
+          <CardTitle>{t("name.title")}</CardTitle>
           <CardDescription>{t("name.description")}</CardDescription>
         </CardHeader>
 
@@ -84,8 +92,12 @@ export function OrganizationName() {
 
         <CardFooter className="border-t text-muted-foreground text-sm justify-between">
           <div>{t("name.message")}</div>
-          <Button type="submit" disabled={isPending}>
-            {isPending ? <Spinner /> : t("save")}
+          <Button type="submit" disabled={updateOrganizationMutation.isPending}>
+            {updateOrganizationMutation.isPending ? (
+              <Spinner />
+            ) : (
+              t("common.save")
+            )}
           </Button>
         </CardFooter>
       </Card>

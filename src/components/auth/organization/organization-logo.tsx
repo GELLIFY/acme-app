@@ -19,7 +19,7 @@ import { useTRPC } from "@/libs/trpc/client";
 import { convertImageToBase64 } from "@/shared/helpers/image";
 import { useScopedI18n } from "@/shared/locales/client";
 
-export function OrganizationAvatar() {
+export function OrganizationLogo() {
   const t = useScopedI18n("organization");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -28,11 +28,11 @@ export function OrganizationAvatar() {
 
   const { data: organization, isLoading } = useOrganizationQuery();
 
-  const updateUserMutation = useMutation(
-    trpc.user.update.mutationOptions({
+  const updateOrganizationMutation = useMutation(
+    trpc.organization.update.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: trpc.user.me.queryKey(),
+          queryKey: trpc.organization.active.queryKey(),
         });
       },
     }),
@@ -41,8 +41,8 @@ export function OrganizationAvatar() {
   return (
     <Card>
       <CardHeader className="gap-x-6">
-        <CardTitle>{t("avatar")}</CardTitle>
-        <CardDescription>{t("avatar.description")}</CardDescription>
+        <CardTitle>{t("logo.title")}</CardTitle>
+        <CardDescription>{t("logo.description")}</CardDescription>
         <CardAction>
           <Avatar
             className="flex cursor-pointer items-center justify-center size-15"
@@ -75,7 +75,7 @@ export function OrganizationAvatar() {
               onChange={async (e) => {
                 const file = e.target.files?.[0] ?? null;
                 const image = file ? await convertImageToBase64(file) : "";
-                updateUserMutation.mutate({ image });
+                updateOrganizationMutation.mutate({ logo: image });
               }}
             />
           </Avatar>
@@ -83,7 +83,7 @@ export function OrganizationAvatar() {
       </CardHeader>
 
       <CardFooter className="border-t text-muted-foreground text-sm">
-        {t("avatar.message")}
+        {t("logo.message")}
       </CardFooter>
     </Card>
   );

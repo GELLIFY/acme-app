@@ -222,7 +222,22 @@ export default {
       description:
         "Crea la tua prima organizzazione o selezionane una dallo switcher.",
     },
+    logo: {
+      title: "Logo",
+      description:
+        "Carica un logo per l'organizzazione. Clicca per scegliere un immagine tra i tuoi file.",
+      upload: "Carica logo",
+      remove: "Rimuovi logo",
+      message: "Un logo è opzionale ma fortemente consigliato.",
+    },
+    name: {
+      title: "Nome",
+      description:
+        "Inserisci il nome completo dell'organizzazione, oppure un nome visualizzato.",
+      message: "Utilizza un massimo di 32 caratteri.",
+    },
     common: {
+      save: "Salva",
       cancel: "Annulla",
     },
     create: {

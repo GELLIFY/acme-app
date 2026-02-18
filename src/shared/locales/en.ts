@@ -215,7 +215,22 @@ export default {
       description:
         "Create your first organization or select one from the switcher to start collaborating.",
     },
+    logo: {
+      title: "Logo",
+      description:
+        "Upload a logo for your organization. Click to choose an image from your files.",
+      upload: "Upload a logo",
+      remove: "Remove logo",
+      message: "A logo is optional but strongly recommended.",
+    },
+    name: {
+      title: "Name",
+      description:
+        "Enter the full name of your organization, or a display name.",
+      message: "Use a maximum of 32 characters.",
+    },
     common: {
+      save: "Save",
       cancel: "Cancel",
     },
     create: {
