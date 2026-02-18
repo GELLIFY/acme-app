@@ -7,10 +7,14 @@ import { OrganizationLogo } from "@/components/auth/organization/organization-lo
 import { OrganizationName } from "@/components/auth/organization/organization-name";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useOrganizationQuery } from "@/hooks/use-organization";
+import { useUserQuery } from "@/hooks/use-user";
 import { useScopedI18n } from "@/shared/locales/client";
+import { OrganizationInvites } from "./organization-invites";
+import { OrganizationMembers } from "./organization-members";
 
 export default function OrganizationTabs() {
   const t = useScopedI18n("organization");
+  const { data: user } = useUserQuery();
   const { data: activeOrganization } = useOrganizationQuery();
 
   return (
@@ -44,10 +48,17 @@ export default function OrganizationTabs() {
       </TabsContent>
       <TabsContent value="members">
         <div className="text-muted-foreground space-y-4">
-          {/*<OrganizationManager
-                activeOrganization={activeOrganization}
-                currentUserId={session.user.id}
-              />*/}
+          {activeOrganization && (
+            <>
+              <OrganizationMembers
+                activeOrganizationId={activeOrganization.id}
+                currentUserId={user.id}
+              />
+              <OrganizationInvites
+                activeOrganizationId={activeOrganization.id}
+              />
+            </>
+          )}
         </div>
       </TabsContent>
       <TabsContent value="danger">

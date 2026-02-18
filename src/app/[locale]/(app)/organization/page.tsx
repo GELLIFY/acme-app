@@ -26,6 +26,7 @@ export default async function OrganizationPage({
   await Promise.all([
     queryClient.prefetchQuery(trpc.organization.active.queryOptions()),
     queryClient.prefetchQuery(trpc.organization.list.queryOptions()),
+    // queryClient.prefetchQuery(trpc.organization.listMembers.queryOptions()),
   ]);
 
   return (
