@@ -2,11 +2,13 @@ import { auth } from "@/libs/better-auth/auth";
 import {
   listInvitations,
   listMembers,
+  listUserInvitations,
   updateOrganizationInformation,
 } from "@/server/domains/auth/organization-service";
 import {
   listInvitationsSchema,
   listMembersSchema,
+  listUserInvitationsSchema,
   updateOrganizationSchema,
 } from "@/shared/validators/organization.schema";
 import { createTRPCRouter, protectedProcedure } from "../init";
@@ -55,5 +57,11 @@ export const organizationRouter = createTRPCRouter({
     .input(listInvitationsSchema)
     .query(async ({ ctx: { headers }, input }) => {
       return await listInvitations(headers, input);
+    }),
+
+  listUserInvitations: protectedProcedure
+    .input(listUserInvitationsSchema)
+    .query(async ({ ctx: { headers }, input }) => {
+      return await listUserInvitations(headers, input);
     }),
 });

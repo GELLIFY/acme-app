@@ -44,3 +44,7 @@ export const listMembersSchema = z.object({
 export const listInvitationsSchema = z.object({
   organizationId: z.uuid(),
 });
+
+export const listUserInvitationsSchema = z.object({
+  email: z.email(),
+});
