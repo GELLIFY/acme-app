@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { CreateOrganizationDialog } from "@/components/auth/organization/create-organization-dialog";
-import { OrganizationSwitcher } from "@/components/auth/organization/organization-switcher";
 import OrganizationTabs from "@/components/auth/organization/organization-tabs";
 import { getCachedSession } from "@/libs/better-auth/get-cached-session";
 import { getQueryClient, HydrateClient, trpc } from "@/libs/trpc/server";
@@ -31,13 +29,7 @@ export default async function OrganizationPage({
 
   return (
     <HydrateClient>
-      <div className="space-y-4">
-        <div className="flex items-center gap-4">
-          <OrganizationSwitcher />
-          <CreateOrganizationDialog />
-        </div>
-        <OrganizationTabs />
-      </div>
+      <OrganizationTabs />
     </HydrateClient>
   );
 }

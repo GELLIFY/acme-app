@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { PlusIcon, Send, SendIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -29,18 +28,34 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import { useTRPC } from "@/libs/trpc/client";
-import { useScopedI18n } from "@/shared/locales/client";
 
 export function NoInvites() {
-  const t = useScopedI18n("organization");
-
   return (
     <Empty className="border">
       <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <SendIcon className="size-4" />
+        <EmptyMedia>
+          <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:size-12 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
+            <Avatar>
+              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+            <Avatar>
+              <AvatarImage
+                src="https://github.com/maxleiter.png"
+                alt="@maxleiter"
+              />
+              <AvatarFallback>LR</AvatarFallback>
+            </Avatar>
+            <Avatar>
+              <AvatarImage
+                src="https://github.com/evilrabbit.png"
+                alt="@evilrabbit"
+              />
+              <AvatarFallback>ER</AvatarFallback>
+            </Avatar>
+          </div>
         </EmptyMedia>
-        <EmptyTitle>No Invitations</EmptyTitle>
+        <EmptyTitle>No Pending Invitations</EmptyTitle>
         <EmptyDescription>
           Invite your team to collaborate on this project.
         </EmptyDescription>
@@ -60,8 +75,6 @@ export function OrganizationInvites({
 }: {
   activeOrganizationId: string;
 }) {
-  const t = useScopedI18n("organization");
-
   const trpc = useTRPC();
 
   const { data } = useQuery(
@@ -75,8 +88,8 @@ export function OrganizationInvites({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("invites.title")}</CardTitle>
-        <CardDescription>{t("invites.description")}</CardDescription>
+        <CardTitle>Inviti</CardTitle>
+        <CardDescription>Inviti per l'organizzazione</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-2">

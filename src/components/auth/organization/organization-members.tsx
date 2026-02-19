@@ -1,15 +1,13 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { PlusIcon } from "lucide-react";
+import { Trash2Icon } from "lucide-react";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -23,7 +21,15 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { authClient } from "@/libs/better-auth/auth-client";
+import { ROLES } from "@/libs/better-auth/permissions";
 import { useTRPC } from "@/libs/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 
@@ -72,13 +78,9 @@ export function OrganizationMembers({
     <Card>
       <CardHeader>
         <CardTitle>{t("members.title")}</CardTitle>
-        <CardDescription>{t("members.description")}</CardDescription>
-        <CardAction>
-          <Button size="sm">
-            <PlusIcon />
-            Add Member
-          </Button>
-        </CardAction>
+        <CardDescription>
+          {t("members.description", { count: data?.members.length ?? 0 })}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
@@ -97,25 +99,35 @@ export function OrganizationMembers({
                   </Avatar>
                 </ItemMedia>
                 <ItemContent>
-                  <ItemTitle className="w-full justify-between">
+                  <ItemTitle className="w-full">
                     <span className="truncate">{member.user.name}</span>
                   </ItemTitle>
                   <ItemDescription>{member.user.email}</ItemDescription>
                 </ItemContent>
                 <ItemActions>
-                  <div className="flex items-center gap-2">
-                    {member.userId === currentUserId && (
-                      <Badge variant="outline">{t("members.me")}</Badge>
-                    )}
-                    <Badge>{member.role}</Badge>
-                  </div>
+                  <Select
+                    value={member.role}
+                    // onValueChange={(value) => handleSetUserRole(value as Role)}
+                    disabled={currentUserId === member.user.id}
+                  >
+                    <SelectTrigger size="sm">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(ROLES).map((role) => (
+                        <SelectItem key={role} value={role}>
+                          {role}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={isPending}
+                    variant="destructive"
+                    size="icon-sm"
+                    disabled={isPending || currentUserId === member.user.id}
                     onClick={() => removeMember(member.id)}
                   >
-                    Remove
+                    <Trash2Icon />
                   </Button>
                 </ItemActions>
               </Item>

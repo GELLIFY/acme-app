@@ -16,6 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
@@ -73,11 +74,14 @@ export function CreateOrganizationDialog() {
       onOpenChangeComplete={(newState) => !newState && form.reset()}
     >
       <DialogTrigger
+        nativeButton={false}
         render={
-          <Button>
-            <PlusIcon />
+          <DropdownMenuItem>
+            <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
+              <PlusIcon className="size-4" />
+            </div>
             {t("create.open")}
-          </Button>
+          </DropdownMenuItem>
         }
       />
       <DialogContent>

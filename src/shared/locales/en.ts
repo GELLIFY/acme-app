@@ -266,7 +266,11 @@ export default {
     },
     members: {
       title: "Members",
-      description: "Read-only list of members in the active organization.",
+      "description#zero": "No members",
+      "description#one":
+        "You're the first person in this organization. Start inviting your team.",
+      "description#other":
+        "Lista in sola lettura dei membri della organization attiva.",
       me: "You",
       member: "Organization member",
       empty: {

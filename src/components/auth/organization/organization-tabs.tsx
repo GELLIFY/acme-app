@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2Icon, TriangleAlertIcon, UsersIcon } from "lucide-react";
+import { Building2Icon, UsersIcon } from "lucide-react";
 import { DeleteOrganization } from "@/components/auth/organization/delete-organization";
 import { NoOrganization } from "@/components/auth/organization/no-organization";
 import { OrganizationLogo } from "@/components/auth/organization/organization-logo";
@@ -19,7 +19,7 @@ export default function OrganizationTabs() {
 
   return (
     <Tabs className="space-y-2" defaultValue="organization">
-      <TabsList className="grid w-full grid-cols-3">
+      <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="organization">
           <Building2Icon size={16} aria-hidden="true" />
           <span className="max-sm:hidden">{t("menu")}</span>
@@ -27,10 +27,6 @@ export default function OrganizationTabs() {
         <TabsTrigger value="members" disabled={!activeOrganization}>
           <UsersIcon size={16} aria-hidden="true" />
           <span className="max-sm:hidden">{t("members.title")}</span>
-        </TabsTrigger>
-        <TabsTrigger value="danger" disabled={!activeOrganization}>
-          <TriangleAlertIcon size={16} aria-hidden="true" />
-          <span className="max-sm:hidden">Danger</span>
         </TabsTrigger>
       </TabsList>
 
@@ -42,6 +38,7 @@ export default function OrganizationTabs() {
             <>
               <OrganizationLogo />
               <OrganizationName />
+              <DeleteOrganization />
             </>
           )}
         </div>
@@ -60,9 +57,6 @@ export default function OrganizationTabs() {
             </>
           )}
         </div>
-      </TabsContent>
-      <TabsContent value="danger">
-        <DeleteOrganization />
       </TabsContent>
     </Tabs>
   );

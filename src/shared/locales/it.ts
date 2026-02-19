@@ -272,7 +272,10 @@ export default {
     },
     members: {
       title: "Membri",
-      description:
+      "description#zero": "No membri",
+      "description#one":
+        "You're the first person in this organization. Start inviting your team.",
+      "description#other":
         "Lista in sola lettura dei membri della organization attiva.",
       me: "Tu",
       member: "Membro organization",
