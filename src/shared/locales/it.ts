@@ -234,7 +234,9 @@ export default {
       title: "Nome",
       description:
         "Inserisci il nome completo dell'organizzazione, oppure un nome visualizzato.",
+      placeholder: "Acme Inc.",
       message: "Utilizza un massimo di 32 caratteri.",
+      updated: "Organizzazione aggiornata.",
     },
     common: {
       save: "Salva",
@@ -272,16 +274,19 @@ export default {
     },
     members: {
       title: "Membri",
-      "description#zero": "No membri",
+      "description#zero":
+        "Nessun membro ancora. Inizia a invitare il tuo team.",
       "description#one":
-        "You're the first person in this organization. Start inviting your team.",
+        "Sei la prima persona in questa organizzazione. Inizia a invitare il tuo team.",
       "description#other":
-        "Lista in sola lettura dei membri della organization attiva.",
+        "Lista in sola lettura dei membri dell'organizzazione attiva.",
       me: "Tu",
-      member: "Membro organization",
+      member: "Membro organizzazione",
+      role_placeholder: "Seleziona ruolo",
+      removed: "Membro rimosso.",
       empty: {
         title: "Nessun membro",
-        description: "Questa organization non ha ancora membri.",
+        description: "Questa organizzazione non ha ancora membri.",
       },
     },
     invite: {
@@ -292,11 +297,14 @@ export default {
       role_member: "Membro",
       role_admin: "Admin",
       submit: "Invita membro",
-      no_permission: "Non puoi invitare membri in questa organization.",
+      no_permission: "Non puoi invitare membri in questa organizzazione.",
       link_label: "Link invito condivisibile",
       copy: "Copia link",
-      pending: "Inviti pendenti",
-      pending_empty: "Nessun invito pendente.",
+      pending: "Inviti in sospeso",
+      pending_empty: "Nessun invito in sospeso.",
+      pending_empty_description:
+        "Invita il tuo team a collaborare su questo progetto.",
+      pending_invite_btn: "Invita Membri",
       cancel_title: "Annullare l'invito?",
       cancel_description:
         "Questo invaliderà il link di invito per questo utente.",
@@ -328,13 +336,16 @@ export default {
 
     // delete
     delete: {
-      title: "Elimina account",
+      title: "Elimina organizzazione",
       description:
-        "Rimuovi definitivamente il tuo account personale e tutti i suoi contenuti. Questa azione non è reversibile, quindi procedi con cautela.",
+        "Rimuovi definitivamente l'organizzazione e tutti i suoi contenuti. Questa azione non è reversibile, quindi procedi con cautela.",
+      btn: "Elimina",
       confirm_title: "Sei assolutamente sicuro?",
       confirm_description:
-        "Questa azione non può essere annullata. Questo eliminerà definitivamente il tuo account e rimuoverà i tuoi dati dai nostri server.",
+        "Questa azione non può essere annullata. Questo eliminerà definitivamente l'organizzazione e rimuoverà i dati dai nostri server.",
       confirm_type: "Digita 'DELETE' per confermare.",
+      confirm_email:
+        "Un'email di conferma è stata inviata al tuo indirizzo. Controlla la tua casella di posta per confermare l'eliminazione dell'organizzazione.",
       confirm_cancel: "Annulla",
       confirm_continue: "Continua",
     },

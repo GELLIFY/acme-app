@@ -38,9 +38,7 @@ export function DeleteOrganization() {
   const deleteOrganizationMutation = useMutation(
     trpc.user.delete.mutationOptions({
       onSuccess: async () => {
-        toast.info(
-          "A confirmation email has been sent to your address. Please check your inbox to confirm account deletion.",
-        );
+        toast.info(t("delete.confirm_email"));
       },
     }),
   );
@@ -56,7 +54,7 @@ export function DeleteOrganization() {
 
         <AlertDialog>
           <AlertDialogTrigger
-            render={<Button variant="destructive">Delete</Button>}
+            render={<Button variant="destructive">{t("delete.btn")}</Button>}
           ></AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -67,9 +65,7 @@ export function DeleteOrganization() {
             </AlertDialogHeader>
 
             <div className="mt-2 flex flex-col gap-2">
-              <Label htmlFor="confirm-delete">
-                Type <span className="font-medium">DELETE</span> to confirm.
-              </Label>
+              <Label htmlFor="confirm-delete">{t("delete.confirm_type")}</Label>
               <Input
                 id="confirm-delete"
                 value={value}

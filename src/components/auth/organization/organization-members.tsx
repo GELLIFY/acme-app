@@ -70,7 +70,7 @@ export function OrganizationMembers({
         }),
       });
 
-      toast.success(t("messages.active_set"));
+      toast.success(t("members.removed"));
     });
   };
 
@@ -111,7 +111,9 @@ export function OrganizationMembers({
                     disabled={currentUserId === member.user.id}
                   >
                     <SelectTrigger size="sm">
-                      <SelectValue placeholder="Select" />
+                      <SelectValue
+                        placeholder={t("members.role_placeholder")}
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {Object.values(ROLES).map((role) => (

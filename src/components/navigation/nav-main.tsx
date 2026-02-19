@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -28,7 +29,7 @@ export function NavMain({
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuSubItem key={item.title}>
-            <SidebarMenuSubButton render={<a href={item.url} />}>
+            <SidebarMenuSubButton render={<Link href={item.url} />}>
               {item.icon}
               <span>{item.title}</span>
             </SidebarMenuSubButton>

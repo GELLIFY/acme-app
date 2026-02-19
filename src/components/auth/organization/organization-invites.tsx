@@ -28,8 +28,11 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import { useTRPC } from "@/libs/trpc/client";
+import { useScopedI18n } from "@/shared/locales/client";
 
 export function NoInvites() {
+  const t = useScopedI18n("organization");
+
   return (
     <Empty className="border">
       <EmptyHeader>
@@ -55,15 +58,15 @@ export function NoInvites() {
             </Avatar>
           </div>
         </EmptyMedia>
-        <EmptyTitle>No Pending Invitations</EmptyTitle>
+        <EmptyTitle>{t("invite.pending_empty")}</EmptyTitle>
         <EmptyDescription>
-          Invite your team to collaborate on this project.
+          {t("invite.pending_empty_description")}
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <Button size="sm">
           <PlusIcon />
-          Invite Members
+          {t("invite.pending_invite_btn")}
         </Button>
       </EmptyContent>
     </Empty>
@@ -75,6 +78,7 @@ export function OrganizationInvites({
 }: {
   activeOrganizationId: string;
 }) {
+  const t = useScopedI18n("organization");
   const trpc = useTRPC();
 
   const { data } = useQuery(
@@ -88,8 +92,8 @@ export function OrganizationInvites({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Inviti</CardTitle>
-        <CardDescription>Inviti per l'organizzazione</CardDescription>
+        <CardTitle>{t("invite.pending")}</CardTitle>
+        <CardDescription>{t("invite.description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-2">

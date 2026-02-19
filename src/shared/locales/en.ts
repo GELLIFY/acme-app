@@ -227,7 +227,9 @@ export default {
       title: "Name",
       description:
         "Enter the full name of your organization, or a display name.",
+      placeholder: "Acme Inc.",
       message: "Use a maximum of 32 characters.",
+      updated: "Organization updated.",
     },
     common: {
       save: "Save",
@@ -266,13 +268,15 @@ export default {
     },
     members: {
       title: "Members",
-      "description#zero": "No members",
+      "description#zero": "No members yet. Start inviting your team.",
       "description#one":
         "You're the first person in this organization. Start inviting your team.",
       "description#other":
-        "Lista in sola lettura dei membri della organization attiva.",
+        "Read-only list of members in the active organization.",
       me: "You",
       member: "Organization member",
+      role_placeholder: "Select role",
+      removed: "Member removed.",
       empty: {
         title: "No members",
         description: "This organization currently has no members.",
@@ -291,6 +295,9 @@ export default {
       copy: "Copy link",
       pending: "Pending invitations",
       pending_empty: "No pending invitations.",
+      pending_empty_description:
+        "Invite your team to collaborate on this project.",
+      pending_invite_btn: "Invite Members",
       cancel_title: "Cancel invitation?",
       cancel_description:
         "This will invalidate the invitation link for this user.",
@@ -325,10 +332,13 @@ export default {
       title: "Delete Organization",
       description:
         "Remove your organization and all its contents permanently. This action cannot be reversed, so proceed with caution.",
+      btn: "Delete",
       confirm_title: "Are you absolutely sure?",
       confirm_description:
         "This action cannot be undone. This will permanently delete your organization and remove your data from our servers.",
       confirm_type: "Type 'DELETE' to confirm.",
+      confirm_email:
+        "A confirmation email has been sent to your address. Please check your inbox to confirm organization deletion.",
       confirm_cancel: "Cancel",
       confirm_continue: "Continue",
     },

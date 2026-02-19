@@ -45,7 +45,7 @@ export function OrganizationName() {
           queryKey: trpc.organization.active.queryKey(),
         });
 
-        toast.success("Organization updated");
+        toast.success(t("name.updated"));
       },
     }),
   );
@@ -80,7 +80,7 @@ export function OrganizationName() {
                 <Input
                   {...field}
                   aria-invalid={fieldState.invalid}
-                  placeholder="Rob"
+                  placeholder={t("name.placeholder")}
                 />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
