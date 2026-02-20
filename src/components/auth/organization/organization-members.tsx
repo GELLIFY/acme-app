@@ -18,6 +18,7 @@ import {
   ItemActions,
   ItemContent,
   ItemDescription,
+  ItemGroup,
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
@@ -32,6 +33,8 @@ import { authClient } from "@/libs/better-auth/auth-client";
 import { ORGANIZATION_ROLES } from "@/libs/better-auth/permissions";
 import { useTRPC } from "@/libs/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
+import { columns } from "./members/columns";
+import { DataTable } from "./members/data-table";
 
 export function OrganizationMembers({
   activeOrganizationId,
@@ -83,7 +86,9 @@ export function OrganizationMembers({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-2">
+        <DataTable columns={columns} data={data?.members ?? []} />
+
+        {/*<ItemGroup>
           {data?.members.map((member) => {
             return (
               <Item key={member.id} variant="outline" size="sm">
@@ -135,7 +140,7 @@ export function OrganizationMembers({
               </Item>
             );
           })}
-        </div>
+        </ItemGroup>*/}
       </CardContent>
     </Card>
   );

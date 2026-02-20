@@ -23,6 +23,7 @@ import {
   ItemActions,
   ItemContent,
   ItemDescription,
+  ItemGroup,
   ItemTitle,
 } from "@/components/ui/item";
 import { useTRPC } from "@/libs/trpc/client";
@@ -40,7 +41,7 @@ function Invitations({
   invitations: Invitation[] | UserInvitation[];
 }) {
   return (
-    <div className="space-y-2">
+    <ItemGroup>
       {invitations.map((invitation) => {
         return (
           <Item key={invitation.id} variant="outline" size="sm">
@@ -58,7 +59,7 @@ function Invitations({
           </Item>
         );
       })}
-    </div>
+    </ItemGroup>
   );
 }
 

@@ -1,10 +1,19 @@
 "use client";
 
+import { formatForDisplay, useHotkey } from "@tanstack/react-hotkeys";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ChevronsUpDownIcon } from "lucide-react";
-import { useTransition } from "react";
+import { ChevronsUpDownIcon, PlusIcon } from "lucide-react";
+import { useRef, useTransition } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +24,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Kbd } from "@/components/ui/kbd";
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -26,9 +36,10 @@ import { useUserQuery } from "@/hooks/use-user";
 import { authClient } from "@/libs/better-auth/auth-client";
 import { useTRPC } from "@/libs/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
-import { CreateOrganizationDialog } from "./create-organization-dialog";
+import { CreateOrganizationForm } from "./create-organization-form";
 
 export function OrganizationSwitcher() {
+  const panelRef = useRef<HTMLUListElement>(null);
   const { isMobile } = useSidebar();
   const [isPending, startTransition] = useTransition();
 
@@ -61,95 +72,124 @@ export function OrganizationSwitcher() {
     });
   };
 
+  useHotkey(
+    "Mod+P",
+    () => {
+      setActiveOrganization(null);
+    },
+    { target: panelRef },
+  );
+
   return (
-    <SidebarMenu>
+    <SidebarMenu ref={panelRef}>
       <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <SidebarMenuButton
-                size="lg"
-                className="data-open:bg-sidebar-accent data-open:text-sidebar-accent-foreground"
-              />
-            }
-          >
-            <Avatar>
-              <AvatarImage
-                src={activeOrganization?.logo ?? user.image ?? ""}
-                alt={activeOrganization?.name ?? user.name}
-              />
-              <AvatarFallback>
-                {activeOrganization?.name.substring(0, 2).toUpperCase() ??
-                  user.name.substring(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-medium">
-                {activeOrganization?.name ?? user.name}
-              </span>
-              <span className="truncate text-xs">
-                {activeOrganization?.slug ?? user.email}
-              </span>
-            </div>
-            <ChevronsUpDownIcon className="ml-auto" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="min-w-56 rounded-lg"
-            align="start"
-            side={isMobile ? "bottom" : "right"}
-            sideOffset={4}
-          >
-            <DropdownMenuGroup>
-              <DropdownMenuLabel className="text-muted-foreground text-xs">
-                Organizations
-              </DropdownMenuLabel>
-              {organizations?.map((org, index) => (
+        <Dialog>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-open:bg-sidebar-accent data-open:text-sidebar-accent-foreground"
+                />
+              }
+            >
+              <Avatar>
+                <AvatarImage
+                  src={activeOrganization?.logo ?? user.image ?? ""}
+                  alt={activeOrganization?.name ?? user.name}
+                />
+                <AvatarFallback>
+                  {activeOrganization?.name.substring(0, 2).toUpperCase() ??
+                    user.name.substring(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-medium">
+                  {activeOrganization?.name ?? user.name}
+                </span>
+                <span className="truncate text-xs">
+                  {activeOrganization?.slug ?? user.email}
+                </span>
+              </div>
+              <ChevronsUpDownIcon className="ml-auto" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="min-w-56 rounded-lg"
+              align="start"
+              side={isMobile ? "bottom" : "right"}
+              sideOffset={4}
+            >
+              <DropdownMenuGroup>
+                <DropdownMenuLabel className="text-muted-foreground text-xs">
+                  Organizations
+                </DropdownMenuLabel>
+                {organizations?.map((org, index) => (
+                  <DropdownMenuItem
+                    key={org.name}
+                    disabled={isPending}
+                    onClick={() => setActiveOrganization(org.id)}
+                    className="gap-2 p-2"
+                  >
+                    <Avatar size="sm">
+                      <AvatarImage src={org?.logo ?? ""} alt={org.name} />
+                      <AvatarFallback>
+                        {org.name.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    {org.name}
+                    <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuLabel className="text-muted-foreground text-xs">
+                  {t("switcher.placeholder")}
+                </DropdownMenuLabel>
                 <DropdownMenuItem
-                  key={org.name}
                   disabled={isPending}
-                  onClick={() => setActiveOrganization(org.id)}
+                  onClick={() => setActiveOrganization(null)}
                   className="gap-2 p-2"
                 >
                   <Avatar size="sm">
-                    <AvatarImage src={org?.logo ?? ""} alt={org.name} />
+                    <AvatarImage src={user.image ?? ""} alt={user.name} />
                     <AvatarFallback>
-                      {org.name.charAt(0).toUpperCase()}
+                      {user.name.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  {org.name}
-                  <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                  {`${user.name}`}
+                  <DropdownMenuShortcut>
+                    <Kbd>{formatForDisplay("Mod+P")}</Kbd>
+                  </DropdownMenuShortcut>
                 </DropdownMenuItem>
-              ))}
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuLabel className="text-muted-foreground text-xs">
-                {t("switcher.placeholder")}
-              </DropdownMenuLabel>
-              <DropdownMenuItem
-                disabled={isPending}
-                onClick={() => setActiveOrganization(null)}
-                className="gap-2 p-2"
-              >
-                <Avatar size="sm">
-                  <AvatarImage src={user.image ?? ""} alt={user.name} />
-                  <AvatarFallback>
-                    {user.name.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                {`${user.name}`}
-                <DropdownMenuShortcut>⌘P</DropdownMenuShortcut>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem
-                className="gap-2 p-2"
-                render={<CreateOrganizationDialog />}
-              />
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DialogTrigger
+                  nativeButton={false}
+                  render={
+                    <DropdownMenuItem className="gap-2 p-2">
+                      <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
+                        <PlusIcon className="size-4" />
+                      </div>
+                      {t("create.open")}
+                    </DropdownMenuItem>
+                  }
+                />
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Dialog content here to prevent autoclose on DropdownItem click */}
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{t("create.title")}</DialogTitle>
+              <DialogDescription>{t("create.description")}</DialogDescription>
+            </DialogHeader>
+
+            <CreateOrganizationForm />
+          </DialogContent>
+        </Dialog>
       </SidebarMenuItem>
     </SidebarMenu>
   );
