@@ -13,7 +13,7 @@ export const updateOrganizationSchema = z.object({
 });
 
 export const listMembersSchema = z.object({
-  organizationId: z.uuid(),
+  organizationId: z.uuid().optional(),
   limit: z.number().optional(),
   offset: z.number().optional(),
   sortBy: z.string().optional().openapi({
@@ -42,7 +42,7 @@ export const listMembersSchema = z.object({
 });
 
 export const listInvitationsSchema = z.object({
-  organizationId: z.uuid(),
+  organizationId: z.uuid().optional(),
 });
 
 export const listUserInvitationsSchema = z.object({

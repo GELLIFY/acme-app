@@ -19,16 +19,19 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  currentUserId: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  currentUserId,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    meta: { userId: currentUserId },
   });
 
   return (

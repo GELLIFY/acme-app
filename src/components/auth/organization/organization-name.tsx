@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { useOrganizationQuery } from "@/hooks/use-organization";
 import { browserLogger as logger } from "@/infrastructure/logger/browser-logger";
+import { authClient } from "@/libs/better-auth/auth-client";
 import { useTRPC } from "@/libs/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 
@@ -49,6 +50,12 @@ export function OrganizationName() {
       },
     }),
   );
+
+  const canUpdateOrganization = authClient.organization.hasPermission({
+    permissions: {
+      organization: ["update"],
+    },
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -81,6 +88,7 @@ export function OrganizationName() {
                   {...field}
                   aria-invalid={fieldState.invalid}
                   placeholder={t("name.placeholder")}
+                  disabled={!canUpdateOrganization}
                 />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
@@ -92,7 +100,12 @@ export function OrganizationName() {
 
         <CardFooter className="border-t text-muted-foreground text-sm justify-between">
           <div>{t("name.message")}</div>
-          <Button type="submit" disabled={updateOrganizationMutation.isPending}>
+          <Button
+            type="submit"
+            disabled={
+              updateOrganizationMutation.isPending || !canUpdateOrganization
+            }
+          >
             {updateOrganizationMutation.isPending ? (
               <Spinner />
             ) : (

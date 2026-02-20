@@ -19,20 +19,10 @@ export const organizationRouter = createTRPCRouter({
       headers,
     });
 
-    const activeOrganization = data.find(
-      (org) => org.id === session.session.activeOrganizationId,
+    return (
+      data.find((org) => org.id === session.session.activeOrganizationId) ??
+      null
     );
-
-    if (!activeOrganization) return null;
-
-    return await auth.api.getFullOrganization({
-      headers,
-      query: {
-        organizationId: activeOrganization?.id,
-        organizationSlug: activeOrganization?.slug,
-        membersLimit: 100,
-      },
-    });
   }),
 
   list: protectedProcedure.query(async ({ ctx: { headers } }) => {

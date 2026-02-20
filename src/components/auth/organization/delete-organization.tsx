@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
+import { authClient } from "@/libs/better-auth/auth-client";
 import { useTRPC } from "@/libs/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 
@@ -43,6 +44,12 @@ export function DeleteOrganization() {
     }),
   );
 
+  const canDeleteOrganization = authClient.organization.hasPermission({
+    permissions: {
+      organization: ["delete"],
+    },
+  });
+
   return (
     <Card className="border-destructive">
       <CardHeader>
@@ -54,7 +61,11 @@ export function DeleteOrganization() {
 
         <AlertDialog>
           <AlertDialogTrigger
-            render={<Button variant="destructive">{t("delete.btn")}</Button>}
+            render={
+              <Button variant="destructive" disabled={!canDeleteOrganization}>
+                {t("delete.btn")}
+              </Button>
+            }
           ></AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>

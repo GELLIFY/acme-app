@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -22,7 +23,6 @@ import {
   Item,
   ItemActions,
   ItemContent,
-  ItemDescription,
   ItemGroup,
   ItemTitle,
 } from "@/components/ui/item";
@@ -46,15 +46,15 @@ function Invitations({
         return (
           <Item key={invitation.id} variant="outline" size="sm">
             <ItemContent>
-              <ItemTitle className="w-full justify-between">
+              <ItemTitle className="">
                 <span className="truncate">{invitation.email}</span>
+                <Badge variant="secondary">{invitation.role}</Badge>
               </ItemTitle>
-              <ItemDescription>{invitation.role}</ItemDescription>
             </ItemContent>
             <ItemActions>
-              <div className="flex items-center gap-2">
-                <Badge>{invitation.role}</Badge>
-              </div>
+              <Button size="sm" variant="destructive">
+                Cancel
+              </Button>
             </ItemActions>
           </Item>
         );
@@ -65,10 +65,8 @@ function Invitations({
 
 export function OrganizationInvites({
   activeOrganizationId,
-  userEmail,
 }: {
   activeOrganizationId: string;
-  userEmail: string;
 }) {
   const t = useScopedI18n("organization");
   const trpc = useTRPC();
@@ -76,12 +74,6 @@ export function OrganizationInvites({
   const { data: invitations } = useQuery(
     trpc.organization.listInvitations.queryOptions({
       organizationId: activeOrganizationId,
-    }),
-  );
-
-  const { data: userInvitations } = useQuery(
-    trpc.organization.listUserInvitations.queryOptions({
-      email: userEmail,
     }),
   );
 
@@ -134,7 +126,6 @@ export function OrganizationInvites({
       <CardContent>
         <div className="space-y-2">
           <Invitations invitations={invitations} />
-          <Invitations invitations={userInvitations ?? []} />
         </div>
       </CardContent>
     </Card>

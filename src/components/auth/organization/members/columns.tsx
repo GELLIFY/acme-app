@@ -24,7 +24,10 @@ import {
 } from "@/components/ui/select";
 import { useOrganizationQuery } from "@/hooks/use-organization";
 import { authClient } from "@/libs/better-auth/auth-client";
-import { ORGANIZATION_ROLES } from "@/libs/better-auth/permissions";
+import {
+  ORGANIZATION_ROLES,
+  type OrganizationRole,
+} from "@/libs/better-auth/permissions";
 import { useTRPC } from "@/libs/trpc/client";
 import type { RouterOutput } from "@/server/api/trpc/routers/_app";
 import { useScopedI18n } from "@/shared/locales/client";
@@ -61,15 +64,52 @@ export const columns: ColumnDef<Member>[] = [
   {
     accessorKey: "role",
     header: "Role",
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       const member = row.original;
+      const userId = table.options.meta?.userId;
+
+      const [isPending, startTransition] = useTransition();
+
       const t = useScopedI18n("organization");
+      const queryClient = useQueryClient();
+      const trpc = useTRPC();
+
+      const { data: organization } = useOrganizationQuery();
+      const activeOrganizationId = organization?.id || "";
+
+      const updateMemberRole = (
+        memberId: string,
+        newRole: OrganizationRole,
+      ) => {
+        startTransition(async () => {
+          const { error } = await authClient.organization.updateMemberRole({
+            role: [newRole], // required
+            memberId: memberId, // required
+            organizationId: activeOrganizationId,
+          });
+
+          if (error) {
+            toast.error(error.message || t("messages.error"));
+            return;
+          }
+
+          queryClient.invalidateQueries({
+            queryKey: trpc.organization.listMembers.queryKey({
+              organizationId: activeOrganizationId,
+            }),
+          });
+
+          toast.success(t("members.removed"));
+        });
+      };
 
       return (
         <Select
           value={member.role}
-          // onValueChange={(value) => handleSetUserRole(value as Role)}
-          // disabled={currentUserId === member.user.id}
+          onValueChange={(value) =>
+            updateMemberRole(member.user.id, value as OrganizationRole)
+          }
+          disabled={isPending || userId === member.user.id}
         >
           <SelectTrigger size="sm">
             <SelectValue placeholder={t("members.role_placeholder")} />
@@ -87,8 +127,9 @@ export const columns: ColumnDef<Member>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       const member = row.original;
+      const userId = table.options.meta?.userId;
       const [isPending, startTransition] = useTransition();
 
       const t = useScopedI18n("organization");
@@ -135,7 +176,7 @@ export const columns: ColumnDef<Member>[] = [
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
                 variant="destructive"
-                disabled={isPending /*|| currentUserId === member.user.id*/}
+                disabled={isPending || userId === member.user.id}
                 onClick={() => removeMember(member.id)}
               >
                 Delete

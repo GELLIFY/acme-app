@@ -53,7 +53,6 @@ export default function OrganizationTabs() {
               />
               <OrganizationInvites
                 activeOrganizationId={activeOrganization.id}
-                userEmail={user.email}
               />
             </>
           )}
