@@ -16,7 +16,7 @@ importers:
         version: 1.4.18(@better-auth/core@1.4.18(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.8(zod@4.3.6))(jose@6.1.0)(kysely@0.28.8)(nanostores@1.0.1))(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-auth@1.4.18(drizzle-kit@0.31.9)(drizzle-orm@0.45.1(@electric-sql/pglite@0.3.15)(@neondatabase/serverless@1.0.2)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(bun-types@1.3.9)(kysely@0.28.8)(pg@8.18.0))(next@16.1.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(pg@8.18.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(better-call@1.1.8(zod@4.3.6))(nanostores@1.0.1)
       '@hono/zod-openapi':
         specifier: 1.2.1
-        version: 1.2.1(hono@4.11.9)(zod@4.3.6)
+        version: 1.2.1(hono@4.11.10)(zod@4.3.6)
       '@hookform/resolvers':
         specifier: 5.2.2
         version: 5.2.2(react-hook-form@7.71.1(react@19.2.4))
@@ -61,7 +61,7 @@ importers:
         version: 1.0.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@scalar/hono-api-reference':
         specifier: 0.9.40
-        version: 0.9.40(hono@4.11.9)
+        version: 0.9.40(hono@4.11.10)
       '@t3-oss/env-nextjs':
         specifier: 0.13.10
         version: 0.13.10(typescript@5.9.3)(zod@4.3.6)
@@ -114,11 +114,11 @@ importers:
         specifier: 6.0.1
         version: 6.0.1
       hono:
-        specifier: 4.11.9
-        version: 4.11.9
+        specifier: 4.11.10
+        version: 4.11.10
       hono-rate-limiter:
         specifier: 0.5.3
-        version: 0.5.3(hono@4.11.9)
+        version: 0.5.3(hono@4.11.10)
       input-otp:
         specifier: 1.4.2
         version: 1.4.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -3069,8 +3069,8 @@ packages:
       unstorage:
         optional: true
 
-  hono@4.11.9:
-    resolution: {integrity: sha512-Eaw2YTGM6WOxA6CXbckaEvslr2Ne4NFsKrvc0v97JD5awbmeBLO5w9Ho9L9kmKonrwF9RJlW6BxT1PVv/agBHQ==}
+  hono@4.11.10:
+    resolution: {integrity: sha512-kyWP5PAiMooEvGrA9jcD3IXF7ATu8+o7B3KCbPXid5se52NPqnOpM/r9qeW2heMnOekF4kqR1fXJqCYeCLKrZg==}
     engines: {node: '>=16.9.0'}
 
   html-to-text@9.0.5:
@@ -5116,21 +5116,21 @@ snapshots:
 
   '@hexagon/base64@1.1.28': {}
 
-  '@hono/node-server@1.19.9(hono@4.11.9)':
+  '@hono/node-server@1.19.9(hono@4.11.10)':
     dependencies:
-      hono: 4.11.9
+      hono: 4.11.10
 
-  '@hono/zod-openapi@1.2.1(hono@4.11.9)(zod@4.3.6)':
+  '@hono/zod-openapi@1.2.1(hono@4.11.10)(zod@4.3.6)':
     dependencies:
       '@asteasolutions/zod-to-openapi': 8.1.0(zod@4.3.6)
-      '@hono/zod-validator': 0.7.6(hono@4.11.9)(zod@4.3.6)
-      hono: 4.11.9
+      '@hono/zod-validator': 0.7.6(hono@4.11.10)(zod@4.3.6)
+      hono: 4.11.10
       openapi3-ts: 4.5.0
       zod: 4.3.6
 
-  '@hono/zod-validator@0.7.6(hono@4.11.9)(zod@4.3.6)':
+  '@hono/zod-validator@0.7.6(hono@4.11.10)(zod@4.3.6)':
     dependencies:
-      hono: 4.11.9
+      hono: 4.11.10
       zod: 4.3.6
 
   '@hookform/resolvers@5.2.2(react-hook-form@7.71.1(react@19.2.4))':
@@ -5310,7 +5310,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.26.0(zod@3.25.76)':
     dependencies:
-      '@hono/node-server': 1.19.9(hono@4.11.9)
+      '@hono/node-server': 1.19.9(hono@4.11.10)
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
       content-type: 1.0.5
@@ -5320,7 +5320,7 @@ snapshots:
       eventsource-parser: 3.0.6
       express: 5.2.1
       express-rate-limit: 8.2.1(express@5.2.1)
-      hono: 4.11.9
+      hono: 4.11.10
       jose: 6.1.3
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
@@ -5841,10 +5841,10 @@ snapshots:
 
   '@scalar/helpers@0.2.11': {}
 
-  '@scalar/hono-api-reference@0.9.40(hono@4.11.9)':
+  '@scalar/hono-api-reference@0.9.40(hono@4.11.10)':
     dependencies:
       '@scalar/core': 0.3.37
-      hono: 4.11.9
+      hono: 4.11.10
 
   '@scalar/types@0.6.2':
     dependencies:
@@ -6897,11 +6897,11 @@ snapshots:
 
   help-me@5.0.0: {}
 
-  hono-rate-limiter@0.5.3(hono@4.11.9):
+  hono-rate-limiter@0.5.3(hono@4.11.10):
     dependencies:
-      hono: 4.11.9
+      hono: 4.11.10
 
-  hono@4.11.9: {}
+  hono@4.11.10: {}
 
   html-to-text@9.0.5:
     dependencies:
