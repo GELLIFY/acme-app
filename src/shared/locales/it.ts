@@ -255,7 +255,7 @@ export default {
       slug_placeholder: "acme-inc",
       slug_taken: "Questo slug e' gia in uso. Scegline uno diverso.",
       logo: "Logo (opzionale)",
-      logo_description: "Carica un logo per l'organizzazione.",
+      logo_description: "Recommended size 1:1, up to 1MB.",
       logo_upload: "Carica logo",
       submit: "Crea organizzazione",
       hint: "Usa almeno 3 caratteri, minuscole e trattini (esempio: acme-inc).",

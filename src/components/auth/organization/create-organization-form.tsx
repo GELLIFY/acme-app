@@ -2,19 +2,14 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Building2Icon, CheckIcon, UploadIcon, XIcon } from "lucide-react";
-import { useRef } from "react";
+import { CheckIcon, UploadIcon, XIcon } from "lucide-react";
+import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   InputGroup,
@@ -31,10 +26,22 @@ import { useScopedI18n } from "@/shared/locales/client";
 const createOrganizationSchema = z.object({
   name: z.string().trim().min(2).max(64),
   slug: z.string().trim().slugify().min(2).max(64),
-  logo: z.string().optional(),
+  logo: z
+    .file()
+    .min(1) // 1 byte
+    .max(1024 * 1024) // 1 MB
+    .mime([
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+      "image/svg+xml",
+      "image/gif",
+    ])
+    .nullable(),
 });
 
 export function CreateOrganizationForm() {
+  const [imagePreview, setImagePreview] = useState<string>();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const t = useScopedI18n("organization");
@@ -43,22 +50,13 @@ export function CreateOrganizationForm() {
 
   const checkSlugMutation = useMutation({
     mutationFn: async ({ slug }: { slug: string }) => {
-      const { data, error } = await authClient.organization.checkSlug({
+      const { error } = await authClient.organization.checkSlug({
         slug,
       });
 
-      if (error) {
-        if (error.code === "SLUG_IS_TAKEN") {
-          return form.setError("slug", {
-            message: t("create.slugExists"),
-          });
-        } else {
-          throw new Error(error.message || t("messages.error"));
-        }
-      }
-
-      form.clearErrors("slug");
-      return data;
+      return error
+        ? form.setError("slug", { message: error.message })
+        : form.clearErrors("slug");
     },
     onError: (error) => {
       toast.error(error.message);
@@ -71,7 +69,7 @@ export function CreateOrganizationForm() {
       const { data, error } = await authClient.organization.create({
         name: values.name,
         slug: values.slug,
-        logo: values.logo || undefined,
+        logo: values.logo ? await convertImageToBase64(values.logo) : "",
         keepCurrentActiveOrganization: true,
       });
 
@@ -92,7 +90,7 @@ export function CreateOrganizationForm() {
       });
 
       toast.success(t("messages.created"));
-      form.reset({ name: "", slug: "", logo: "" });
+      form.reset({ name: "", slug: "", logo: null });
     },
   });
 
@@ -101,7 +99,7 @@ export function CreateOrganizationForm() {
     defaultValues: {
       name: "",
       slug: "",
-      logo: "",
+      logo: null,
     },
   });
 
@@ -109,8 +107,19 @@ export function CreateOrganizationForm() {
     createOrganizationMutation.mutate(values);
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="gap-4 grid">
       <Controller
         name="logo"
         control={form.control}
@@ -119,40 +128,53 @@ export function CreateOrganizationForm() {
             <FieldLabel>{t("create.logo")}</FieldLabel>
             <div className="flex items-center gap-3">
               <Avatar
-                className="size-12 cursor-pointer"
+                className="size-12 cursor-pointer group"
                 onClick={() => fileInputRef.current?.click()}
               >
-                <AvatarImage src={field.value || undefined} />
+                <AvatarImage src={imagePreview} />
                 <AvatarFallback>
-                  <Building2Icon className="size-4" />
+                  <UploadIcon className="size-4 group-hover:scale-110 transition-transform" />
                 </AvatarFallback>
               </Avatar>
 
               <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    {t("create.logo_upload")}
+                  </Button>
+                  {imagePreview && (
+                    <Button
+                      size="icon-sm"
+                      variant="outline"
+                      onClick={() => {
+                        form.resetField("logo");
+                        setImagePreview(undefined);
+                      }}
+                    >
+                      <XIcon className="cursor-pointer" />
+                    </Button>
+                  )}
+                </div>
                 <p className="text-xs text-muted-foreground">
                   {t("create.logo_description")}
                 </p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <UploadIcon />
-                  {t("create.logo_upload")}
-                </Button>
               </div>
 
               <Input
                 accept="image/*"
                 ref={fileInputRef}
                 type="file"
-                style={{ display: "none" }}
+                className="hidden"
                 multiple={false}
-                onChange={async (event) => {
-                  const file = event.target.files?.[0] ?? null;
-                  const image = file ? await convertImageToBase64(file) : "";
-                  field.onChange(image);
+                onChange={(e) => {
+                  const file = e.target.files?.[0] ?? null;
+                  field.onChange(file);
+                  handleImageChange(e);
                 }}
               />
             </div>
@@ -168,7 +190,21 @@ export function CreateOrganizationForm() {
             <FieldLabel htmlFor="organization_name">
               {t("create.name")}
             </FieldLabel>
-            <Input {...field} id="organization_name" placeholder="Acme Inc" />
+            <Input
+              {...field}
+              onChange={(e) => {
+                field.onChange(e);
+
+                // automatic slug only if slug input is empty
+                if (!form.getFieldState("slug").isDirty) {
+                  const newValue = e.target.value;
+                  const slugifyValue = z.string().slugify().parse(newValue);
+                  form.setValue("slug", slugifyValue);
+                }
+              }}
+              id="organization_name"
+              placeholder="Acme Inc"
+            />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
@@ -198,20 +234,21 @@ export function CreateOrganizationForm() {
               <InputGroupAddon align="inline-end">
                 {checkSlugMutation.isPending ? (
                   <Spinner />
-                ) : fieldState.error ? (
-                  <XIcon className="text-red-600" />
                 ) : (
-                  <CheckIcon className="text-green-600" />
+                  !fieldState.error && <CheckIcon />
                 )}
               </InputGroupAddon>
             </InputGroup>
-            <FieldDescription>{t("create.hint")}</FieldDescription>
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
       />
 
-      <Button type="submit" disabled={createOrganizationMutation.isPending}>
+      <Button
+        type="submit"
+        className="justify-self-end mt-4"
+        disabled={createOrganizationMutation.isPending}
+      >
         {createOrganizationMutation.isPending ? (
           <Spinner />
         ) : (

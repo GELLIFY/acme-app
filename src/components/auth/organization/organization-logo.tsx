@@ -15,7 +15,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { useOrganizationQuery } from "@/hooks/use-organization";
-import { authClient } from "@/libs/better-auth/auth-client";
 import { useTRPC } from "@/libs/trpc/client";
 import { convertImageToBase64 } from "@/shared/helpers/image";
 import { useScopedI18n } from "@/shared/locales/client";
@@ -38,12 +37,6 @@ export function OrganizationLogo() {
       },
     }),
   );
-
-  const canUpdateOrganization = authClient.organization.hasPermission({
-    permissions: {
-      organization: ["update"],
-    },
-  });
 
   return (
     <Card>
@@ -79,7 +72,7 @@ export function OrganizationLogo() {
               type="file"
               style={{ display: "none" }}
               multiple={false}
-              disabled={!canUpdateOrganization}
+              // disabled={!canUpdateOrganization}
               onChange={async (e) => {
                 const file = e.target.files?.[0] ?? null;
                 const image = file ? await convertImageToBase64(file) : "";

@@ -17,6 +17,7 @@ export default async function OrganizationPage() {
 
   const [activeOrganization] = await Promise.all([
     queryClient.fetchQuery(trpc.organization.active.queryOptions()),
+    queryClient.prefetchQuery(trpc.user.me.queryOptions()),
     queryClient.prefetchQuery(trpc.organization.list.queryOptions()),
   ]);
 

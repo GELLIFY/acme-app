@@ -42,6 +42,7 @@ import { useOrganizationQuery } from "@/hooks/use-organization";
 import { useUserQuery } from "@/hooks/use-user";
 import { authClient } from "@/libs/better-auth/auth-client";
 import { useTRPC } from "@/libs/trpc/client";
+import { cn } from "@/libs/utils";
 import { useScopedI18n } from "@/shared/locales/client";
 import { CreateOrganizationForm } from "./create-organization-form";
 
@@ -158,8 +159,12 @@ export function OrganizationSwitcher() {
             >
               <Avatar>
                 <AvatarImage
-                  src={activeOrganization?.logo ?? user.image ?? ""}
-                  alt={activeOrganization?.name ?? user.name}
+                  src={
+                    activeOrganization
+                      ? (activeOrganization.logo ?? undefined)
+                      : (user.image ?? undefined)
+                  }
+                  alt={activeOrganization ? activeOrganization.name : user.name}
                 />
                 <AvatarFallback>
                   {activeOrganization?.name.substring(0, 2).toUpperCase() ??
@@ -191,11 +196,14 @@ export function OrganizationSwitcher() {
                     key={org.id}
                     disabled={setActiveOrganizationMutation.isPending}
                     onClick={() => setActiveOrganization(org.id)}
-                    className="gap-2 p-2"
+                    className={cn("gap-2 p-2", {
+                      "focus:bg-transparent focus:text-primary":
+                        activeOrganization?.id === org.id,
+                    })}
                   >
                     <Avatar size="sm">
                       <AvatarImage src={org?.logo ?? ""} alt={org.name} />
-                      <AvatarFallback>
+                      <AvatarFallback className="text-primary">
                         {org.name.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
@@ -203,7 +211,6 @@ export function OrganizationSwitcher() {
                     <DropdownMenuShortcut>
                       {activeOrganization?.id === org.id ? (
                         <Button
-                          className="group-focus/dropdown-menu-item:opacity-100 opacity-0 transition-opacity"
                           variant="ghost"
                           size="icon-sm"
                           nativeButton={false}
