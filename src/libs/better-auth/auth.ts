@@ -81,7 +81,6 @@ export const auth = instrumentBetterAuth(
       organization({
         organizationLimit: 5,
         cancelPendingInvitationsOnReInvite: true,
-        disableOrganizationDeletion: true,
       }),
       apiKey({
         permissions: {

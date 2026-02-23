@@ -244,15 +244,21 @@ export default {
     },
     create: {
       title: "Crea organizzazione",
-      description: "Create a new organization to collaborate with your team.",
+      description:
+        "Crea una nuova organizzazione per collaborare con il tuo team.",
       open: "Nuova Organizzazione",
       name: "Nome",
+      name_label: "Nome organizzazione",
+      name_placeholder: "Acme Inc.",
       slug: "Slug",
+      slug_label: "Slug organizzazione",
+      slug_placeholder: "acme-inc",
+      slug_taken: "Questo slug e' gia in uso. Scegline uno diverso.",
       logo: "Logo (opzionale)",
       logo_description: "Carica un logo per l'organizzazione.",
       logo_upload: "Carica logo",
       submit: "Crea organizzazione",
-      hint: "Usa slug in minuscolo con trattini (esempio: acme-inc).",
+      hint: "Usa almeno 3 caratteri, minuscole e trattini (esempio: acme-inc).",
     },
     summary: {
       members: "{count} membri",
