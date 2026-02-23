@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { Building2Icon, UploadIcon } from "lucide-react";
 import { useRef, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -12,6 +13,7 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/libs/better-auth/auth-client";
+import { useTRPC } from "@/libs/trpc/client";
 import { convertImageToBase64 } from "@/shared/helpers/image";
 import { useScopedI18n } from "@/shared/locales/client";
 
@@ -22,9 +24,12 @@ const createOrganizationSchema = z.object({
 });
 
 export function CreateOrganizationForm() {
-  const t = useScopedI18n("organization");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
+
+  const t = useScopedI18n("organization");
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof createOrganizationSchema>>({
     resolver: zodResolver(createOrganizationSchema),
@@ -48,6 +53,11 @@ export function CreateOrganizationForm() {
         toast.error(error.message || t("messages.error"));
         return;
       }
+
+      // invalidate organization list query
+      queryClient.invalidateQueries({
+        queryKey: trpc.organization.list.queryKey(),
+      });
 
       toast.success(t("messages.created"));
       form.reset({ name: "", slug: "", logo: "" });

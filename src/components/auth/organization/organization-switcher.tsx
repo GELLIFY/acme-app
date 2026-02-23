@@ -2,10 +2,17 @@
 
 import { formatForDisplay, useHotkey } from "@tanstack/react-hotkeys";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ChevronsUpDownIcon, PlusIcon } from "lucide-react";
+import {
+  ArrowRightIcon,
+  ChevronsUpDownIcon,
+  PlusIcon,
+  SettingsIcon,
+} from "lucide-react";
+import Link from "next/link";
 import { useRef, useTransition } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -54,6 +61,8 @@ export function OrganizationSwitcher() {
   );
 
   const setActiveOrganization = (organizationId: string | null) => {
+    if (organizationId === activeOrganization?.id) return;
+
     startTransition(async () => {
       const { error } = await authClient.organization.setActive({
         organizationId,
@@ -123,7 +132,7 @@ export function OrganizationSwitcher() {
                 <DropdownMenuLabel className="text-muted-foreground text-xs">
                   Organizations
                 </DropdownMenuLabel>
-                {organizations?.map((org, index) => (
+                {organizations?.map((org) => (
                   <DropdownMenuItem
                     key={org.name}
                     disabled={isPending}
@@ -137,7 +146,24 @@ export function OrganizationSwitcher() {
                       </AvatarFallback>
                     </Avatar>
                     {org.name}
-                    <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                    <DropdownMenuShortcut>
+                      {activeOrganization?.id === org.id ? (
+                        <Button
+                          className="group-focus/dropdown-menu-item:opacity-100 opacity-0 transition-opacity"
+                          variant="ghost"
+                          size="icon-sm"
+                          render={
+                            <Link href="/organization">
+                              <SettingsIcon />
+                            </Link>
+                          }
+                        ></Button>
+                      ) : (
+                        <div className="pr-2">
+                          <ArrowRightIcon className="group-focus/dropdown-menu-item:opacity-100 opacity-0 transition-opacity" />
+                        </div>
+                      )}
+                    </DropdownMenuShortcut>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuGroup>

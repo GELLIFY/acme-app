@@ -1,4 +1,4 @@
-import { CogIcon, HomeIcon, ListTodoIcon } from "lucide-react";
+import { HomeIcon, ListTodoIcon } from "lucide-react";
 import type * as React from "react";
 import { OrganizationSwitcher } from "@/components/auth/organization/organization-switcher";
 import { NavMain } from "@/components/navigation/nav-main";
@@ -31,11 +31,11 @@ const data = {
     },
   ],
   navSecondary: [
-    {
-      title: "Settings",
-      url: "/organization",
-      icon: CogIcon,
-    },
+    // {
+    //   title: "Settings",
+    //   url: "/organization",
+    //   icon: CogIcon,
+    // },
   ],
 };
 
