@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/card";
 import { useTRPC } from "@/libs/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
-import { columns } from "./members/columns";
-import { DataTable } from "./members/data-table";
+import { columns } from "./columns";
+import { DataTable } from "./data-table";
 
 export function OrganizationMembers({
   activeOrganizationId,

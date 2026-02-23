@@ -9,8 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useOrganizationQuery } from "@/hooks/use-organization";
 import { useUserQuery } from "@/hooks/use-user";
 import { useScopedI18n } from "@/shared/locales/client";
-import { OrganizationInvites } from "./organization-invites";
-import { OrganizationMembers } from "./organization-members";
+import { OrganizationInvites } from "./members/organization-invites";
+import { OrganizationMembers } from "./members/organization-members";
 
 export default function OrganizationTabs() {
   const t = useScopedI18n("organization");
