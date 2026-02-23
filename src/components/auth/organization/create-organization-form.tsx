@@ -9,7 +9,12 @@ import { toast } from "sonner";
 import * as z from "zod";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/libs/better-auth/auth-client";
@@ -138,16 +143,13 @@ export function CreateOrganizationForm() {
               {t("create.slug")}
             </FieldLabel>
             <Input {...field} id="organization_slug" placeholder="acme-inc" />
+            <FieldDescription>{t("create.hint")}</FieldDescription>
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
       />
 
-      <div className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">
-        {t("create.hint")}
-      </div>
-
-      <Button type="submit" className="w-full" disabled={isPending}>
+      <Button type="submit" disabled={isPending}>
         {isPending ? <Spinner /> : t("create.submit")}
       </Button>
     </form>
