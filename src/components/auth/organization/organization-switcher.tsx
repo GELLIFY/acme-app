@@ -189,7 +189,7 @@ export function OrganizationSwitcher() {
             >
               <DropdownMenuGroup>
                 <DropdownMenuLabel className="text-muted-foreground text-xs">
-                  Organizations
+                  {t("switcher.label")}
                 </DropdownMenuLabel>
                 {organizations?.map((org) => (
                   <DropdownMenuItem

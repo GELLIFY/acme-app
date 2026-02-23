@@ -267,7 +267,7 @@ export default {
       title: "Organization attiva",
       description:
         "Cambia la organization attiva usata dalle API organization-scoped.",
-      label: "Organization",
+      label: "Organizzazioni",
       placeholder: "Personal",
       submit: "Imposta organization attiva",
       current: "Organization attiva selezionata.",
@@ -280,6 +280,11 @@ export default {
     },
     members: {
       title: "Membri",
+      table_member: "Membro",
+      table_role: "Ruolo",
+      open_menu: "Apri menu",
+      actions: "Azioni",
+      delete: "Elimina",
       "description#zero":
         "Nessun membro ancora. Inizia a invitare il tuo team.",
       "description#one":

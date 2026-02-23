@@ -3,11 +3,16 @@ import { redirect } from "next/navigation";
 import OrganizationTabs from "@/components/auth/organization/organization-tabs";
 import { getCachedSession } from "@/libs/better-auth/get-cached-session";
 import { getQueryClient, HydrateClient, trpc } from "@/libs/trpc/server";
+import { getScopedI18n } from "@/shared/locales/server";
 
-export const metadata: Metadata = {
-  title: "Organization | Acme",
-  description: "Organization management page",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getScopedI18n("organization");
+
+  return {
+    title: `${t("title")} | Acme`,
+    description: t("description"),
+  };
+}
 
 export default async function OrganizationPage() {
   const session = await getCachedSession();

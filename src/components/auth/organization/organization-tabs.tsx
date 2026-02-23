@@ -20,11 +20,20 @@ export default function OrganizationTabs() {
   return (
     <Tabs className="space-y-2" defaultValue="organization">
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="organization">
+        <TabsTrigger
+          value="organization"
+          aria-label={t("menu")}
+          title={t("menu")}
+        >
           <Building2Icon size={16} aria-hidden="true" />
           <span className="max-sm:hidden">{t("menu")}</span>
         </TabsTrigger>
-        <TabsTrigger value="members" disabled={!activeOrganization}>
+        <TabsTrigger
+          value="members"
+          disabled={!activeOrganization}
+          aria-label={t("members.title")}
+          title={t("members.title")}
+        >
           <UsersIcon size={16} aria-hidden="true" />
           <span className="max-sm:hidden">{t("members.title")}</span>
         </TabsTrigger>

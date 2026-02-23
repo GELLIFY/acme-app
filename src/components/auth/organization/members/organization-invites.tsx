@@ -40,6 +40,8 @@ function Invitations({
 }: {
   invitations: Invitation[] | UserInvitation[];
 }) {
+  const t = useScopedI18n("organization");
+
   return (
     <ItemGroup>
       {invitations.map((invitation) => {
@@ -53,7 +55,7 @@ function Invitations({
             </ItemContent>
             <ItemActions>
               <Button size="sm" variant="destructive">
-                Cancel
+                {t("invite.cancel_confirm")}
               </Button>
             </ItemActions>
           </Item>

@@ -39,7 +39,10 @@ export type Member = RouterOutput["organization"]["listMembers"]["members"][0];
 export const columns: ColumnDef<Member>[] = [
   {
     accessorKey: "user.name",
-    header: "Member",
+    header: () => {
+      const t = useScopedI18n("organization");
+      return t("members.table_member");
+    },
     cell: ({ row }) => {
       const member = row.original;
 
@@ -63,7 +66,10 @@ export const columns: ColumnDef<Member>[] = [
   },
   {
     accessorKey: "role",
-    header: "Role",
+    header: () => {
+      const t = useScopedI18n("organization");
+      return t("members.table_role");
+    },
     cell: ({ row, table }) => {
       const member = row.original;
       const userId = table.options.meta?.userId;
@@ -166,20 +172,20 @@ export const columns: ColumnDef<Member>[] = [
           <DropdownMenuTrigger
             render={
               <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
+                <span className="sr-only">{t("members.open_menu")}</span>
                 <MoreHorizontalIcon className="h-4 w-4" />
               </Button>
             }
           ></DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuGroup>
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuLabel>{t("members.actions")}</DropdownMenuLabel>
               <DropdownMenuItem
                 variant="destructive"
                 disabled={isPending || userId === member.user.id}
                 onClick={() => removeMember(member.id)}
               >
-                Delete
+                {t("members.delete")}
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>

@@ -97,8 +97,8 @@ export function InviteMemberDialog({
       />
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t("create.title")}</DialogTitle>
-          <DialogDescription>{t("create.description")}</DialogDescription>
+          <DialogTitle>{t("invite.title")}</DialogTitle>
+          <DialogDescription>{t("invite.description")}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

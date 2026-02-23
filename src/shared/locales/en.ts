@@ -273,6 +273,11 @@ export default {
     },
     members: {
       title: "Members",
+      table_member: "Member",
+      table_role: "Role",
+      open_menu: "Open menu",
+      actions: "Actions",
+      delete: "Delete",
       "description#zero": "No members yet. Start inviting your team.",
       "description#one":
         "You're the first person in this organization. Start inviting your team.",

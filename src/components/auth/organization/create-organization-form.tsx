@@ -203,7 +203,7 @@ export function CreateOrganizationForm() {
                 }
               }}
               id="organization_name"
-              placeholder="Acme Inc"
+              placeholder={t("create.name_placeholder")}
             />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
@@ -221,7 +221,7 @@ export function CreateOrganizationForm() {
             <InputGroup>
               <InputGroupInput
                 id="organization_slug"
-                placeholder="acme-inc"
+                placeholder={t("create.slug_placeholder")}
                 value={field.value}
                 onChange={async (e) => {
                   field.onChange(e);
