@@ -1,9 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
-import { Building2Icon, UploadIcon } from "lucide-react";
-import { useRef, useTransition } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Building2Icon, CheckIcon, UploadIcon, XIcon } from "lucide-react";
+import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -16,7 +16,13 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { Spinner } from "@/components/ui/spinner";
+import { browserLogger } from "@/infrastructure/logger/browser-logger";
 import { authClient } from "@/libs/better-auth/auth-client";
 import { useTRPC } from "@/libs/trpc/client";
 import { convertImageToBase64 } from "@/shared/helpers/image";
@@ -30,11 +36,65 @@ const createOrganizationSchema = z.object({
 
 export function CreateOrganizationForm() {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isPending, startTransition] = useTransition();
 
   const t = useScopedI18n("organization");
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+
+  const checkSlugMutation = useMutation({
+    mutationFn: async ({ slug }: { slug: string }) => {
+      const { data, error } = await authClient.organization.checkSlug({
+        slug,
+      });
+
+      if (error) {
+        if (error.code === "SLUG_IS_TAKEN") {
+          return form.setError("slug", {
+            message: t("create.slugExists"),
+          });
+        } else {
+          throw new Error(error.message || t("messages.error"));
+        }
+      }
+
+      form.clearErrors("slug");
+      return data;
+    },
+    onError: (error) => {
+      toast.error(error.message);
+      browserLogger.error(error.message, error);
+    },
+  });
+
+  const createOrganizationMutation = useMutation({
+    mutationFn: async (values: z.infer<typeof createOrganizationSchema>) => {
+      const { data, error } = await authClient.organization.create({
+        name: values.name,
+        slug: values.slug,
+        logo: values.logo || undefined,
+        keepCurrentActiveOrganization: true,
+      });
+
+      if (error) {
+        throw new Error(error.message || t("messages.error"));
+      }
+
+      return data;
+    },
+    onError: (error) => {
+      toast.error(error.message);
+      browserLogger.error(error.message, error);
+    },
+    onSuccess: () => {
+      // invalidate organization list query
+      queryClient.invalidateQueries({
+        queryKey: trpc.organization.list.queryKey(),
+      });
+
+      toast.success(t("messages.created"));
+      form.reset({ name: "", slug: "", logo: "" });
+    },
+  });
 
   const form = useForm<z.infer<typeof createOrganizationSchema>>({
     resolver: zodResolver(createOrganizationSchema),
@@ -46,27 +106,7 @@ export function CreateOrganizationForm() {
   });
 
   const onSubmit = (values: z.infer<typeof createOrganizationSchema>) => {
-    startTransition(async () => {
-      const { error } = await authClient.organization.create({
-        name: values.name,
-        slug: values.slug,
-        logo: values.logo || undefined,
-        keepCurrentActiveOrganization: true,
-      });
-
-      if (error) {
-        toast.error(error.message || t("messages.error"));
-        return;
-      }
-
-      // invalidate organization list query
-      queryClient.invalidateQueries({
-        queryKey: trpc.organization.list.queryKey(),
-      });
-
-      toast.success(t("messages.created"));
-      form.reset({ name: "", slug: "", logo: "" });
-    });
+    createOrganizationMutation.mutate(values);
   };
 
   return (
@@ -142,15 +182,41 @@ export function CreateOrganizationForm() {
             <FieldLabel htmlFor="organization_slug">
               {t("create.slug")}
             </FieldLabel>
-            <Input {...field} id="organization_slug" placeholder="acme-inc" />
+            <InputGroup>
+              <InputGroupInput
+                id="organization_slug"
+                placeholder="acme-inc"
+                value={field.value}
+                onChange={async (e) => {
+                  field.onChange(e);
+
+                  await checkSlugMutation.mutateAsync({
+                    slug: e.target.value,
+                  });
+                }}
+              />
+              <InputGroupAddon align="inline-end">
+                {checkSlugMutation.isPending ? (
+                  <Spinner />
+                ) : fieldState.error ? (
+                  <XIcon className="text-red-600" />
+                ) : (
+                  <CheckIcon className="text-green-600" />
+                )}
+              </InputGroupAddon>
+            </InputGroup>
             <FieldDescription>{t("create.hint")}</FieldDescription>
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
       />
 
-      <Button type="submit" disabled={isPending}>
-        {isPending ? <Spinner /> : t("create.submit")}
+      <Button type="submit" disabled={createOrganizationMutation.isPending}>
+        {createOrganizationMutation.isPending ? (
+          <Spinner />
+        ) : (
+          t("create.submit")
+        )}
       </Button>
     </form>
   );

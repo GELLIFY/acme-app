@@ -25,28 +25,37 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
+import { browserLogger } from "@/infrastructure/logger/browser-logger";
 import { authClient } from "@/libs/better-auth/auth-client";
-import { useTRPC } from "@/libs/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 
-export function DeleteOrganization() {
+export function DeleteOrganization({
+  organizationId,
+}: {
+  organizationId: string;
+}) {
   const [value, setValue] = useState("");
 
   const t = useScopedI18n("organization");
 
-  const trpc = useTRPC();
+  const deleteOrganizationMutation = useMutation({
+    mutationFn: async ({ organizationId }: { organizationId: string }) => {
+      const { data, error } = await authClient.organization.delete({
+        organizationId,
+      });
 
-  const deleteOrganizationMutation = useMutation(
-    trpc.user.delete.mutationOptions({
-      onSuccess: async () => {
-        toast.info(t("delete.confirm_email"));
-      },
-    }),
-  );
+      if (error) {
+        throw new Error(error.message || t("messages.error"));
+      }
 
-  const canDeleteOrganization = authClient.organization.hasPermission({
-    permissions: {
-      organization: ["delete"],
+      return data;
+    },
+    onError: (error) => {
+      toast.error(error.message || t("messages.error"));
+      browserLogger.error(error.message, error);
+    },
+    onSuccess: () => {
+      toast.info(t("delete.confirm_email"));
     },
   });
 
@@ -61,11 +70,7 @@ export function DeleteOrganization() {
 
         <AlertDialog>
           <AlertDialogTrigger
-            render={
-              <Button variant="destructive" disabled={!canDeleteOrganization}>
-                {t("delete.btn")}
-              </Button>
-            }
+            render={<Button variant="destructive">{t("delete.btn")}</Button>}
           ></AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -89,7 +94,9 @@ export function DeleteOrganization() {
                 {t("delete.confirm_cancel")}
               </AlertDialogCancel>
               <AlertDialogAction
-                onClick={() => deleteOrganizationMutation.mutate()}
+                onClick={() =>
+                  deleteOrganizationMutation.mutate({ organizationId })
+                }
                 disabled={value !== "DELETE"}
               >
                 {deleteOrganizationMutation.isPending ? (

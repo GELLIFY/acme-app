@@ -38,7 +38,7 @@ export default function OrganizationTabs() {
             <>
               <OrganizationLogo />
               <OrganizationName />
-              <DeleteOrganization />
+              <DeleteOrganization organizationId={activeOrganization.id} />
             </>
           )}
         </div>
