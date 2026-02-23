@@ -78,10 +78,14 @@ export function OrganizationSwitcher() {
           queryKey: trpc.organization.active.queryKey(),
         }),
         queryClient.cancelQueries({
-          queryKey: trpc.organization.listMembers.queryKey({}),
+          queryKey: trpc.organization.listMembers.queryKey({
+            organizationId: activeOrganization?.id,
+          }),
         }),
         queryClient.cancelQueries({
-          queryKey: trpc.organization.listInvitations.queryKey({}),
+          queryKey: trpc.organization.listInvitations.queryKey({
+            organizationId: activeOrganization?.id,
+          }),
         }),
       ]);
 
@@ -122,10 +126,14 @@ export function OrganizationSwitcher() {
           queryKey: trpc.organization.list.queryKey(),
         }),
         queryClient.invalidateQueries({
-          queryKey: trpc.organization.listMembers.queryKey({}),
+          queryKey: trpc.organization.listMembers.queryKey({
+            organizationId: activeOrganization?.id,
+          }),
         }),
         queryClient.invalidateQueries({
-          queryKey: trpc.organization.listInvitations.queryKey({}),
+          queryKey: trpc.organization.listInvitations.queryKey({
+            organizationId: activeOrganization?.id,
+          }),
         }),
       ]);
     },

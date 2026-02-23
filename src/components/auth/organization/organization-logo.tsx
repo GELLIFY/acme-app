@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { UserCircleIcon } from "lucide-react";
+import { Building2Icon, UploadIcon, UserCircleIcon } from "lucide-react";
 import { useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -45,7 +45,7 @@ export function OrganizationLogo() {
         <CardDescription>{t("logo.description")}</CardDescription>
         <CardAction>
           <Avatar
-            className="flex cursor-pointer items-center justify-center size-15"
+            className="group flex cursor-pointer items-center justify-center size-15"
             onClick={() => {
               if ("current" in fileInputRef && fileInputRef.current) {
                 fileInputRef.current.click();
@@ -61,7 +61,7 @@ export function OrganizationLogo() {
                   src={organization?.logo ?? undefined}
                 />
                 <AvatarFallback>
-                  <UserCircleIcon className="size-5" />
+                  <UploadIcon className="size-5 group-hover:scale-110 transition-transform" />
                 </AvatarFallback>
               </>
             )}

@@ -60,7 +60,7 @@ export function DeleteOrganization({
   });
 
   return (
-    <Card className="border-destructive">
+    <Card className="ring-destructive">
       <CardHeader>
         <CardTitle>{t("delete.title")}</CardTitle>
         <CardDescription>{t("delete.description")}</CardDescription>
