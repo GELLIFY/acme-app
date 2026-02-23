@@ -1,7 +1,7 @@
 "use client";
 
 import { formatForDisplay, useHotkey } from "@tanstack/react-hotkeys";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowRightIcon,
   ChevronsUpDownIcon,
@@ -9,7 +9,7 @@ import {
   SettingsIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { useRef, useTransition } from "react";
+import { useRef } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -48,7 +48,6 @@ import { CreateOrganizationForm } from "./create-organization-form";
 export function OrganizationSwitcher() {
   const panelRef = useRef<HTMLUListElement>(null);
   const { isMobile } = useSidebar();
-  const [isPending, startTransition] = useTransition();
 
   const t = useScopedI18n("organization");
   const trpc = useTRPC();
@@ -60,25 +59,80 @@ export function OrganizationSwitcher() {
     trpc.organization.list.queryOptions(),
   );
 
-  const setActiveOrganization = (organizationId: string | null) => {
-    if (organizationId === activeOrganization?.id) return;
-
-    startTransition(async () => {
+  const setActiveOrganizationMutation = useMutation({
+    mutationFn: async (organizationId: string | null) => {
       const { error } = await authClient.organization.setActive({
         organizationId,
       });
 
       if (error) {
-        toast.error(error.message || t("messages.error"));
-        return;
+        throw new Error(error.message || t("messages.error"));
       }
 
-      queryClient.invalidateQueries({
-        queryKey: trpc.organization.active.queryKey(),
-      });
+      return organizationId;
+    },
+    onMutate: async (organizationId) => {
+      await Promise.all([
+        queryClient.cancelQueries({
+          queryKey: trpc.organization.active.queryKey(),
+        }),
+        queryClient.cancelQueries({
+          queryKey: trpc.organization.listMembers.queryKey({}),
+        }),
+        queryClient.cancelQueries({
+          queryKey: trpc.organization.listInvitations.queryKey({}),
+        }),
+      ]);
 
+      const previousActiveOrganization = queryClient.getQueryData(
+        trpc.organization.active.queryKey(),
+      );
+
+      const nextActiveOrganization = organizationId
+        ? (organizations?.find((org) => org.id === organizationId) ?? null)
+        : null;
+
+      queryClient.setQueryData(
+        trpc.organization.active.queryKey(),
+        nextActiveOrganization,
+      );
+
+      return { previousActiveOrganization };
+    },
+    onError: (error, _organizationId, context) => {
+      if (context?.previousActiveOrganization !== undefined) {
+        queryClient.setQueryData(
+          trpc.organization.active.queryKey(),
+          context.previousActiveOrganization,
+        );
+      }
+
+      toast.error(error.message || t("messages.error"));
+    },
+    onSuccess: () => {
       toast.success(t("messages.active_set"));
-    });
+    },
+    onSettled: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: trpc.organization.active.queryKey(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: trpc.organization.list.queryKey(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: trpc.organization.listMembers.queryKey({}),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: trpc.organization.listInvitations.queryKey({}),
+        }),
+      ]);
+    },
+  });
+
+  const setActiveOrganization = (organizationId: string | null) => {
+    if (organizationId === activeOrganization?.id) return;
+    setActiveOrganizationMutation.mutate(organizationId);
   };
 
   useHotkey(
@@ -134,8 +188,8 @@ export function OrganizationSwitcher() {
                 </DropdownMenuLabel>
                 {organizations?.map((org) => (
                   <DropdownMenuItem
-                    key={org.name}
-                    disabled={isPending}
+                    key={org.id}
+                    disabled={setActiveOrganizationMutation.isPending}
                     onClick={() => setActiveOrganization(org.id)}
                     className="gap-2 p-2"
                   >
@@ -174,7 +228,7 @@ export function OrganizationSwitcher() {
                   {t("switcher.placeholder")}
                 </DropdownMenuLabel>
                 <DropdownMenuItem
-                  disabled={isPending}
+                  disabled={setActiveOrganizationMutation.isPending}
                   onClick={() => setActiveOrganization(null)}
                   className="gap-2 p-2"
                 >
