@@ -152,6 +152,7 @@ export function OrganizationSwitcher() {
                           className="group-focus/dropdown-menu-item:opacity-100 opacity-0 transition-opacity"
                           variant="ghost"
                           size="icon-sm"
+                          nativeButton={false}
                           render={
                             <Link href="/organization">
                               <SettingsIcon />
