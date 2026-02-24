@@ -18,6 +18,7 @@ import {
   sendChangeEmailConfirmationEmail,
   sendDeleteAccountVerificationEmail,
   sendEmailVerificationEmail,
+  sendOrganizationInvitationEmail,
   sendResetPasswordEmail,
 } from "@/server/services/email-service";
 import { ac, adminRole, userRole } from "./permissions";
@@ -81,6 +82,16 @@ export const auth = instrumentBetterAuth(
       organization({
         organizationLimit: 5,
         cancelPendingInvitationsOnReInvite: true,
+        async sendInvitationEmail(data) {
+          const inviteLink = `https://example.com/accept-invitation/${data.id}`;
+          sendOrganizationInvitationEmail({
+            email: data.email,
+            invitedByUsername: data.inviter.user.name,
+            invitedByEmail: data.inviter.user.email,
+            teamName: data.organization.name,
+            inviteLink,
+          });
+        },
       }),
       apiKey({
         permissions: {

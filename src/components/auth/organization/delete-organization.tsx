@@ -31,8 +31,10 @@ import { useScopedI18n } from "@/shared/locales/client";
 
 export function DeleteOrganization({
   organizationId,
+  canDeleteOrganization,
 }: {
   organizationId: string;
+  canDeleteOrganization: boolean;
 }) {
   const [value, setValue] = useState("");
 
@@ -51,7 +53,7 @@ export function DeleteOrganization({
       return data;
     },
     onError: (error) => {
-      toast.error(error.message || t("messages.error"));
+      toast.error(error.message);
       browserLogger.error(error.message, error);
     },
     onSuccess: () => {
@@ -97,7 +99,7 @@ export function DeleteOrganization({
                 onClick={() =>
                   deleteOrganizationMutation.mutate({ organizationId })
                 }
-                disabled={value !== "DELETE"}
+                disabled={value !== "DELETE" || !canDeleteOrganization}
               >
                 {deleteOrganizationMutation.isPending ? (
                   <Spinner />

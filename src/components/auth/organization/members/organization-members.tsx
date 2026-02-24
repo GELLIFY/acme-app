@@ -15,10 +15,8 @@ import { DataTable } from "./data-table";
 
 export function OrganizationMembers({
   activeOrganizationId,
-  currentUserId,
 }: {
   activeOrganizationId: string;
-  currentUserId: string;
 }) {
   const t = useScopedI18n("organization");
 
@@ -39,11 +37,7 @@ export function OrganizationMembers({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <DataTable
-          columns={columns}
-          data={data?.members ?? []}
-          currentUserId={currentUserId}
-        />
+        <DataTable columns={columns} data={data?.members ?? []} />
       </CardContent>
     </Card>
   );

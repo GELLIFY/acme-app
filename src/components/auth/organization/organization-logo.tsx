@@ -1,8 +1,9 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Building2Icon, UploadIcon, UserCircleIcon } from "lucide-react";
+import { UploadIcon } from "lucide-react";
 import { useRef } from "react";
+import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
@@ -15,11 +16,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { useOrganizationQuery } from "@/hooks/use-organization";
+import { browserLogger } from "@/infrastructure/logger/browser-logger";
+import { authClient } from "@/libs/better-auth/auth-client";
 import { useTRPC } from "@/libs/trpc/client";
 import { convertImageToBase64 } from "@/shared/helpers/image";
 import { useScopedI18n } from "@/shared/locales/client";
 
-export function OrganizationLogo() {
+export function OrganizationLogo({
+  canUpdateOrganization,
+}: {
+  canUpdateOrganization: boolean;
+}) {
   const t = useScopedI18n("organization");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -28,15 +35,29 @@ export function OrganizationLogo() {
 
   const { data: organization, isLoading } = useOrganizationQuery();
 
-  const updateOrganizationMutation = useMutation(
-    trpc.organization.update.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.organization.active.queryKey(),
-        });
-      },
-    }),
-  );
+  const updateOrganizationMutation = useMutation({
+    mutationFn: async ({ logo }: { logo: string }) => {
+      const { data, error } = await authClient.organization.update({
+        data: { logo },
+        organizationId: organization?.id,
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data;
+    },
+    onError: (error) => {
+      toast.error(error.message);
+      browserLogger.error(error.message, error);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: trpc.organization.active.queryKey(),
+      });
+    },
+  });
 
   return (
     <Card>
@@ -72,7 +93,7 @@ export function OrganizationLogo() {
               type="file"
               style={{ display: "none" }}
               multiple={false}
-              // disabled={!canUpdateOrganization}
+              disabled={!canUpdateOrganization}
               onChange={async (e) => {
                 const file = e.target.files?.[0] ?? null;
                 const image = file ? await convertImageToBase64(file) : "";

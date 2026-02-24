@@ -4,24 +4,7 @@ import type {
   listInvitationsSchema,
   listMembersSchema,
   listUserInvitationsSchema,
-  updateOrganizationSchema,
 } from "@/shared/validators/organization.schema";
-
-export async function updateOrganizationInformation(
-  headers: Headers,
-  params: z.infer<typeof updateOrganizationSchema>,
-) {
-  const data = await auth.api.updateOrganization({
-    headers,
-    body: {
-      data: {
-        ...params,
-      },
-    },
-  });
-
-  return data;
-}
 
 export async function listMembers(
   headers: Headers,

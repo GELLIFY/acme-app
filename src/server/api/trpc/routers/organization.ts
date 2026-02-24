@@ -3,13 +3,11 @@ import {
   listInvitations,
   listMembers,
   listUserInvitations,
-  updateOrganizationInformation,
 } from "@/server/domains/auth/organization-service";
 import {
   listInvitationsSchema,
   listMembersSchema,
   listUserInvitationsSchema,
-  updateOrganizationSchema,
 } from "@/shared/validators/organization.schema";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
@@ -30,12 +28,6 @@ export const organizationRouter = createTRPCRouter({
       headers,
     });
   }),
-
-  update: protectedProcedure
-    .input(updateOrganizationSchema)
-    .mutation(async ({ ctx: { headers }, input }) => {
-      return await updateOrganizationInformation(headers, input);
-    }),
 
   listMembers: protectedProcedure
     .input(listMembersSchema)

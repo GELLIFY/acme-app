@@ -4,6 +4,7 @@ import { formatForDisplay, useHotkey } from "@tanstack/react-hotkeys";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowRightIcon,
+  Building2Icon,
   ChevronsUpDownIcon,
   PlusIcon,
   SettingsIcon,
@@ -58,6 +59,9 @@ export function OrganizationSwitcher() {
   const { data: activeOrganization } = useOrganizationQuery();
   const { data: organizations } = useQuery(
     trpc.organization.list.queryOptions(),
+  );
+  const { data: invitations } = useQuery(
+    trpc.organization.listUserInvitations.queryOptions({ email: user.email }),
   );
 
   const setActiveOrganizationMutation = useMutation({
@@ -233,6 +237,33 @@ export function OrganizationSwitcher() {
                           <ArrowRightIcon className="group-focus/dropdown-menu-item:opacity-100 opacity-0 transition-opacity" />
                         </div>
                       )}
+                    </DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                ))}
+                {invitations?.map((invitation) => (
+                  <DropdownMenuItem
+                    key={invitation.id}
+                    className={cn(
+                      "gap-2 p-2 focus:bg-transparent focus:text-primary",
+                    )}
+                  >
+                    <Avatar size="sm">
+                      <AvatarFallback>
+                        <Building2Icon className="size-3" />
+                      </AvatarFallback>
+                    </Avatar>
+                    {invitation.organizationName}
+                    <DropdownMenuShortcut>
+                      <Button
+                        variant="outline"
+                        size="xs"
+                        render={
+                          <Link href={`/accept-invitation/${invitation.id}`}>
+                            Join
+                          </Link>
+                        }
+                        nativeButton={false}
+                      />
                     </DropdownMenuShortcut>
                   </DropdownMenuItem>
                 ))}

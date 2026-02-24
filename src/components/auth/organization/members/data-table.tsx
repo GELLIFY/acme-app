@@ -15,26 +15,27 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useUserQuery } from "@/hooks/use-user";
 import { useScopedI18n } from "@/shared/locales/client";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  currentUserId: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  currentUserId,
 }: DataTableProps<TData, TValue>) {
   const t = useScopedI18n("organization");
+
+  const { data: user } = useUserQuery();
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    meta: { userId: currentUserId },
+    meta: { userId: user.id },
   });
 
   return (
