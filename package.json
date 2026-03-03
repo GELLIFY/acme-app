@@ -10,7 +10,7 @@
   "scripts": {
     "build": "next build",
     "clean": "git clean -xdf node_modules .next",
-    "auth:generate": "pnpm dlx @better-auth/cli@latest generate --config=src/shared/infrastructure/better-auth/auth.ts --output=src/server/db/schema/auth-schema-new.ts --yes",
+    "auth:generate": "pnpm dlx @better-auth/cli@latest generate --config=src/libs/better-auth/auth.ts --output=src/server/db/schema/auth-schema-new.ts --yes",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -46,6 +46,7 @@
     "@react-email/components": "1.0.7",
     "@scalar/hono-api-reference": "0.9.40",
     "@t3-oss/env-nextjs": "0.13.10",
+    "@tanstack/react-hotkeys": "^0.1.3",
     "@tanstack/react-query": "5.90.21",
     "@tanstack/react-query-devtools": "5.91.3",
     "@tanstack/react-table": "8.21.3",

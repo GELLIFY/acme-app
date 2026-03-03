@@ -212,6 +212,156 @@ export default {
   "account.delete.confirm_cancel": "Annulla",
   "account.delete.confirm_continue": "Continua",
 
+  organization: {
+    menu: "Organizzazione",
+    title: "Organizzazioni",
+    description:
+      "Creata una nuova organizzazione per collaborare con il tuo team.",
+    no_active: {
+      title: "Nessuna organizzazione attiva",
+      description:
+        "Crea la tua prima organizzazione o selezionane una dallo switcher.",
+    },
+    logo: {
+      title: "Logo",
+      description:
+        "Carica un logo per l'organizzazione. Clicca per scegliere un immagine tra i tuoi file.",
+      upload: "Carica logo",
+      remove: "Rimuovi logo",
+      message: "Un logo è opzionale ma fortemente consigliato.",
+    },
+    name: {
+      title: "Nome",
+      description:
+        "Inserisci il nome completo dell'organizzazione, oppure un nome visualizzato.",
+      placeholder: "Acme Inc.",
+      message: "Utilizza un massimo di 32 caratteri.",
+      updated: "Organizzazione aggiornata.",
+    },
+    common: {
+      save: "Salva",
+      cancel: "Annulla",
+    },
+    create: {
+      title: "Crea organizzazione",
+      description:
+        "Crea una nuova organizzazione per collaborare con il tuo team.",
+      open: "Nuova Organizzazione",
+      name: "Nome",
+      name_label: "Nome organizzazione",
+      name_placeholder: "Acme Inc.",
+      slug: "Slug",
+      slug_label: "Slug organizzazione",
+      slug_placeholder: "acme-inc",
+      slug_taken: "Questo slug e' gia in uso. Scegline uno diverso.",
+      logo: "Logo (opzionale)",
+      logo_description: "Recommended size 1:1, up to 1MB.",
+      logo_upload: "Carica logo",
+      submit: "Crea organizzazione",
+      hint: "Usa almeno 3 caratteri, minuscole e trattini (esempio: acme-inc).",
+    },
+    summary: {
+      members: "{count} membri",
+    },
+    switcher: {
+      title: "Organization attiva",
+      description:
+        "Cambia la organization attiva usata dalle API organization-scoped.",
+      label: "Organizzazioni",
+      placeholder: "Personal",
+      submit: "Imposta organization attiva",
+      current: "Organization attiva selezionata.",
+      none: "Nessuna organization attiva selezionata.",
+      empty: {
+        title: "Nessuna organization",
+        description:
+          "Crea la tua prima organization per gestire membri e inviti.",
+      },
+    },
+    members: {
+      title: "Membri",
+      table_member: "Membro",
+      table_role: "Ruolo",
+      open_menu: "Apri menu",
+      actions: "Azioni",
+      delete: "Elimina",
+      "description#zero":
+        "Nessun membro ancora. Inizia a invitare il tuo team.",
+      "description#one":
+        "Sei la prima persona in questa organizzazione. Inizia a invitare il tuo team.",
+      "description#other":
+        "Lista in sola lettura dei membri dell'organizzazione attiva.",
+      me: "Tu",
+      member: "Membro organizzazione",
+      role_placeholder: "Seleziona ruolo",
+      removed: "Membro rimosso.",
+      empty: {
+        title: "Nessun membro",
+        description: "Questa organizzazione non ha ancora membri.",
+      },
+    },
+    invite: {
+      title: "Invita membri",
+      description: "Invita utenti e condividi direttamente il link di invito.",
+      email: "Email membro",
+      role: "Ruolo",
+      role_member: "Membro",
+      role_admin: "Admin",
+      submit: "Invita membro",
+      no_permission: "Non puoi invitare membri in questa organizzazione.",
+      link_label: "Link invito condivisibile",
+      copy: "Copia link",
+      pending: "Inviti in sospeso",
+      pending_empty: "Nessun invito in sospeso.",
+      pending_empty_description:
+        "Invita il tuo team a collaborare su questo progetto.",
+      pending_invite_btn: "Invita Membri",
+      cancel_title: "Annullare l'invito?",
+      cancel_description:
+        "Questo invaliderà il link di invito per questo utente.",
+      cancel_confirm: "Annulla invito",
+    },
+    incoming: {
+      title: "Inviti ricevuti",
+      description:
+        "Controlla e accetta o rifiuta gli inviti ricevuti sulla tua email.",
+      from_link: "Invito da URL",
+      invalid_link:
+        "L'invito nell'URL non è valido, è scaduto, o non è destinato al tuo utente.",
+      accept: "Accetta",
+      reject: "Rifiuta",
+      empty: {
+        title: "Nessun invito",
+        description: "Non hai inviti organization pendenti.",
+      },
+    },
+    messages: {
+      created: "Organization creata.",
+      active_set: "Organization attiva aggiornata.",
+      invited: "Invito creato con successo.",
+      accepted: "Invito accettato.",
+      rejected: "Invito rifiutato.",
+      canceled: "Invito annullato.",
+      error: "Azione organization non riuscita.",
+    },
+
+    // delete
+    delete: {
+      title: "Elimina organizzazione",
+      description:
+        "Rimuovi definitivamente l'organizzazione e tutti i suoi contenuti. Questa azione non è reversibile, quindi procedi con cautela.",
+      btn: "Elimina",
+      confirm_title: "Sei assolutamente sicuro?",
+      confirm_description:
+        "Questa azione non può essere annullata. Questo eliminerà definitivamente l'organizzazione e rimuoverà i dati dai nostri server.",
+      confirm_type: "Digita 'DELETE' per confermare.",
+      confirm_email:
+        "Un'email di conferma è stata inviata al tuo indirizzo. Controlla la tua casella di posta per confermare l'eliminazione dell'organizzazione.",
+      confirm_cancel: "Annulla",
+      confirm_continue: "Continua",
+    },
+  },
+
   // todo feature
   "todo.title": "List todo",
   "todo.subtitle": "Gestisci i tuoi task in modo efficiente",

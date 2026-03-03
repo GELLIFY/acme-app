@@ -38,8 +38,15 @@ export const ROLES = {
   ADMIN: "admin",
   USER: "user",
 } as const;
-
 export type Role = (typeof ROLES)[keyof typeof ROLES];
+
+export const ORGANIZATION_ROLES = {
+  OWNER: "owner",
+  ADMIN: "admin",
+  MEMBER: "member",
+} as const;
+export type OrganizationRole =
+  (typeof ORGANIZATION_ROLES)[keyof typeof ORGANIZATION_ROLES];
 
 export type AccessControlStatements = typeof ac.statements;
 

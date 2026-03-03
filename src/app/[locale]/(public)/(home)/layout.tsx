@@ -1,15 +1,17 @@
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/navbar-components/navbar";
+import { getCachedSession } from "@/libs/better-auth/get-cached-session";
 
 export default async function Layout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <div className="relative">
-      <Navbar />
+  const session = await getCachedSession();
 
-      <div>{children}</div>
+  return (
+    <div>
+      <Navbar user={session?.user} />
+      {children}
     </div>
   );
 }

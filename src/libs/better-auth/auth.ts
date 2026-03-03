@@ -2,7 +2,12 @@ import { passkey } from "@better-auth/passkey";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
-import { apiKey, lastLoginMethod, openAPI } from "better-auth/plugins";
+import {
+  apiKey,
+  lastLoginMethod,
+  openAPI,
+  organization,
+} from "better-auth/plugins";
 import type { Statements } from "better-auth/plugins/access";
 import { admin } from "better-auth/plugins/admin";
 import { twoFactor } from "better-auth/plugins/two-factor";
@@ -13,6 +18,7 @@ import {
   sendChangeEmailConfirmationEmail,
   sendDeleteAccountVerificationEmail,
   sendEmailVerificationEmail,
+  sendOrganizationInvitationEmail,
   sendResetPasswordEmail,
 } from "@/server/services/email-service";
 import { ac, adminRole, userRole } from "./permissions";
@@ -73,6 +79,20 @@ export const auth = instrumentBetterAuth(
           user: userRole,
         },
       }),
+      organization({
+        organizationLimit: 5,
+        cancelPendingInvitationsOnReInvite: true,
+        async sendInvitationEmail(data) {
+          const inviteLink = `https://example.com/accept-invitation/${data.id}`;
+          sendOrganizationInvitationEmail({
+            email: data.email,
+            invitedByUsername: data.inviter.user.name,
+            invitedByEmail: data.inviter.user.email,
+            teamName: data.organization.name,
+            inviteLink,
+          });
+        },
+      }),
       apiKey({
         permissions: {
           defaultPermissions: async (_userId) => {
@@ -97,3 +117,9 @@ export const auth = instrumentBetterAuth(
     ],
   }),
 );
+
+export type Session = typeof auth.$Infer.Session;
+export type User = typeof auth.$Infer.Session.user;
+export type ActiveOrganization = typeof auth.$Infer.ActiveOrganization;
+export type Organization = typeof auth.$Infer.Organization;
+export type OrganizationRole = ActiveOrganization["members"][number]["role"];
