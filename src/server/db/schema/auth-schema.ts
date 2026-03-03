@@ -155,16 +155,10 @@ export const apikey = createTable(
   "apikey",
   (d) => ({
     id: d.uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
-    createdAt: d.timestamp("created_at").notNull(),
-    updatedAt: d.timestamp("updated_at").notNull(),
-
-    userId: d
-      .uuid("user_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
-
+    configId: d.text("config_id").default("default").notNull(),
     name: d.text("name"),
     start: d.text("start"),
+    referenceId: d.text("reference_id").notNull(),
     prefix: d.text("prefix"),
     key: d.text("key").notNull(),
     refillInterval: d.integer("refill_interval"),
@@ -178,12 +172,15 @@ export const apikey = createTable(
     remaining: d.integer("remaining"),
     lastRequest: d.timestamp("last_request"),
     expiresAt: d.timestamp("expires_at"),
+    createdAt: d.timestamp("created_at").notNull(),
+    updatedAt: d.timestamp("updated_at").notNull(),
     permissions: d.text("permissions"),
     metadata: d.text("metadata"),
   }),
   (table) => [
+    index("apikey_configId_idx").on(table.configId),
+    index("apikey_referenceId_idx").on(table.referenceId),
     index("apikey_key_idx").on(table.key),
-    index("apikey_userId_idx").on(table.userId),
   ],
 );
 
@@ -237,7 +234,6 @@ export const userRelations = relations(user, ({ many }) => ({
   accounts: many(account),
   members: many(member),
   invitations: many(invitation),
-  apikeys: many(apikey),
   passkeys: many(passkey),
   twoFactors: many(twoFactor),
 }));
@@ -279,13 +275,6 @@ export const invitationRelations = relations(invitation, ({ one }) => ({
   }),
   user: one(user, {
     fields: [invitation.inviterId],
-    references: [user.id],
-  }),
-}));
-
-export const apikeyRelations = relations(apikey, ({ one }) => ({
-  user: one(user, {
-    fields: [apikey.userId],
     references: [user.id],
   }),
 }));

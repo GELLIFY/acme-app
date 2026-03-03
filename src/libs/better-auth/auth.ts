@@ -1,13 +1,9 @@
+import { apiKey } from "@better-auth/api-key";
+import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { passkey } from "@better-auth/passkey";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
-import {
-  apiKey,
-  lastLoginMethod,
-  openAPI,
-  organization,
-} from "better-auth/plugins";
+import { lastLoginMethod, openAPI, organization } from "better-auth/plugins";
 import type { Statements } from "better-auth/plugins/access";
 import { admin } from "better-auth/plugins/admin";
 import { twoFactor } from "better-auth/plugins/two-factor";
@@ -95,7 +91,7 @@ export const auth = instrumentBetterAuth(
       }),
       apiKey({
         permissions: {
-          defaultPermissions: async (_userId) => {
+          defaultPermissions: async (_referenceId) => {
             // Fetch user role or other data to determine permissions
             const permissions: Statements = {
               todo: ["create"],

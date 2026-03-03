@@ -28,7 +28,7 @@ export default async function AdminPage({
     async userHasPermission() {
       return auth.api.userHasPermission({
         headers: await this.$.headersList,
-        body: { permission: { user: ["list"] } },
+        body: { permissions: { user: ["list"] } },
       });
     },
   });

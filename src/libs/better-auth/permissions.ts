@@ -52,7 +52,7 @@ export type AccessControlStatements = typeof ac.statements;
 
 export type Permissions = {
   [Resource in keyof AccessControlStatements]?: AccessControlStatements[Resource] extends readonly (infer Actions)[]
-    ? Actions[]
+    ? readonly Actions[]
     : never;
 };
 

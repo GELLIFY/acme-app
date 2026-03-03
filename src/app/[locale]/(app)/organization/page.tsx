@@ -44,7 +44,7 @@ export default async function OrganizationPage() {
     async canUpdateOrganization() {
       const { error, success } = await auth.api.hasPermission({
         headers: await this.$.headersList,
-        body: { permission: { organization: ["update"] } },
+        body: { permissions: { organization: ["update"] } },
       });
 
       return error ? false : success;
@@ -52,7 +52,7 @@ export default async function OrganizationPage() {
     async canDeleteOrganization() {
       const { error, success } = await auth.api.hasPermission({
         headers: await this.$.headersList,
-        body: { permission: { organization: ["delete"] } },
+        body: { permissions: { organization: ["delete"] } },
       });
 
       return error ? false : success;

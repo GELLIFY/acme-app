@@ -73,7 +73,9 @@ import type { auth } from "@/libs/better-auth/auth";
 import { authClient } from "@/libs/better-auth/auth-client";
 import { useScopedI18n } from "@/shared/locales/client";
 
-type ApiKey = Awaited<ReturnType<typeof auth.api.listApiKeys>>[number];
+type ApiKey = Awaited<
+  ReturnType<typeof auth.api.listApiKeys>
+>["apiKeys"][number];
 type ApiKeyData = Awaited<ReturnType<typeof auth.api.createApiKey>>;
 
 const EXPIRES_OPTIONS = {

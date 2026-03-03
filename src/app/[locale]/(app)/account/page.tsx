@@ -90,7 +90,7 @@ export default async function AccountPage() {
           </div>
         </TabsContent>
         <TabsContent value="api_keys">
-          <ApiKeyManagement apiKeys={apiKeys} />
+          <ApiKeyManagement apiKeys={apiKeys.apiKeys} />
         </TabsContent>
         <TabsContent value="danger">
           <DeleteAccount />

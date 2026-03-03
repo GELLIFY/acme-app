@@ -48,12 +48,13 @@ export const withAuth = createMiddleware<Context>(async (c, next) => {
 
     if (!data.valid || data.error || !data.key) {
       throw new HTTPException(401, {
-        message: data.error?.message ?? "Invalid or expired api-key",
+        message:
+          (data.error?.message as string) ?? "Invalid or expired api-key",
       });
     }
 
     // Set session on context
-    c.set("userId", data.key.userId);
+    c.set("userId", data.key.referenceId);
     c.set("permissions", data.key.permissions ?? {});
     return await next();
   }
