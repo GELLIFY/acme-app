@@ -7,6 +7,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { ImpersonationIndicator } from "@/components/auth/admin/impersonation-indicator";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { TRPCReactProvider } from "@/libs/trpc/client";
 import { I18nProviderClient } from "@/shared/locales/client";
 
@@ -55,10 +56,12 @@ export default async function RootLayout({
                 enableSystem
                 disableTransitionOnChange
               >
-                {children}
-                <Toaster />
-                <ImpersonationIndicator />
-                <WebVitals />
+                <TooltipProvider>
+                  {children}
+                  <Toaster />
+                  <ImpersonationIndicator />
+                  <WebVitals />
+                </TooltipProvider>
               </ThemeProvider>
             </NuqsAdapter>
           </I18nProviderClient>
