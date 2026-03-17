@@ -66,7 +66,7 @@ export function OrganizationLogo({
         <CardDescription>{t("logo.description")}</CardDescription>
         <CardAction>
           <Avatar
-            className="group flex cursor-pointer items-center justify-center size-15"
+            className="group flex size-15 cursor-pointer items-center justify-center"
             onClick={() => {
               if ("current" in fileInputRef && fileInputRef.current) {
                 fileInputRef.current.click();
@@ -78,11 +78,11 @@ export function OrganizationLogo({
             ) : (
               <>
                 <AvatarImage
-                  className="size-15"
+                  className="size-15 transition-opacity duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:group-hover:opacity-20"
                   src={organization?.logo ?? undefined}
                 />
-                <AvatarFallback>
-                  <UploadIcon className="size-5 group-hover:scale-110 transition-transform" />
+                <AvatarFallback className="transition-[opacity,transform] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:scale-95 [@media(hover:hover)_and_(pointer:fine)]:opacity-80 [@media(hover:hover)_and_(pointer:fine)]:group-hover:scale-100 [@media(hover:hover)_and_(pointer:fine)]:group-hover:opacity-100">
+                  <UploadIcon className="size-5 transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:group-hover:scale-105" />
                 </AvatarFallback>
               </>
             )}

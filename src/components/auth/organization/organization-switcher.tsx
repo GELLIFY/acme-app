@@ -147,7 +147,7 @@ export function OrganizationSwitcher() {
             <Button
               variant="ghost"
               size="lg"
-              className="h-auto p-0 hover:bg-transparent"
+              className="h-auto p-0 transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-transparent active:scale-[0.97] motion-reduce:transition-none"
             />
           }
         >
@@ -206,7 +206,7 @@ export function OrganizationSwitcher() {
                     ></Button>
                   ) : (
                     <div className="pr-2">
-                      <ArrowRightIcon className="group-focus/dropdown-menu-item:opacity-100 opacity-0 transition-opacity" />
+                      <ArrowRightIcon className="translate-x-0 opacity-0 transition-[transform,opacity] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none group-focus/dropdown-menu-item:translate-x-0.5 group-focus/dropdown-menu-item:opacity-100 group-hover/dropdown-menu-item:translate-x-0.5 group-hover/dropdown-menu-item:opacity-100" />
                     </div>
                   )}
                 </DropdownMenuShortcut>
@@ -283,7 +283,7 @@ export function OrganizationSwitcher() {
                   />
                 ) : (
                   <div className="pr-2">
-                    <ArrowRightIcon className="group-focus/dropdown-menu-item:opacity-100 opacity-0 transition-opacity" />
+                    <ArrowRightIcon className="translate-x-0 opacity-0 transition-[transform,opacity] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none group-focus/dropdown-menu-item:translate-x-0.5 group-focus/dropdown-menu-item:opacity-100 group-hover/dropdown-menu-item:translate-x-0.5 group-hover/dropdown-menu-item:opacity-100" />
                   </div>
                 )}
               </DropdownMenuShortcut>

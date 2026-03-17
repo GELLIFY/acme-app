@@ -61,15 +61,15 @@ export default function Navbar({ user }: { user?: User }) {
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  className="-translate-y-[7px] origin-center transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-expanded:translate-x-0 group-aria-expanded:translate-y-0 group-aria-expanded:rotate-315"
+                  className="-translate-y-[7px] origin-center transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none group-aria-expanded:translate-x-0 group-aria-expanded:translate-y-0 group-aria-expanded:rotate-315"
                   d="M4 12L20 12"
                 />
                 <path
-                  className="origin-center transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.8)] group-aria-expanded:rotate-45"
+                  className="origin-center transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none group-aria-expanded:rotate-45"
                   d="M4 12H20"
                 />
                 <path
-                  className="origin-center translate-y-[7px] transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-expanded:translate-y-0 group-aria-expanded:rotate-135"
+                  className="origin-center translate-y-[7px] transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none group-aria-expanded:translate-y-0 group-aria-expanded:rotate-135"
                   d="M4 12H20"
                 />
               </svg>

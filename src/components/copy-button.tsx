@@ -30,7 +30,7 @@ export function CopyButton({
             size="icon"
             variant={variant}
             className={cn(
-              "bg-code absolute top-3 right-2 z-10 size-7 hover:opacity-100 focus-visible:opacity-100",
+              "bg-code absolute top-3 right-2 z-10 size-7 hover:opacity-100 focus-visible:opacity-100 transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] motion-reduce:transition-none",
               className,
             )}
             onClick={() => {
@@ -39,7 +39,20 @@ export function CopyButton({
             {...props}
           >
             <span className="sr-only">Copy</span>
-            {isCopied ? <CopyCheckIcon /> : <CopyIcon />}
+            <span className="relative size-4">
+              <CopyIcon
+                className={cn(
+                  "absolute inset-0 size-4 transition-[opacity,filter] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none",
+                  isCopied ? "opacity-0 blur-[2px]" : "opacity-100 blur-0",
+                )}
+              />
+              <CopyCheckIcon
+                className={cn(
+                  "absolute inset-0 size-4 transition-[opacity,filter] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none",
+                  isCopied ? "opacity-100 blur-0" : "opacity-0 blur-[2px]",
+                )}
+              />
+            </span>
           </Button>
         }
       />

@@ -12,7 +12,7 @@ export function ImpersonationIndicator() {
   if (session?.session.impersonatedBy == null) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 z-50">
+    <div className="fixed bottom-4 left-4 z-50 motion-reduce:transition-none motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 motion-safe:duration-200">
       <Button
         onClick={() =>
           authClient.admin.stopImpersonating(undefined, {
