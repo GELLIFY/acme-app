@@ -10,6 +10,7 @@ concurrency:
 
 jobs:
   delete_neon_branch:
+    if: ${{ !startsWith(github.head_ref, 'renovate/') }}
     name: Delete Neon Branch
     runs-on: ubuntu-latest
     steps:
@@ -26,6 +27,7 @@ jobs:
           api_key: ${{ secrets.NEON_API_KEY }}
 
   cleanup_preview:
+    if: ${{ !startsWith(github.head_ref, 'renovate/') }}
     name: Cleanup Vercel Preview
     needs: delete_neon_branch
     runs-on: ubuntu-latest
