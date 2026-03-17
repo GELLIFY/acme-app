@@ -27,10 +27,10 @@
     "start": "node .next/standalone/server.js"
   },
   "dependencies": {
-    "@base-ui/react": "1.2.0",
-    "@better-auth/api-key": "^1.5.2",
-    "@better-auth/drizzle-adapter": "^1.5.2",
-    "@better-auth/passkey": "1.5.2",
+    "@base-ui/react": "1.3.0",
+    "@better-auth/api-key": "1.5.5",
+    "@better-auth/drizzle-adapter": "1.5.5",
+    "@better-auth/passkey": "1.5.5",
     "@hono/zod-openapi": "1.2.1",
     "@hookform/resolvers": "5.2.2",
     "@kubiks/otel-better-auth": "2.0.2",
@@ -57,7 +57,7 @@
     "@trpc/tanstack-react-query": "11.10.0",
     "@vercel/otel": "2.1.0",
     "better-all": "0.0.7",
-    "better-auth": "1.5.2",
+    "better-auth": "1.5.5",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "date-fns": "4.1.0",
