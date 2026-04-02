@@ -12,3 +12,11 @@ Acme App is a Next.js 16 app built on the GELLIFY Stack for full-stack TypeScrip
 - Testing: docs/agent/TESTING.md
 - Security: docs/agent/SECURITY.md
 - PRs: docs/agent/PR.md
+
+<!-- BEGIN:nextjs-agent-rules -->
+ 
+# Next.js: ALWAYS read docs before coding
+ 
+Before any Next.js work, find and read the relevant doc in `node_modules/next/dist/docs/`. Your training data is outdated — the docs are the source of truth.
+ 
+<!-- END:nextjs-agent-rules -->

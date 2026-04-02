@@ -1,6 +1,10 @@
 "use client";
 
-import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { Trash2Icon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -23,7 +27,9 @@ export function TodoList() {
   );
   const [visibleIds, setVisibleIds] = useState<Record<string, boolean>>({});
   const [exitingIds, setExitingIds] = useState<Record<string, boolean>>({});
-  const deleteTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const deleteTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>(
+    {},
+  );
 
   useEffect(() => {
     const nextIds = data.map((todo) => todo.id);

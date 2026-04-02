@@ -131,7 +131,10 @@ export function CreateOrganizationForm() {
                 className="group size-12 cursor-pointer"
                 onClick={() => fileInputRef.current?.click()}
               >
-                <AvatarImage className="transition-opacity duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:group-hover:opacity-20" src={imagePreview} />
+                <AvatarImage
+                  className="transition-opacity duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:group-hover:opacity-20"
+                  src={imagePreview}
+                />
                 <AvatarFallback className="transition-[opacity,transform] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:scale-95 [@media(hover:hover)_and_(pointer:fine)]:opacity-80 [@media(hover:hover)_and_(pointer:fine)]:group-hover:scale-100 [@media(hover:hover)_and_(pointer:fine)]:group-hover:opacity-100">
                   <UploadIcon className="size-4 transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:group-hover:scale-105" />
                 </AvatarFallback>
