@@ -20,7 +20,7 @@ import { loadTodoFilters } from "./search-params";
 
 export default async function TodoPage(props: PageProps<"/[locale]/todo">) {
   // auth guard
-  const session = getCachedSession();
+  const session = await getCachedSession();
   if (!session) return unauthorized();
 
   // get scoped translations and filters

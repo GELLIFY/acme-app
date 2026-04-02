@@ -8,9 +8,19 @@ export function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        // With SSR, we usually want to set some default staleTime
-        // above 0 to avoid refetching immediately on the client
-        staleTime: 30 * 1000,
+        // Data is fresh for 60 seconds — no refetch in this window
+        staleTime: 60 * 1000,
+        // Keep inactive queries in cache for 10 minutes
+        gcTime: 10 * 60 * 1000,
+        // Don't refetch on window focus for most apps
+        refetchOnWindowFocus: false,
+        // Retry failed queries 2 times with exponential backoff
+        retry: 2,
+        retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      },
+      mutations: {
+        // Retry mutations once (be careful — mutations are not idempotent!)
+        retry: 1,
       },
       dehydrate: {
         serializeData: superjson.serialize,
