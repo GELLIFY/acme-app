@@ -7,7 +7,7 @@ import { lastLoginMethod, openAPI, organization } from "better-auth/plugins";
 import type { Statements } from "better-auth/plugins/access";
 import { admin } from "better-auth/plugins/admin";
 import { twoFactor } from "better-auth/plugins/two-factor";
-import { instrumentBetterAuth } from "@/infrastructure/otel/otel-better-auth";
+import { instrumentBetterAuth } from "@/libs/better-auth/otel-better-auth";
 import { db } from "@/server/db";
 import { schema } from "@/server/db/schema";
 import {

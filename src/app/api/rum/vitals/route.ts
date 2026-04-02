@@ -3,7 +3,7 @@ import type { Metric } from "web-vitals";
 import {
   exportMetricEntry,
   initializeMetricsExporter,
-} from "@/infrastructure/otel/metric-exporter";
+} from "@/app/api/rum/vitals/metric-exporter";
 import { logger } from "@/libs/logger/logger";
 
 // Initialize the OTLP exporter when this route is first hit

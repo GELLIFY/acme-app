@@ -1,5 +1,5 @@
-import { reportErrorStackTrace } from "@/infrastructure/otel/report-error-stack-trace";
 import { browserLogger } from "@/libs/logger/browser-logger";
+import { reportErrorStackTrace } from "@/shared/helpers/report-error-stack-trace";
 
 // Set up error tracking
 window.onerror = (message, source, lineno, colno, error) => {
