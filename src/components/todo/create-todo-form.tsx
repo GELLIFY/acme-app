@@ -4,10 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import type z from "zod";
-
+import { useTodoFilters } from "@/app/[locale]/(app)/todo/search-params";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useTodoFilterParams } from "@/hooks/use-todo-filter-params";
 import { browserLogger } from "@/libs/logger/browser-logger";
 import { useTRPC } from "@/libs/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
@@ -18,7 +17,7 @@ import { Spinner } from "../ui/spinner";
 export function CreateTodoForm() {
   const t = useScopedI18n("todo");
 
-  const { filter } = useTodoFilterParams();
+  const [filter] = useTodoFilters();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof createTodoSchema>>({

@@ -1,7 +1,7 @@
 "use client";
 
 import { useId } from "react";
-import { useTodoFilterParams } from "@/hooks/use-todo-filter-params";
+import { useTodoFilters } from "@/app/[locale]/(app)/todo/search-params";
 import { useScopedI18n } from "@/shared/locales/client";
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
@@ -10,7 +10,7 @@ export function TodoFilters() {
   const t = useScopedI18n("todo");
   const id = useId();
 
-  const { filter, setFilter } = useTodoFilterParams();
+  const [filter, setFilter] = useTodoFilters();
 
   return (
     <div className="mb-4 flex flex-col gap-4">

@@ -1,4 +1,4 @@
-import { FileTextIcon, LayersIcon, ListTodoIcon } from "lucide-react";
+import { FileTextIcon, ListTodoIcon } from "lucide-react";
 import Link from "next/link";
 import Logo from "@/components/navbar-components/logo";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,6 @@ import ThemeToggle from "./theme-toggle";
 
 // Navigation links with icons for desktop icon-only navigation
 const navigationLinks = [
-  { active: true, href: "/dashboard", icon: LayersIcon, label: "Dashboard" },
   { href: "/todo", icon: ListTodoIcon, label: "Todos" },
   { href: "#", icon: FileTextIcon, label: "Documentation" },
 ];
@@ -82,7 +81,6 @@ export default function Navbar({ user }: { user?: User }) {
                     return (
                       <NavigationMenuItem className="w-full" key={link.label}>
                         <NavigationMenuLink
-                          active={link.active}
                           className="flex-row items-center gap-2 py-1.5"
                           href={link.href}
                         >

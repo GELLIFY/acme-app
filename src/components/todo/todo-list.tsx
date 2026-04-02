@@ -9,7 +9,7 @@ import { Trash2Icon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { useTodoFilterParams } from "@/hooks/use-todo-filter-params";
+import { useTodoFilters } from "@/app/[locale]/(app)/todo/search-params";
 import { useTRPC } from "@/libs/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 import { Button } from "../ui/button";
@@ -18,7 +18,7 @@ import { Checkbox } from "../ui/checkbox";
 export function TodoList() {
   const t = useScopedI18n("todo");
 
-  const { filter } = useTodoFilterParams();
+  const [filter] = useTodoFilters();
 
   const trpc = useTRPC();
   const queryClient = useQueryClient();

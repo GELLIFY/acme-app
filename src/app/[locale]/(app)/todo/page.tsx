@@ -1,8 +1,6 @@
-import type { SearchParams } from "nuqs/server";
-import { createLoader } from "nuqs/server";
+import { unauthorized } from "next/navigation";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-
 import { ErrorFallback } from "@/components/error-fallback";
 import { CreateTodoForm } from "@/components/todo/create-todo-form";
 import { TodoFilters } from "@/components/todo/todo-filters";
@@ -15,28 +13,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getCachedSession } from "@/libs/better-auth/get-cached-session";
 import { getQueryClient, HydrateClient, trpc } from "@/libs/trpc/server";
 import { getScopedI18n } from "@/shared/locales/server";
-import { todoFilterParamsSchema } from "@/shared/validators/todo.schema";
+import { loadTodoFilters } from "./search-params";
 
-type TodoPageProps = Readonly<{
-  searchParams: Promise<SearchParams>;
-}>;
+export default async function TodoPage(props: PageProps<"/[locale]/todo">) {
+  // auth guard
+  const session = getCachedSession();
+  if (!session) return unauthorized();
 
-export default async function TodoPage(props: TodoPageProps) {
-  // Get scoped translations for i18n
-  const [t, searchParams] = await Promise.all([
+  // get scoped translations and filters
+  const [t, filter] = await Promise.all([
     getScopedI18n("todo"),
-    props.searchParams,
+    loadTodoFilters(props.searchParams),
   ]);
-  const loadTodoFilterParams = createLoader(todoFilterParamsSchema);
-  const filter = loadTodoFilterParams(searchParams);
 
-  // Prefetch data on the server, they will be hydated on the client
+  // prefetch data on the server, they will be hydated on the client
   const queryClient = getQueryClient();
-  await queryClient.prefetchQuery(trpc.todo.get.queryOptions({ ...filter }));
-  // Or use the caller directly to get the actual data
-  // const todos = await caller.todo.getAll();
+  queryClient.prefetchQuery(trpc.todo.get.queryOptions({ ...filter }));
 
   return (
     <HydrateClient>
