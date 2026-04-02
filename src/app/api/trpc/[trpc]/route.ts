@@ -2,7 +2,7 @@ import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import type { NextRequest } from "next/server";
 
 import { env } from "@/env";
-import { serverLogger } from "@/infrastructure/logger/pino-logger";
+import { serverLogger } from "@/libs/logger/pino-logger";
 import { createTRPCContext } from "@/server/api/trpc/init";
 import { appRouter } from "@/server/api/trpc/routers/_app";
 

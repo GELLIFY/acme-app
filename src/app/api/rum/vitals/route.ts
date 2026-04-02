@@ -1,10 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
 import type { Metric } from "web-vitals";
-import { logger } from "@/infrastructure/logger/logger";
 import {
   exportMetricEntry,
   initializeMetricsExporter,
 } from "@/infrastructure/otel/metric-exporter";
+import { logger } from "@/libs/logger/logger";
 
 // Initialize the OTLP exporter when this route is first hit
 initializeMetricsExporter();

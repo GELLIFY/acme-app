@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { initTRPC } from "@trpc/server";
-import { serverLogger } from "@/infrastructure/logger/pino-logger";
+import { serverLogger } from "@/libs/logger/pino-logger";
 import { createWideEvent, shouldSample } from "@/shared/helpers/wide-event";
 import type { createTRPCContext } from "../init";
 

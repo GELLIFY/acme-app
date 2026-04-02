@@ -1,5 +1,5 @@
-import { exportLogEntry } from "@/infrastructure/logger/log-exporter";
-import { getTraceContext } from "../otel/get-trace-context";
+import { getTraceContext } from "@/infrastructure/otel/get-trace-context";
+import { exportLogEntry } from "@/libs/logger/log-exporter";
 
 export interface LogContext {
   traceId?: string;

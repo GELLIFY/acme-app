@@ -1,6 +1,6 @@
 "use client";
 
-import { getTraceContext } from "../otel/get-trace-context";
+import { getTraceContext } from "@/infrastructure/otel/get-trace-context";
 
 type LogLevel = "debug" | "info" | "warn" | "error";
 

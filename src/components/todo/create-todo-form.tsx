@@ -8,7 +8,7 @@ import type z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTodoFilterParams } from "@/hooks/use-todo-filter-params";
-import { browserLogger } from "@/infrastructure/logger/browser-logger";
+import { browserLogger } from "@/libs/logger/browser-logger";
 import { useTRPC } from "@/libs/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 import { createTodoSchema } from "@/shared/validators/todo.schema";

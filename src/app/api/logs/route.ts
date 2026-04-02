@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { initializeLogsExporter } from "@/infrastructure/logger/log-exporter";
-import { type LogEntry, logger } from "@/infrastructure/logger/logger";
+import { initializeLogsExporter } from "@/libs/logger/log-exporter";
+import { type LogEntry, logger } from "@/libs/logger/logger";
 
 // Initialize the OTLP exporter when this route is first hit
 initializeLogsExporter();

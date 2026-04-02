@@ -13,7 +13,7 @@ import {
 } from "@opentelemetry/semantic-conventions";
 import type { Metric } from "web-vitals";
 import { env } from "@/env";
-import { serverLogger } from "../logger/pino-logger";
+import { serverLogger } from "@/libs/logger/pino-logger";
 
 let isInitialized = false;
 let meterProvider: MeterProvider | null = null;

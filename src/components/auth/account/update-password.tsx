@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { browserLogger as logger } from "@/infrastructure/logger/browser-logger";
+import { browserLogger as logger } from "@/libs/logger/browser-logger";
 import { useTRPC } from "@/libs/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
 import { changePasswordSchema } from "@/shared/validators/user.schema";

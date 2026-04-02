@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { createMiddleware } from "hono/factory";
-import { serverLogger } from "@/infrastructure/logger/pino-logger";
+import { serverLogger } from "@/libs/logger/pino-logger";
 import { createWideEvent, shouldSample } from "@/shared/helpers/wide-event";
 import type { Context } from "../init";
 

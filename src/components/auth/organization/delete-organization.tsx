@@ -25,8 +25,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
-import { browserLogger } from "@/infrastructure/logger/browser-logger";
 import { authClient } from "@/libs/better-auth/auth-client";
+import { browserLogger } from "@/libs/logger/browser-logger";
 import { useScopedI18n } from "@/shared/locales/client";
 
 export function DeleteOrganization({

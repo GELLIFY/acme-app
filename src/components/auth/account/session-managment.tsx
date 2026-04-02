@@ -22,8 +22,8 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
-import { browserLogger as logger } from "@/infrastructure/logger/browser-logger";
 import { authClient } from "@/libs/better-auth/auth-client";
+import { browserLogger as logger } from "@/libs/logger/browser-logger";
 import { useScopedI18n } from "@/shared/locales/client";
 
 export function SessionManagement({

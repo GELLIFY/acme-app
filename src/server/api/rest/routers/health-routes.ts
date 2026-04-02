@@ -1,5 +1,5 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import { serverLogger } from "@/infrastructure/logger/pino-logger";
+import { serverLogger } from "@/libs/logger/pino-logger";
 import { checkHealth } from "@/server/services/health-service";
 import { createRouter } from "../utils/create-router";
 

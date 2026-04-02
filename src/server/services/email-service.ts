@@ -3,7 +3,7 @@ import DeleteAccountVerificationEmail from "@/emails/delete-account-verification
 import EmailVerificationEmail from "@/emails/email-verification-email";
 import OrganizationInvitationEmail from "@/emails/organization-invitation-email";
 import ResetPasswordEmail from "@/emails/reset-password-email";
-import { logger } from "@/infrastructure/logger/logger";
+import { logger } from "@/libs/logger/logger";
 import { resend } from "@/libs/resend";
 
 type ResetPasswordEmailParams = {
