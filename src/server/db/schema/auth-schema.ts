@@ -1,4 +1,4 @@
-import { relations, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { index, uniqueIndex } from "drizzle-orm/pg-core";
 import { createTable } from "./_table";
 
@@ -228,67 +228,3 @@ export const twoFactor = createTable(
     index("twoFactor_userId_idx").on(table.userId),
   ],
 );
-
-export const userRelations = relations(user, ({ many }) => ({
-  sessions: many(session),
-  accounts: many(account),
-  members: many(member),
-  invitations: many(invitation),
-  passkeys: many(passkey),
-  twoFactors: many(twoFactor),
-}));
-
-export const sessionRelations = relations(session, ({ one }) => ({
-  user: one(user, {
-    fields: [session.userId],
-    references: [user.id],
-  }),
-}));
-
-export const accountRelations = relations(account, ({ one }) => ({
-  user: one(user, {
-    fields: [account.userId],
-    references: [user.id],
-  }),
-}));
-
-export const organizationRelations = relations(organization, ({ many }) => ({
-  members: many(member),
-  invitations: many(invitation),
-}));
-
-export const memberRelations = relations(member, ({ one }) => ({
-  organization: one(organization, {
-    fields: [member.organizationId],
-    references: [organization.id],
-  }),
-  user: one(user, {
-    fields: [member.userId],
-    references: [user.id],
-  }),
-}));
-
-export const invitationRelations = relations(invitation, ({ one }) => ({
-  organization: one(organization, {
-    fields: [invitation.organizationId],
-    references: [organization.id],
-  }),
-  user: one(user, {
-    fields: [invitation.inviterId],
-    references: [user.id],
-  }),
-}));
-
-export const passkeyRelations = relations(passkey, ({ one }) => ({
-  user: one(user, {
-    fields: [passkey.userId],
-    references: [user.id],
-  }),
-}));
-
-export const twoFactorRelations = relations(twoFactor, ({ one }) => ({
-  user: one(user, {
-    fields: [twoFactor.userId],
-    references: [user.id],
-  }),
-}));

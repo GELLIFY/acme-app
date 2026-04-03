@@ -5,7 +5,7 @@ import { drizzle as drizzleWs } from "drizzle-orm/neon-serverless";
 import ws from "ws";
 
 import { env } from "@/env";
-import { schema } from "./schema";
+import { relations } from "./schema/relations";
 
 let connectionString = env.DATABASE_URL;
 
@@ -46,7 +46,7 @@ if (env.NODE_ENV === "development") {
 // - Better for high-frequency database operations
 const drizzleClientWs = drizzleWs({
   client: new Pool({ connectionString }),
-  schema,
+  relations,
   casing: "snake_case",
 });
 
