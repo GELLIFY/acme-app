@@ -1,4 +1,4 @@
-import { unauthorized } from "next/navigation";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "@/components/error-fallback";
@@ -21,7 +21,7 @@ import { loadTodoFilters } from "./search-params";
 export default async function TodoPage(props: PageProps<"/[locale]/todo">) {
   // auth guard
   const session = await getCachedSession();
-  if (!session) return unauthorized();
+  if (!session) return redirect("/sign-in");
 
   // get scoped translations and filters
   const [t, filter] = await Promise.all([

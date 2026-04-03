@@ -19,8 +19,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { User } from "@/libs/better-auth/auth";
-import { OrganizationSwitcher } from "../auth/organization/organization-switcher";
+import type { authClient } from "@/libs/better-auth/auth-client";
+import { UserMenu } from "../auth/user-menu";
 import LanguageSelector from "./language-selector";
 import ThemeToggle from "./theme-toggle";
 
@@ -29,6 +29,8 @@ const navigationLinks = [
   { href: "/todo", icon: ListTodoIcon, label: "Todos" },
   { href: "#", icon: FileTextIcon, label: "Documentation" },
 ];
+
+type User = typeof authClient.$Infer.Session.user;
 
 export default function Navbar({ user }: { user?: User }) {
   return (
@@ -143,7 +145,7 @@ export default function Navbar({ user }: { user?: User }) {
           <LanguageSelector />
           {/* User menu */}
           {user ? (
-            <OrganizationSwitcher />
+            <UserMenu user={user} />
           ) : (
             <Button
               className="text-sm"

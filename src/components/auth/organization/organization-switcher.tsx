@@ -33,20 +33,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useOrganizationQuery } from "@/hooks/use-organization";
-import { useUserQuery } from "@/hooks/use-user";
 import { authClient } from "@/libs/better-auth/auth-client";
 import { useTRPC } from "@/libs/trpc/client";
 import { cn } from "@/libs/utils";
+import type { RouterOutput } from "@/server/api/trpc/routers/_app";
 import { useScopedI18n } from "@/shared/locales/client";
 import { CreateOrganizationForm } from "./create-organization-form";
 
-export function OrganizationSwitcher() {
+export function OrganizationSwitcher({
+  user,
+}: {
+  user: RouterOutput["user"]["me"];
+}) {
   const router = useRouter();
   const t = useScopedI18n("organization");
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
-  const { data: user } = useUserQuery();
   const { data: activeOrganization } = useOrganizationQuery();
   const { data: organizations } = useQuery(
     trpc.organization.list.queryOptions(),
