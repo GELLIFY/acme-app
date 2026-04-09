@@ -62,7 +62,7 @@
     "clsx": "2.1.1",
     "date-fns": "4.1.0",
     "dotenv": "17.3.1",
-    "drizzle-orm": "0.45.1",
+    "drizzle-orm": "0.45.2",
     "drizzle-seed": "0.3.1",
     "flat": "6.0.1",
     "hono": "4.12.12",
