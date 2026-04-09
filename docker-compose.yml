@@ -36,7 +36,7 @@ services:
         max-file: "5"
 
   neon-proxy:
-    image: ghcr.io/timowilhelm/local-neon-http-proxy:main@sha256:19b528f4565b4d9b282bc64a8fb9d0b3a7f0ca7cd1b56d21e122ac7e0927a091
+    image: ghcr.io/timowilhelm/local-neon-http-proxy:main@sha256:cd2ae14edf2feafbc3330492de5c80506f77274c3bd013154cdef697bdeb768a
     environment:
       - PG_CONNECTION_STRING=postgres://postgres:postgres@db:5432/main
     ports:
