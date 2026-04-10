@@ -106,7 +106,7 @@
     "@types/node": "24.11.0",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
-    "babel-plugin-react-compiler": "^1.0.0",
+    "babel-plugin-react-compiler": "1.0.0",
     "drizzle-kit": "0.31.9",
     "postcss": "8.5.8",
     "react-email": "5.2.10",
