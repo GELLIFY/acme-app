@@ -1,0 +1,67 @@
+name: Performance Budget
+
+on:
+  workflow_call:
+    inputs:
+      preview_url:
+        type: string
+        required: true
+        description: preview url
+      db_url:
+        type: string
+        required: true
+        description: db connection string
+
+jobs:
+  bundle-size:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+      issues: write
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Install dependencies & tooling
+        uses: ./.github/workflows/setup
+
+      - run: |
+          touch .env
+          echo SKIP_ENV_VALIDATION=1 >> .env
+          echo DATABASE_URL=${{ inputs.db_url }} >> .env
+          echo BETTER_AUTH_URL=${{ inputs.preview_url }} >> .env
+          echo BETTER_SECRET=replace-with-a-32-char-minimum-secret >> .env
+
+      - run: pnpm run build
+
+      - uses: andresz1/size-limit-action@94bc357df29c36c8f8d50ea497c3e225c3c95d1d
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          skip_step: install
+          script: pnpm dlx size-limit --json
+          package_manager: pnpm
+
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Install dependencies & tooling
+        uses: ./.github/workflows/setup
+
+      - run: |
+          touch .env
+          echo SKIP_ENV_VALIDATION=1 >> .env
+          echo DATABASE_URL=${{ inputs.db_url }} >> .env
+          echo BETTER_AUTH_URL=${{ inputs.preview_url }} >> .env
+          echo BETTER_SECRET=replace-with-a-32-char-minimum-secret >> .env
+
+      - name: Run Lighthouse and test budgets
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: |
+            ${{inputs.preview_url}}
+            ${{inputs.preview_url}}/sign-in
+          budgetPath: ./budgets.json
+          temporaryPublicStorage: true
