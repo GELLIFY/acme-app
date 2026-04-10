@@ -1,15 +1,14 @@
 name: Performance Budget
 
-inputs:
-  preview_url:
-    description: preview url
-    required: true
-  db_url:
-    description: db connection string
-    required: true
-
 on:
   workflow_call:
+    inputs:
+      preview_url:
+        description: preview url
+        required: true
+      db_url:
+        description: db connection string
+        required: true
 
 jobs:
   bundle-size:
