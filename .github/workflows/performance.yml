@@ -1,11 +1,24 @@
 name: Performance Budget
 
+inputs:
+  preview_url:
+    description: preview url
+    required: true
+  db_url:
+    description: db connection string
+    required: true
+
 on:
   workflow_call:
 
 jobs:
   bundle-size:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+      issues: write
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
 
@@ -17,7 +30,7 @@ jobs:
       - uses: andresz1/size-limit-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          build_script: pnpm run build
+          build_script: build
           script: pnpm dlx size-limit --json
 
   lighthouse:
@@ -25,12 +38,11 @@ jobs:
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
 
-      - name: Install dependencies & tooling
-        uses: ./.github/workflows/setup
-
-      - run: mv .env.example .env
-      - run: pnpm run build
-
-      - run: |
-          LHCI_GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
-          pnpm dlx @lhci/cli autorun
+      - name: Run Lighthouse and test budgets
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: |
+            ${{inputs.preview_url}}
+            ${{inputs.preview_url}}/sign-in
+          budgetPath: ./budgets.json
+          temporaryPublicStorage: true
