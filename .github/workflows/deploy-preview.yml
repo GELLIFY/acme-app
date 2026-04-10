@@ -88,4 +88,3 @@ jobs:
     with:
       preview_url: ${{ needs.deploy_vercel.outputs.preview_url }}
       db_url: ${{ needs.create_branch.outputs.db_url_pooled }}
-      pr_number: ${{ github.event.number }}
