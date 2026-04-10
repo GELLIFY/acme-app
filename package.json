@@ -97,6 +97,7 @@
     "@electric-sql/pglite": "0.4.3",
     "@happy-dom/global-registrator": "20.8.9",
     "@react-email/preview-server": "5.2.10",
+    "@size-limit/preset-app": "^12.0.1",
     "@tailwindcss/postcss": "4.2.2",
     "@testing-library/dom": "10.4.1",
     "@testing-library/jest-dom": "6.9.1",
