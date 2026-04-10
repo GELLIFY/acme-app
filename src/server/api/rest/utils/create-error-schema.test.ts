@@ -232,7 +232,7 @@ describe("create-error-schema", () => {
     expect(Object.keys(example)).toHaveLength(2);
 
     expect(Array.isArray(example.issues)).toBe(true);
-    example.issues.forEach((issue) => {
+    for (const issue of example.issues) {
       expect(issue).toHaveProperty("code");
       expect(issue).toHaveProperty("path");
       const expectedKeys = ["code", "path"];
@@ -240,7 +240,7 @@ describe("create-error-schema", () => {
         expectedKeys.push("message");
       }
       expect(Object.keys(issue)).toEqual(expectedKeys);
-    });
+    }
   });
 
   it("ensures example shape is array for array schemas", () => {
@@ -264,7 +264,7 @@ describe("create-error-schema", () => {
     expect(Object.keys(example)).toHaveLength(2);
 
     expect(Array.isArray(example.issues)).toBe(true);
-    example.issues.forEach((issue) => {
+    for (const issue of example.issues) {
       expect(issue).toHaveProperty("code");
       expect(issue).toHaveProperty("path");
       const expectedKeys = ["code", "path"];
@@ -275,6 +275,6 @@ describe("create-error-schema", () => {
         );
       }
       expect(Object.keys(issue)).toEqual(expectedKeys);
-    });
+    }
   });
 });

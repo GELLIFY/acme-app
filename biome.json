@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.10/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.11/schema.json",
   "vcs": {
     "enabled": false,
     "clientKind": "git",
@@ -31,6 +31,8 @@
         "useKeyWithClickEvents": "off"
       },
       "style": {
+        "useConst": "error",
+        "useTemplate": "error",
         "noNonNullAssertion": "off",
         "noRestrictedImports": {
           "options": {
@@ -46,10 +48,17 @@
       },
       "correctness": {
         "useExhaustiveDependencies": "off",
-        "useUniqueElementIds": "off"
+        "useUniqueElementIds": "off",
+        "noUnusedImports": "error",
+        "noUnusedVariables": "error"
       },
       "suspicious": {
-        "noArrayIndexKey": "off"
+        "noArrayIndexKey": "off",
+        "noExplicitAny": "error"
+      },
+      "complexity": {
+        "noForEach": "warn",
+        "useFlatMap": "error"
       }
     }
   },
@@ -60,6 +69,7 @@
   },
   "javascript": {
     "formatter": {
+      "semicolons": "always",
       "quoteStyle": "double"
     }
   },
