@@ -2,7 +2,6 @@ import { instrumentDrizzleClient } from "@kubiks/otel-drizzle";
 import { neonConfig, Pool } from "@neondatabase/serverless";
 // import { drizzle as drizzleHttp } from "drizzle-orm/neon-http";
 import { drizzle as drizzleWs } from "drizzle-orm/neon-serverless";
-import ws from "ws";
 
 import { env } from "@/env";
 import { schema } from "./schema";
@@ -24,7 +23,7 @@ if (env.NODE_ENV === "development") {
   //@ts-expect-error bad typings
   neonConfig.wsProxy = (host) =>
     host === "db.localtest.me" ? `${host}:4444/v1` : undefined;
-  neonConfig.webSocketConstructor = ws;
+  neonConfig.webSocketConstructor = WebSocket;
 }
 
 // Drizzle supports both HTTP and WebSocket clients. Choose the one that fits your needs:

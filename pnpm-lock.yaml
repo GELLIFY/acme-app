@@ -197,9 +197,6 @@ importers:
       web-vitals:
         specifier: 5.1.0
         version: 5.1.0
-      ws:
-        specifier: 8.18.3
-        version: 8.18.3(bufferutil@4.1.0)
       zod:
         specifier: 4.3.6
         version: 4.3.6
@@ -243,9 +240,6 @@ importers:
       '@types/react-dom':
         specifier: 19.2.3
         version: 19.2.3(@types/react@19.2.14)
-      '@types/ws':
-        specifier: 8.18.1
-        version: 8.18.1
       babel-plugin-react-compiler:
         specifier: ^1.0.0
         version: 1.0.0
@@ -264,10 +258,6 @@ importers:
       typescript:
         specifier: 6.0.2
         version: 6.0.2
-    optionalDependencies:
-      bufferutil:
-        specifier: 4.1.0
-        version: 4.1.0
 
 packages:
 
