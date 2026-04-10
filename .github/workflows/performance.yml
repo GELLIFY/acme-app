@@ -31,17 +31,27 @@ jobs:
           echo SKIP_ENV_VALIDATION=1 >> .env
           echo DATABASE_URL=${{ inputs.db_url }} >> .env
           echo BETTER_AUTH_URL=${{ inputs.preview_url }} >> .env
+          echo BETTER_SECRET=replace-with-a-32-char-minimum-secret >> .env
 
       - uses: andresz1/size-limit-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          build_script: build
           script: pnpm dlx size-limit --json
 
   lighthouse:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Install dependencies & tooling
+        uses: ./.github/workflows/setup
+
+      - run: |
+          touch .env
+          echo SKIP_ENV_VALIDATION=1 >> .env
+          echo DATABASE_URL=${{ inputs.db_url }} >> .env
+          echo BETTER_AUTH_URL=${{ inputs.preview_url }} >> .env
+          echo BETTER_SECRET=replace-with-a-32-char-minimum-secret >> .env
 
       - name: Run Lighthouse and test budgets
         uses: treosh/lighthouse-ci-action@v12
