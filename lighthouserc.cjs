@@ -1,8 +1,6 @@
 const config = {
   ci: {
     collect: {
-      url: ['http://localhost:3000/'],
-      startServerCommand: 'pnpm run start',
       numberOfRuns: 3,
     },
     assert: {
