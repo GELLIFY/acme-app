@@ -13,11 +13,12 @@ jobs:
         uses: ./.github/workflows/setup
 
       - run: mv .env.example .env
-      - run: pnpm run build
 
       - uses: andresz1/size-limit-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          build_script: pnpm run build
+          script: pnpm dlx size-limit --json
 
   lighthouse:
     runs-on: ubuntu-latest
@@ -30,4 +31,6 @@ jobs:
       - run: mv .env.example .env
       - run: pnpm run build
 
-      - run: pnpm dlx @lhci/cli autorun
+      - run: |
+          LHCI_GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+          pnpm dlx @lhci/cli autorun
