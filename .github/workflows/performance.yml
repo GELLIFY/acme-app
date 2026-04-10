@@ -35,9 +35,11 @@ jobs:
 
       - run: pnpm run build
 
-      - uses: andresz1/size-limit-action@v1
+      - uses: andresz1/size-limit-action@94bc357df29c36c8f8d50ea497c3e225c3c95d1d
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          skip_step: install
+          script: pnpm dlx size-limit --json
           package_manager: pnpm
 
   lighthouse:
