@@ -16,6 +16,10 @@ jobs:
     name: Code quality
     uses: ./.github/workflows/ci.yml
 
+  performance:
+    name: Performance
+    uses: ./.github/workflows/performance.yml
+
   deploy_preview:
     if: ${{ !startsWith(github.head_ref, 'renovate/') }}
     name: Deploy Preview
