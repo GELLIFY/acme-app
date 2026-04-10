@@ -4,11 +4,13 @@ on:
   workflow_call:
     inputs:
       preview_url:
+        type: string
+        required: true
         description: preview url
-        required: true
       db_url:
-        description: db connection string
+        type: string
         required: true
+        description: db connection string
 
 jobs:
   bundle-size:
@@ -24,7 +26,11 @@ jobs:
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
 
-      - run: mv .env.example .env
+      - run: |
+          touch .env
+          echo SKIP_ENV_VALIDATION=1 >> .env
+          echo DATABASE_URL=${{ inputs.db_url }} >> .env
+          echo BETTER_AUTH_URL=${{ inputs.preview_url }} >> .env
 
       - uses: andresz1/size-limit-action@v1
         with:
