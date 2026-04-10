@@ -110,6 +110,7 @@
     "drizzle-kit": "0.31.9",
     "postcss": "8.5.8",
     "react-email": "5.2.10",
+    "size-limit": "^12.0.1",
     "tsx": "4.21.0",
     "typescript": "6.0.2"
   },
