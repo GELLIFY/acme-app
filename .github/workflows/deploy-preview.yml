@@ -27,8 +27,8 @@ jobs:
       id-token: write
       issues: write
     outputs:
-      output1: ${{ steps.create_branch.outputs.db_url }}
-      output2: ${{ steps.deploy_vercel.outputs.preview_url }}
+      db_url: ${{ steps.create_branch.outputs.db_url }}
+      preview_url: ${{ steps.deploy_vercel.outputs.preview_url }}
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
 
@@ -86,5 +86,5 @@ jobs:
     needs: [deploy_preview]
     uses: ./.github/workflows/performance.yml
     with:
-      preview_url: ${{ needs.deploy_vercel.outputs.preview_url }}
-      db_url: ${{ needs.create_branch.outputs.db_url_pooled }}
+      preview_url: ${{ needs.deploy_preview.outputs.preview_url }}
+      db_url: ${{ needs.deploy_preview.outputs.db_url_pooled }}
