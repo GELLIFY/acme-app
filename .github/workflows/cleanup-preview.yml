@@ -20,7 +20,7 @@ jobs:
 
       - name: Delete Neon Branch
         continue-on-error: true
-        uses: neondatabase/delete-branch-action@c2005bb7d7caeba12ba3ec63857e9c9f9a4d695a # v3
+        uses: neondatabase/delete-branch-action@4468d825d5a88ef4012f1705a82f02ec3072f776 # v3
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
           branch: preview/pr-${{ github.event.number }}-${{ steps.branch_name.outputs.current_branch }}
