@@ -1,5 +1,9 @@
 name: Cleanup Preview
 
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
 on:
   pull_request:
     types:
@@ -36,12 +40,13 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
-
-      - name: Install dependencies & tooling
-        uses: ./.github/workflows/setup
-
-      - name: Cleanup Preview Deployment
-        id: cleanup_vercel
-        uses: ./.github/workflows/cd/vercel/cleanup-preview
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          node-version-file: ".nvmrc"
+      - name: Get branch name
+        id: branch_name
+        uses: tj-actions/branch-names@dde14ac574a8b9b1cedc59a1cf312788af43d8d8 # v8
+      - name: Delete Vercel Environment Information
+        continue-on-error: true
+        run: pnpm dlx vercel env rm DATABASE_URL preview ${{ steps.branch_name.outputs.current_branch }} --yes --token=${{ secrets.VERCEL_TOKEN }}
