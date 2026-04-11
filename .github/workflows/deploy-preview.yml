@@ -1,5 +1,9 @@
 name: Deploy Preview
 
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
 on:
   pull_request:
     types:
@@ -9,18 +13,79 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: true # Cancel previous runs for the same branch
 
 jobs:
-  code_quality:
-    name: Code quality
-    uses: ./.github/workflows/ci.yml
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-24.04-arm
+    outputs:
+      src: ${{ steps.filter.outputs.src }}
+      tests: ${{ steps.filter.outputs.tests }}
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            src:
+              - 'src/**'
+              - 'public/**'
+              - '!src/tests/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'drizzle.config.ts'
+              - 'next.config.ts'
+              - 'postcss.config.cjs'
+              - 'tsconfig.json'
+            tests:
+              - 'src/tests/**'
+              - '**/*.test.*'
+              - '**/*.spec.*'
+              - 'bunfig.toml'
 
-  deploy_preview:
-    if: ${{ !startsWith(github.head_ref, 'renovate/') }}
-    name: Deploy Preview
+  quality:
+    name: Code quality
+    needs: changes
+    if: needs.changes.outputs.src == 'true' || needs.changes.outputs.tests == 'true'
+    runs-on: ubuntu-24.04-arm
+    strategy:
+      fail-fast: false
+      matrix:
+        check: [lint, typecheck, test-unit]
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - name: Setup Biome
+        if: matrix.check == 'lint'
+        uses: biomejs/setup-biome@4c91541eaada48f67d7dbd7833600ce162b68f51 # v2
+        with:
+          version: "2.4.11"
+      - name: Setup dependencies
+        if: matrix.check != 'lint'
+        uses: ./.github/workflows/setup
+      - name: Setup Bun
+        if: matrix.check == 'test-unit'
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: 1.3.11
+      - name: Setup test env
+        if: matrix.check == 'test-unit'
+        run: |
+          cp .env.example .env
+          echo SKIP_ENV_VALIDATION=1 >> .env
+      - run: |
+          case "${{ matrix.check }}" in
+            lint)      biome ci . ;;
+            typecheck) pnpm run typecheck ;;
+            test-unit) pnpm run test ;;
+          esac
+
+  deploy_app:
+    name: Deploy App
     environment: Preview
-    runs-on: ubuntu-latest
+    needs: [changes, quality]
+    runs-on: ubuntu-24.04-arm
+    if: needs.changes.outputs.src == 'true' && !startsWith(github.head_ref, 'renovate/')
     permissions:
       contents: read
       pull-requests: write
@@ -28,15 +93,17 @@ jobs:
       issues: write
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
-
-      - name: Install dependencies & tooling
-        uses: ./.github/workflows/setup
+      - uses: ./.github/workflows/setup
 
       - name: Get branch name
         id: branch_name
         uses: tj-actions/branch-names@5250492686b253f06fa55861556d1027b067aeb5 # v9
 
-      - name: Create Neon Branch
+      - name: Get branch expiration date as an env variable (2 weeks from now)
+        run: |
+          echo "EXPIRES_AT=$(date -u --date '+14 days' +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
+
+      - name: 🪾 Create Neon Branch
         id: create_branch
         uses: neondatabase/create-branch-action@72ed4f69a12b6be9c16aebfad893f6a21e9aba8b # v6
         with:
@@ -46,34 +113,41 @@ jobs:
           database: neondb
           role: neondb_owner
           api_key: ${{ secrets.NEON_API_KEY }}
+          expires_at: ${{ env.EXPIRES_AT }}
 
-      - name: Apply Migrations
+      - name: 📦 Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: |
+            .next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.css') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+            nextjs-${{ runner.os }}-
+
+      - name: 📤 Pull Vercel Environment Information
         run: |
-          touch .env
-          echo SKIP_ENV_VALIDATION=1 >> .env
-          echo DATABASE_URL=${{ steps.create_branch.outputs.db_url_pooled }} >> .env
-          pnpm run db:migrate
+          printf '%s' '${{ steps.create_branch.outputs.db_url_pooled }}' | pnpm dlx vercel env add DATABASE_URL preview ${{ steps.branch_name.outputs.current_branch }} --force --token=${{ secrets.VERCEL_TOKEN }}
+          pnpm dlx vercel env pull .env --yes --environment=preview --git-branch=${{ steps.branch_name.outputs.current_branch }} --token=${{ secrets.VERCEL_TOKEN }}
+          echo "SKIP_ENV_VALIDATION=1" >> .env
+          pnpm dlx vercel pull --yes --environment=preview --git-branch=${{ steps.branch_name.outputs.current_branch }} --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Post Schema Diff Comment to PR
-        uses: neondatabase/schema-diff-action@80cfa8521628e890015b60f5291a7738926617dc # v1
-        with:
-          project_id: ${{ vars.NEON_PROJECT_ID }}
-          compare_branch: preview/pr-${{ github.event.number }}-${{ steps.branch_name.outputs.current_branch }}
-          database: neondb
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          base_branch: main
-          api_key: ${{ secrets.NEON_API_KEY }}
+      - name: 🐘 Apply Migrations
+        run: pnpm run db:migrate
 
-      - name: Deploy to Preview (Vercel)
-        id: deploy_vercel
-        uses: ./.github/workflows/cd/vercel/deploy-preview
-        with:
-          VERCEL_TOKEN: ${{ secrets.vercel_token }}
+      - name: 🏗 Build Project Artifacts
+        run: pnpm dlx vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        shell: bash
 
-      - name: Comment on Pull Request
+      - name: 🚀 Deploy Preview to Vercel
+        id: deploy
+        run: echo "preview_url=$(pnpm dlx vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" >> "$GITHUB_OUTPUT"
+        shell: bash
+
+      - name: 💬 Comment on Pull Request
         uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           message: |
-            Vercel Preview URL :rocket: : ${{ steps.deploy_vercel.outputs.preview_url }}
+            Vercel Preview URL :rocket: : ${{ steps.deploy.outputs.preview_url }}
             Neon branch :elephant: : https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ steps.create_branch.outputs.branch_id }}

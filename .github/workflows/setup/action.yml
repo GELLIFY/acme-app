@@ -1,5 +1,5 @@
-name: "Setup and install"
-description: "Common setup steps for Actions"
+name: "Setup"
+description: "Setup Node, pnpm, and install dependencies"
 
 runs:
   using: composite
@@ -11,4 +11,4 @@ runs:
         cache: "pnpm"
 
     - shell: bash
-      run: pnpm install
+      run: pnpm install --frozen-lockfile
