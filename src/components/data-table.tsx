@@ -41,11 +41,13 @@ import {
   ChevronsLeftIcon,
   ChevronsRightIcon,
   CircleCheckIcon,
+  CircleDotIcon,
   Columns3Icon,
   EllipsisVerticalIcon,
   GripVerticalIcon,
   LoaderIcon,
   PlusIcon,
+  SearchIcon,
   TrendingUpIcon,
 } from "lucide-react";
 import * as React from "react";
@@ -103,12 +105,15 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 export const schema = z.object({
   id: z.number(),
+  pr_id: z.string(),
   header: z.string(),
   type: z.string(),
   status: z.string(),
   target: z.string(),
   limit: z.string(),
-  reviewer: z.string(),
+  hours_saved: z.number(),
+  issues_found: z.number(),
+  issues_critical: z.number(),
 });
 
 // Create a separate component for the drag handle
@@ -163,8 +168,17 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "pr_id",
+    header: "PR",
+    cell: ({ row }) => (
+      <span className="text-muted-foreground font-mono text-xs">
+        {row.original.pr_id}
+      </span>
+    ),
+  },
+  {
     accessorKey: "header",
-    header: "Header",
+    header: "Titolo",
     cell: ({ row }) => {
       return <TableCellViewer item={row.original} />;
     },
@@ -172,7 +186,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   },
   {
     accessorKey: "type",
-    header: "Section Type",
+    header: "Team",
     cell: ({ row }) => (
       <div className="w-32">
         <Badge variant="outline" className="px-1.5 text-muted-foreground">
@@ -182,24 +196,11 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     ),
   },
   {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => (
-      <Badge variant="outline" className="px-1.5 text-muted-foreground">
-        {row.original.status === "Done" ? (
-          <CircleCheckIcon className="fill-green-500 dark:fill-green-400" />
-        ) : (
-          <LoaderIcon />
-        )}
-        {row.original.status}
-      </Badge>
-    ),
-  },
-  {
     accessorKey: "target",
-    header: () => <div className="w-full text-right">Target</div>,
+    header: () => <div className="w-full text-right">Token</div>,
     cell: ({ row }) => (
       <form
+        className="flex justify-end"
         onSubmit={(e) => {
           e.preventDefault();
           toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
@@ -210,7 +211,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
         }}
       >
         <Label htmlFor={`${row.original.id}-target`} className="sr-only">
-          Target
+          Token
         </Label>
         <Input
           className="h-8 w-16 border-transparent bg-transparent text-right shadow-none hover:bg-input/30 focus-visible:border focus-visible:bg-background dark:bg-transparent dark:hover:bg-input/30 dark:focus-visible:bg-input/30"
@@ -222,9 +223,10 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   },
   {
     accessorKey: "limit",
-    header: () => <div className="w-full text-right">Limit</div>,
+    header: () => <div className="w-full text-right">Costo</div>,
     cell: ({ row }) => (
       <form
+        className="flex justify-end"
         onSubmit={(e) => {
           e.preventDefault();
           toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
@@ -235,7 +237,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
         }}
       >
         <Label htmlFor={`${row.original.id}-limit`} className="sr-only">
-          Limit
+          Costo
         </Label>
         <Input
           className="h-8 w-16 border-transparent bg-transparent text-right shadow-none hover:bg-input/30 focus-visible:border focus-visible:bg-background dark:bg-transparent dark:hover:bg-input/30 dark:focus-visible:bg-input/30"
@@ -246,43 +248,57 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     ),
   },
   {
-    accessorKey: "reviewer",
-    header: "Reviewer",
+    accessorKey: "hours_saved",
+    header: () => <div className="w-full text-right">Ore</div>,
+    cell: ({ row }) => (
+      <div className="text-right tabular-nums">
+        {row.original.hours_saved}h
+      </div>
+    ),
+  },
+  {
+    accessorKey: "issues_found",
+    header: () => <div className="w-full text-right">Issues</div>,
     cell: ({ row }) => {
-      const isAssigned = row.original.reviewer !== "Assign reviewer";
-      if (isAssigned) {
-        return row.original.reviewer;
-      }
+      const { issues_found, issues_critical } = row.original;
       return (
-        <>
-          <Label htmlFor={`${row.original.id}-reviewer`} className="sr-only">
-            Reviewer
-          </Label>
-          <Select
-            items={[
-              { label: "Eddie Lake", value: "Eddie Lake" },
-              { label: "Jamik Tashpulatov", value: "Jamik Tashpulatov" },
-            ]}
-          >
-            <SelectTrigger
-              className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
-              size="sm"
-              id={`${row.original.id}-reviewer`}
-            >
-              <SelectValue placeholder="Assign reviewer" />
-            </SelectTrigger>
-            <SelectContent align="end">
-              <SelectGroup>
-                <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
-                <SelectItem value="Jamik Tashpulatov">
-                  Jamik Tashpulatov
-                </SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </>
+        <div className="text-right tabular-nums">
+          {issues_found > 0 ? (
+            <>
+              {issues_found}
+              {issues_critical > 0 && (
+                <span className="ml-1 text-xs text-red-500">
+                  ({issues_critical} crit)
+                </span>
+              )}
+            </>
+          ) : (
+            <span className="text-muted-foreground">0</span>
+          )}
+        </div>
       );
     },
+  },
+  {
+    accessorKey: "status",
+    header: "Stato",
+    cell: ({ row }) => (
+      <Badge
+        variant="outline"
+        className={
+          row.original.status === "merged"
+            ? "px-1.5 text-green-600 dark:text-green-400"
+            : "px-1.5 text-blue-600 dark:text-blue-400"
+        }
+      >
+        {row.original.status === "merged" ? (
+          <CircleCheckIcon className="fill-green-500 dark:fill-green-400" />
+        ) : (
+          <CircleDotIcon className="fill-blue-400 dark:fill-blue-500" />
+        )}
+        {row.original.status}
+      </Badge>
+    ),
   },
   {
     id: "actions",
@@ -400,42 +416,18 @@ export function DataTable({
       defaultValue="outline"
       className="w-full flex-col justify-start gap-6"
     >
-      <div className="flex items-center justify-between px-4 lg:px-6">
-        <Label htmlFor="view-selector" className="sr-only">
-          View
-        </Label>
-        <Select
-          defaultValue="outline"
-          items={[
-            { label: "Outline", value: "outline" },
-            { label: "Past Performance", value: "past-performance" },
-            { label: "Key Personnel", value: "key-personnel" },
-            { label: "Focus Documents", value: "focus-documents" },
-          ]}
-        >
-          <SelectTrigger
-            className="flex w-fit @4xl/main:hidden"
-            size="sm"
-            id="view-selector"
-          >
-            <SelectValue placeholder="Select a view" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem value="outline">
-                PR list con costo AI + reviewer + stato
-              </SelectItem>
-              <SelectItem value="past-performance">Past Performance</SelectItem>
-              <SelectItem value="key-personnel">Key Personnel</SelectItem>
-              <SelectItem value="focus-documents">Focus Documents</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-        <TabsList className="hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:bg-muted-foreground/30 **:data-[slot=badge]:px-1 @4xl/main:flex">
-          <TabsTrigger value="outline">
-            PR list con costo AI + reviewer + stato
-          </TabsTrigger>
-        </TabsList>
+      <div className="flex items-center justify-between gap-4 px-4 lg:px-6">
+        <div className="relative flex-1 max-w-sm">
+          <SearchIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+          <Input
+            placeholder="Cerca PR..."
+            value={(table.getColumn("header")?.getFilterValue() as string) ?? ""}
+            onChange={(e) =>
+              table.getColumn("header")?.setFilterValue(e.target.value)
+            }
+            className="pl-8 h-8 w-full"
+          />
+        </div>
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger
@@ -471,7 +463,7 @@ export function DataTable({
           </DropdownMenu>
           <Button variant="outline" size="sm">
             <PlusIcon />
-            <span className="hidden lg:inline">Add Section</span>
+            <span className="hidden lg:inline">Add PR</span>
           </Button>
         </div>
       </div>

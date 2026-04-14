@@ -16,86 +16,86 @@ export function SectionCards() {
     <div className="grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4 dark:*:data-[slot=card]:bg-card">
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Token Consumed</CardDescription>
+          <CardDescription>Token consumati</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            30.2M
+            4,38M
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
               <TrendingUpIcon />
-              +12.5%
+              +23%
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Trending up this month <TrendingUpIcon className="size-4" />
+            In crescita vs mese prec. <TrendingUpIcon className="size-4" />
           </div>
           <div className="text-muted-foreground">
-            Tokens for the last 30 days
+            Ultimi 30 giorni
           </div>
         </CardFooter>
       </Card>
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>PRs with AI Review</CardDescription>
+          <CardDescription>Costo totale</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            1,234
+            €13,15
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
-              <TrendingDownIcon />
-              -20%
+              <TrendingUpIcon />
+              +19%
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Down 20% this period <TrendingDownIcon className="size-4" />
+            In crescita vs mese prec. <TrendingUpIcon className="size-4" />
           </div>
           <div className="text-muted-foreground">
-            Acquisition needs attention
+            Costo AI totale (EUR)
           </div>
         </CardFooter>
       </Card>
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Dev Hours Saved</CardDescription>
+          <CardDescription>PR con AI review</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            45,678
+            38
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
               <TrendingUpIcon />
-              +12.5%
+              +8 nuove PR
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Strong user retention <TrendingUpIcon className="size-4" />
+            +8 nuove PR questo periodo <TrendingUpIcon className="size-4" />
           </div>
-          <div className="text-muted-foreground">Engagement exceed targets</div>
+          <div className="text-muted-foreground">Revisioni automatizzate attive</div>
         </CardFooter>
       </Card>
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Cost per Feature (€)</CardDescription>
+          <CardDescription>Ore dev risparmiate</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            4.5%
+            94,5h
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
               <TrendingUpIcon />
-              +4.5%
+              +45,5%
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Steady performance increase <TrendingUpIcon className="size-4" />
+            In crescita vs mese prec. <TrendingUpIcon className="size-4" />
           </div>
-          <div className="text-muted-foreground">Meets growth projections</div>
+          <div className="text-muted-foreground">Stima da AI review</div>
         </CardFooter>
       </Card>
     </div>
