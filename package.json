@@ -94,7 +94,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.11",
-    "@electric-sql/pglite": "0.4.3",
+    "@electric-sql/pglite": "0.4.4",
     "@happy-dom/global-registrator": "20.8.9",
     "@react-email/preview-server": "5.2.10",
     "@tailwindcss/postcss": "4.2.2",
