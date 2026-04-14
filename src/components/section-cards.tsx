@@ -1,6 +1,6 @@
 "use client";
 
-import { TrendingDownIcon, TrendingUpIcon } from "lucide-react";
+import { TrendingUpIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -31,9 +31,7 @@ export function SectionCards() {
           <div className="line-clamp-1 flex gap-2 font-medium">
             In crescita vs mese prec. <TrendingUpIcon className="size-4" />
           </div>
-          <div className="text-muted-foreground">
-            Ultimi 30 giorni
-          </div>
+          <div className="text-muted-foreground">Ultimi 30 giorni</div>
         </CardFooter>
       </Card>
       <Card className="@container/card">
@@ -53,9 +51,7 @@ export function SectionCards() {
           <div className="line-clamp-1 flex gap-2 font-medium">
             In crescita vs mese prec. <TrendingUpIcon className="size-4" />
           </div>
-          <div className="text-muted-foreground">
-            Costo AI totale (EUR)
-          </div>
+          <div className="text-muted-foreground">Costo AI totale (EUR)</div>
         </CardFooter>
       </Card>
       <Card className="@container/card">
@@ -75,7 +71,9 @@ export function SectionCards() {
           <div className="line-clamp-1 flex gap-2 font-medium">
             +8 nuove PR questo periodo <TrendingUpIcon className="size-4" />
           </div>
-          <div className="text-muted-foreground">Revisioni automatizzate attive</div>
+          <div className="text-muted-foreground">
+            Revisioni automatizzate attive
+          </div>
         </CardFooter>
       </Card>
       <Card className="@container/card">

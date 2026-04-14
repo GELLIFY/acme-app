@@ -66,11 +66,11 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.505 0.14 158.5); /* ISP green #008652 */
-  --chart-1: oklch(0.505 0.14 158.5);  /* ISP green  #008652 */
-  --chart-2: oklch(0.44 0.10 231.5);   /* ISP blue   #01669b */
-  --chart-3: oklch(0.69 0.148 52.3);   /* ISP orange #e98a42 */
-  --chart-4: oklch(0.748 0.152 83.7);  /* ISP gold   #deb630 */
-  --chart-5: oklch(0.35 0.10 158.5);   /* ISP dark green */
+  --chart-1: oklch(0.505 0.14 158.5); /* ISP green  #008652 */
+  --chart-2: oklch(0.44 0.1 231.5); /* ISP blue   #01669b */
+  --chart-3: oklch(0.69 0.148 52.3); /* ISP orange #e98a42 */
+  --chart-4: oklch(0.748 0.152 83.7); /* ISP gold   #deb630 */
+  --chart-5: oklch(0.35 0.1 158.5); /* ISP dark green */
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -101,14 +101,14 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.72 0.13 158.5); /* ISP green lighter for dark */
-  --chart-1: oklch(0.72 0.13 158.5);   /* ISP green lighter  */
-  --chart-2: oklch(0.60 0.12 231.5);   /* ISP blue lighter   */
-  --chart-3: oklch(0.75 0.14 52.3);    /* ISP orange lighter */
-  --chart-4: oklch(0.80 0.14 83.7);    /* ISP gold lighter   */
-  --chart-5: oklch(0.505 0.14 158.5);  /* ISP green base     */
+  --chart-1: oklch(0.72 0.13 158.5); /* ISP green lighter  */
+  --chart-2: oklch(0.6 0.12 231.5); /* ISP blue lighter   */
+  --chart-3: oklch(0.75 0.14 52.3); /* ISP orange lighter */
+  --chart-4: oklch(0.8 0.14 83.7); /* ISP gold lighter   */
+  --chart-5: oklch(0.505 0.14 158.5); /* ISP green base     */
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.44 0.10 231.5); /* ISP blue #01669b */
+  --sidebar-primary: oklch(0.44 0.1 231.5); /* ISP blue #01669b */
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
