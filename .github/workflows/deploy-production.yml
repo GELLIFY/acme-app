@@ -30,7 +30,6 @@ jobs:
             src:
               - 'src/**'
               - 'public/**'
-              - '!src/tests/**'
               - 'package.json'
               - 'pnpm-lock.yaml'
               - 'drizzle.config.ts'
