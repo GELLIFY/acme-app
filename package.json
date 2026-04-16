@@ -64,7 +64,7 @@
     "drizzle-orm": "0.45.2",
     "drizzle-seed": "0.3.1",
     "flat": "6.0.1",
-    "hono": "4.12.12",
+    "hono": "4.12.14",
     "hono-rate-limiter": "0.5.3",
     "input-otp": "1.4.2",
     "lucide-react": "0.563.0",
