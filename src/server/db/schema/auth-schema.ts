@@ -1,4 +1,5 @@
-import { relations, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
+import { relations } from "drizzle-orm/_relations";
 import { index, uniqueIndex } from "drizzle-orm/pg-core";
 import { createTable } from "./_table";
 
