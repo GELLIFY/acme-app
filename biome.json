@@ -10,6 +10,7 @@
     "includes": [
       "src/**",
       "!src/components/ui",
+      "!src/server/db/migrations",
       "public/**",
       "drizzle.config.ts",
       "next.config.ts",
