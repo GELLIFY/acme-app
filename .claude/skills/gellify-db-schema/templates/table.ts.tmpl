@@ -1,0 +1,48 @@
+// Annotated template — extracted from src/server/db/schema/todos.ts
+// Rename: todoTable / todoRelations / DB_TodoType → your entity.
+
+import { relations, sql } from "drizzle-orm";
+import { index } from "drizzle-orm/pg-core";
+import { timestamps } from "../utils"; // createdAt / updatedAt helpers
+import { createTable } from "./_table"; // applies the `acme_` prefix
+import { user } from "./auth-schema"; // parent FK reference
+
+export const todoTable = createTable(
+  // SQL table name suffix — final name becomes `acme_todo_table`.
+  "todo_table",
+
+  // Column callback — `d` exposes column helpers (d.uuid, d.varchar, d.boolean, ...).
+  (d) => ({
+    id: d
+      .uuid("id")
+      .default(sql`pg_catalog.gen_random_uuid()`)
+      .primaryKey(),
+
+    // createdAt / updatedAt from shared helper.
+    ...timestamps,
+
+    // FK with cascade — always specify onDelete explicitly.
+    userId: d
+      .uuid()
+      .references(() => user.id, { onDelete: "cascade" })
+      .notNull(),
+
+    text: d.varchar({ length: 256 }).notNull(),
+    completed: d.boolean().default(false).notNull(),
+  }),
+
+  // Indexes — array of index() calls. Index every FK column.
+  (t) => [index("user_id_idx").on(t.userId)],
+);
+
+// Relations — separate export, references both ends.
+export const todoRelations = relations(todoTable, ({ one }) => ({
+  user: one(user, {
+    fields: [todoTable.userId],
+    references: [user.id],
+  }),
+}));
+
+// Inferred types — consumed by service / queries / mutations.
+export type DB_TodoType = typeof todoTable.$inferSelect;
+export type DB_TodoInsertType = typeof todoTable.$inferInsert;

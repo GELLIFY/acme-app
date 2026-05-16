@@ -1,0 +1,65 @@
+// Annotated template — extracted from src/server/domains/todo/queries.ts
+// PURE DB READS. Drizzle only. No mapping/aggregation — leave that for service.ts.
+"server-only";
+
+import { and, desc, eq, ilike } from "drizzle-orm";
+
+import type { DBClient } from "@/server/db";
+import { todoTable } from "@/server/db/schema/todos";
+
+// Request type INCLUDES userId — scoping is explicit at every query level.
+type GetTodosRequest = {
+  text?: string | null;
+  completed?: boolean | null;
+  userId: string;
+};
+
+export async function getTodosQuery(db: DBClient, filters: GetTodosRequest) {
+  // Always scope by userId for protected entities — first predicate in the array.
+  const where = [eq(todoTable.userId, filters.userId)];
+
+  // Optional filters: push into the array, then spread into and().
+  if (filters?.text) {
+    where.push(ilike(todoTable.text, `%${filters.text}%`));
+  }
+  if (filters?.completed) {
+    where.push(eq(todoTable.completed, filters.completed));
+  }
+
+  // Select only the columns you need — never `select().from(...)` without columns.
+  return await db
+    .select({
+      id: todoTable.id,
+      text: todoTable.text,
+      completed: todoTable.completed,
+    })
+    .from(todoTable)
+    .where(and(...where))
+    .orderBy(desc(todoTable.createdAt))
+    .limit(10);
+}
+
+type GetTodoByIdRequest = {
+  id: string;
+  userId: string;
+};
+
+export async function getTodoByIdQuery(
+  db: DBClient,
+  params: GetTodoByIdRequest,
+) {
+  const [result] = await db
+    .select({
+      id: todoTable.id,
+      text: todoTable.text,
+      completed: todoTable.completed,
+    })
+    .from(todoTable)
+    .where(
+      // Compound predicate: id AND userId — prevents IDOR.
+      and(eq(todoTable.id, params.id), eq(todoTable.userId, params.userId)),
+    )
+    .limit(1);
+
+  return result;
+}

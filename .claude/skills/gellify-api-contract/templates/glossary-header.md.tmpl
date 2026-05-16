@@ -1,0 +1,50 @@
+# Glossary
+
+Project-wide glossary of domain concepts, resources, and API operations. Owned by `gellify-api-contract`. Other skills (and humans) **read** this file; only `gellify-api-contract` writes new entries.
+
+## How to read this file
+
+- **Resources** — canonical names for entities exposed via APIs. Use the canonical name in code, validators, URLs, docs.
+- **Operations** — verbs the API supports on a resource (CRUD + actions).
+- **Terms** — domain concepts that aren't themselves resources but are referenced across the codebase (e.g., "session", "permission", "wide event").
+
+When adding code, search this file first before inventing a new name.
+
+## Resources
+
+<!-- Append entries below. Format:
+
+### <ResourceName>
+
+- **Path**: `/<resources>` (collection), `/<resources>/{id}` (item)
+- **Definition**: One paragraph. What it is, what it represents in the domain.
+- **Owner module**: `src/server/domains/<name>/`
+- **Operations**: list / create / read / update / delete / <custom actions>
+- **Related resources**: links to other glossary entries (`[[<OtherResource>]]`)
+- **Contract**: `docs/api/contracts/<name>.yaml`
+- **Notes**: anything non-obvious — invariants, scoping rules, soft-delete semantics.
+
+-->
+
+## Operations
+
+<!-- Standard verbs and their meaning across the codebase. Append non-standard actions here.
+
+### cancel
+
+- **Method**: POST
+- **Path shape**: `/<resources>/{id}/cancel`
+- **Definition**: Transition a resource into a terminal "cancelled" state. Idempotent on already-cancelled resources (returns 200 with current state).
+- **Used by**: <ResourceA>, <ResourceB>
+
+-->
+
+## Terms
+
+<!-- Cross-cutting concepts that aren't resources.
+
+### Wide event
+
+A canonical log line attached to every request. See `logging-best-practices` skill and `docs/logs.md`.
+
+-->
