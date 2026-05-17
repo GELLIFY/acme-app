@@ -32,7 +32,8 @@ export const todoTable = createTable(
   }),
 
   // Indexes — array of index() calls. Index every FK column.
-  (t) => [index("user_id_idx").on(t.userId)],
+  // Index names are global in PostgreSQL — prefix with the entity to avoid collisions.
+  (t) => [index("todo_user_id_idx").on(t.userId)],
 );
 
 // Relations — separate export, references both ends.

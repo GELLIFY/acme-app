@@ -41,6 +41,11 @@ export async function updateTodoMutation(
   // Strip the id/userId before passing to .set() — they go in WHERE, not SET.
   const { id, userId, ...rest } = params;
 
+  // Drizzle generates invalid SQL (`SET WHERE ...`) on an empty .set() — guard.
+  if (Object.keys(rest).length === 0) {
+    throw new Error("At least one field must be provided for update");
+  }
+
   const [todo] = await db
     .update(todoTable)
     .set(rest)

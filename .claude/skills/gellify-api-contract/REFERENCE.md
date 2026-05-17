@@ -54,14 +54,14 @@ Use the smallest set that conveys meaning:
 
 For list endpoints, default to **cursor pagination** when ordering is stable:
 
-```
+```http
 GET /orders?limit=20&cursor=<opaque>
-→ 200 { "data": [...], "next_cursor": "..." | null }
+→ 200 { "data": [...], "nextCursor": "..." | null }
 ```
 
 Use **offset pagination** only when the dataset is small and stable:
 
-```
+```http
 GET /orders?limit=20&offset=40
 → 200 { "data": [...], "total": 1234 }
 ```

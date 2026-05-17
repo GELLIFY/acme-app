@@ -141,7 +141,7 @@ components:
     Cursor:
       name: cursor
       in: query
-      schema: { type: string, nullable: true }
+      schema: { type: [string, "null"] }
 
   schemas:
     <Resource>:
@@ -172,8 +172,7 @@ components:
           type: array
           items: { $ref: "#/components/schemas/<Resource>" }
         nextCursor:
-          type: string
-          nullable: true
+          type: [string, "null"]
           description: Opaque cursor for the next page; null when no more pages
 
     ErrorResponse:

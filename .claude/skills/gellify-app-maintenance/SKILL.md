@@ -12,7 +12,7 @@ Central orchestrator. The user describes a change in natural language; this skil
 ### 1. Intake & analysis (no code)
 
 1. Read the request. Locate every affected file using Grep/Glob — table in `src/server/db/schema/`, validator in `src/shared/validators/`, service in `src/server/domains/<name>/`, router in `src/server/api/trpc/routers/` and/or `src/server/api/rest/routers/`.
-1a. **Check for an input contract.** If the user pasted/attached any of:
+2. **Check for an input contract.** If the user pasted/attached any of:
    - OpenAPI / JSON Schema fragment
    - Zod schema snippet
    - tRPC procedure signature
@@ -21,11 +21,11 @@ Central orchestrator. The user describes a change in natural language; this skil
    - TypeScript interface / type alias describing inputs or outputs
 
    → treat it as **authoritative**. Do not invent field names, types, or response shapes that contradict it. If the contract is ambiguous or partial, ask the user to fill the gap rather than guessing. Pass the contract verbatim to the relevant building block in the dispatch step.
-2. Classify the change using [DISPATCH.md](DISPATCH.md):
+3. Classify the change using [DISPATCH.md](DISPATCH.md):
    - **New endpoint** / **Edit existing** / **Contract change (rename/deprecate/version/break)**
    - tRPC, REST, or **both** (if both surfaces exist for the domain, change both unless user says otherwise)
-3. If the surface is unclear AND the user didn't specify, ask **once**: *"tRPC procedure, REST endpoint, or both?"* Default: whatever already exists for that domain.
-4. Build a **layer plan**:
+4. If the surface is unclear AND the user didn't specify, ask **once**: *"tRPC procedure, REST endpoint, or both?"* Default: whatever already exists for that domain.
+5. Build a **layer plan**:
 
    | Layer | Touch? | Sub-skill |
    |---|---|---|
@@ -37,7 +37,7 @@ Central orchestrator. The user describes a change in natural language; this skil
    | REST router | y/n | `gellify-api-rest-route` |
    | Docs / ADR | always | `gellify-docs-update` |
 
-5. Draft a **test list** — concrete `describe/it` names per affected layer (happy path, validation, auth/permission, edge cases). Pattern: see `src/server/domains/todo/todo-service.test.ts` and `src/server/api/rest/routers/todos-routes.test.ts`.
+6. Draft a **test list** — concrete `describe/it` names per affected layer (happy path, validation, auth/permission, edge cases). Pattern: see `src/server/domains/todo/todo-service.test.ts` and `src/server/api/rest/routers/todos-routes.test.ts`.
 
 ### 2. Confirmation gate (blocking)
 
@@ -50,10 +50,12 @@ Ask: *"Accept the plan and test list, edit them, or supply your own test cases?"
 
 ### 3. TDD dispatch loop
 
-For each layer in dependency order (DB → migration → service → validator → router):
+For each layer in dependency order (DB → migration → validator → service → router):
+
+> Validator before service: domain service signatures are typed from validator schemas (`z.infer<typeof ...Schema>`), so the Zod schema must exist before the service layer compiles.
 
 1. Invoke the matching sub-skill.
-2. **Red first**: write failing tests using `bun test` conventions (`bun:test` imports, see existing tests). Run `pnpm test` — confirm red.
+2. **Red first**: write failing tests using `bun:test` imports (see existing tests). Run `pnpm test` (the script invokes `bun test`) — confirm red.
 3. **Green**: implement until green.
 4. Run `pnpm lint` and `pnpm typecheck`.
 5. (Optional) Invoke `simplify` skill on changed files.

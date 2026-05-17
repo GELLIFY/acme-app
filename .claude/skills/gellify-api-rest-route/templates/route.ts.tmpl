@@ -53,6 +53,7 @@ export const todosRouter = createRouter()
         },
         401: { description: "Unauthorized", content: { "application/json": { schema: unauthorizedSchema() } } },
         403: { description: "Forbidden", content: { "application/json": { schema: forbiddenSchema() } } },
+        422: { description: "The validation error(s)", content: { "application/json": { schema: createErrorSchema(getTodosSchema) } } },
         500: { description: "Internal Server Error", content: { "application/json": { schema: internalServerErrorSchema() } } },
       },
       middleware: [withRequiredPermissions({ todo: ["list"] })],

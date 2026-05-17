@@ -22,7 +22,7 @@ export async function getTodosQuery(db: DBClient, filters: GetTodosRequest) {
   if (filters?.text) {
     where.push(ilike(todoTable.text, `%${filters.text}%`));
   }
-  if (filters?.completed) {
+  if (filters?.completed !== undefined && filters?.completed !== null) {
     where.push(eq(todoTable.completed, filters.completed));
   }
 
