@@ -35,21 +35,6 @@ services:
         max-size: "20m"
         max-file: "5"
 
-  neon-proxy:
-    image: ghcr.io/timowilhelm/local-neon-http-proxy:main@sha256:cd2ae14edf2feafbc3330492de5c80506f77274c3bd013154cdef697bdeb768a
-    environment:
-      - PG_CONNECTION_STRING=postgres://postgres:postgres@db:5432/main
-    ports:
-      - "4444:4444"
-    logging:
-      driver: "local"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    depends_on:
-      db:
-        condition: service_healthy
-
   # cron:
   #   image: alpine/curl
   #   command: >

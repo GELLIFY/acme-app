@@ -3,14 +3,10 @@ set -a
 . .env
 set +a
 
-# setup
-docker-compose up -d --wait db neon-proxy
+# shared Postgres (one instance for all worktrees)
+docker-compose up -d --wait db
 
-# db
-pnpm db:push
-pnpm db:seed
-
-# run
+# run (predev provisions this worktree's database, then portless serves it)
 pnpm run dev
 
 # for local first OTEL
