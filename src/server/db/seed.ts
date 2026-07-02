@@ -1,4 +1,4 @@
-import "dotenv/config";
+import "@/load-env";
 
 import { reset, seed } from "drizzle-seed";
 import { auth } from "@/libs/better-auth/auth";

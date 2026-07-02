@@ -65,7 +65,7 @@ async function main(): Promise<void> {
   );
 
   if (created) {
-    run("db:push", url);
+    run("db:migrate", url);
     run("db:seed", url);
   }
 }

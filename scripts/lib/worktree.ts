@@ -1,5 +1,6 @@
 import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { basename } from "node:path";
 
 const MAIN_BRANCHES = new Set(["main", "master"]);
 
@@ -7,10 +8,20 @@ const MAIN_BRANCHES = new Set(["main", "master"]);
 const POSTGRES_BASE_URL =
   process.env.POSTGRES_BASE_URL ?? "postgres://postgres:postgres@localhost:5432";
 
+/** Branch for naming purposes; detached HEAD falls back to the worktree dir name. */
+export function resolveBranch(gitBranch: string, worktreeDir: string): string {
+  if (gitBranch !== "HEAD") return gitBranch;
+  return basename(worktreeDir);
+}
+
 export function currentBranch(): string {
-  return execFileSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], {
+  const branch = execFileSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], {
     encoding: "utf8",
   }).trim();
+  const toplevel = execFileSync("git", ["rev-parse", "--show-toplevel"], {
+    encoding: "utf8",
+  }).trim();
+  return resolveBranch(branch, toplevel);
 }
 
 function slug(branch: string, separator: string): string {
