@@ -2,32 +2,36 @@
 
 ## Project overview
 
-Acme App is a Next.js 16 app built on the GELLIFY Stack for full-stack TypeScript with tRPC, Hono, Drizzle, and Better Auth.
+Acme App is a Next.js 16 full-stack app built with TypeScript, tRPC, Hono, Drizzle, Better Auth and Shadcn.
 
 ## Essentials
 
 - Package manager: pnpm (scripts in package.json)
-- Build and run: docs/agent/BUILD.md
-- Code style: docs/agent/CODE_STYLE.md
-- Testing: docs/agent/TESTING.md
-- Security: docs/agent/SECURITY.md
-- PRs: docs/agent/PR.md
+- For setup, dev server, build, and local URLs, read `docs/agents/build.md`.
+- For database schema, Drizzle migrations, and seed data, read `docs/agents/database.md`.
+- For unit, integration, and UI unit testing, read `docs/agents/testing.md`.
+- For domain language and decisions, read `CONTEXT.md` and relevant ADRs in `docs/adr/`.
+
+## Agent skills
+
+### Domain docs
+
+Single-context: `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+
+### Product design
+
+For UI/UX/copy/visual decisions and the "estratto-conto" ledger idiom, load the `product-design`
+skill (`.agents/skills/product-design/`) — it is the canonical base documentation for product design
+(STANDARDS, surfaces, exemplars). Set a request-mode first; Review is flag-only.
 
 <!-- intent-skills:start -->
-# Skill mappings - when working in these areas, load the linked skill file into context.
-skills:
-  - task: "working on the React Query tRPC client in src/libs/trpc/client.tsx or src/libs/trpc/server.tsx"
-    load: "node_modules/@trpc/tanstack-react-query/skills/react-query-setup/SKILL.md"
-  - task: "adding or changing routers and procedures in src/server/api/trpc/routers"
-    load: "node_modules/@trpc/server/skills/server-setup/SKILL.md"
-  - task: "changing auth or base procedures in src/server/api/trpc/init.ts or src/server/api/trpc/middleware"
-    load: "node_modules/@trpc/server/skills/auth/SKILL.md"
-  - task: "changing tRPC middleware composition in src/server/api/trpc/init.ts or src/server/api/trpc/middleware"
-    load: "node_modules/@trpc/server/skills/middlewares/SKILL.md"
-  - task: "changing tRPC input or output validation on procedures"
-    load: "node_modules/@trpc/server/skills/validators/SKILL.md"
-  - task: "changing SuperJSON or tRPC link configuration between client and server"
-    load: "node_modules/@trpc/client/skills/superjson/SKILL.md"
+## Skill Loading
+
+Before substantial work:
+- Skill check: run `pnpm dlx @tanstack/intent@latest list`, or use skills already listed in context.
+- Skill guidance: if one local skill clearly matches the task, run `pnpm dlx @tanstack/intent@latest load <package>#<skill>` and follow the returned `SKILL.md`.
+- Monorepos: when working across packages, run the skill check from the workspace root and prefer the local skill for the package being changed.
+- Multiple matches: prefer the most specific local skill for the package or concern you are changing; load additional skills only when the task spans multiple packages or concerns.
 <!-- intent-skills:end -->
 
 <!-- BEGIN:nextjs-agent-rules -->
