@@ -1,26 +1,43 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { initializeLogsExporter } from "@/libs/logger/log-exporter";
-import { type LogEntry, logger } from "@/libs/logger/logger";
+import { logger } from "@/libs/logger/logger";
+import { browserLogsSchema } from "@/shared/validators/telemetry.schema";
 
 // Initialize the OTLP exporter when this route is first hit
 initializeLogsExporter();
 
 export async function POST(request: NextRequest) {
   try {
-    const logs = (await request.json()) as LogEntry[];
-    if (!Array.isArray(logs)) {
+    const raw = await request.text();
+    if (raw.length > 256_000) {
+      return NextResponse.json({ error: "Payload too large" }, { status: 413 });
+    }
+
+    let parsedJson: unknown;
+    try {
+      parsedJson = JSON.parse(raw);
+    } catch {
       return NextResponse.json(
         { error: "Invalid logs payload" },
         { status: 400 },
       );
     }
 
+    const parsed = browserLogsSchema.safeParse(parsedJson);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid logs payload" },
+        { status: 400 },
+      );
+    }
+    const logs = parsed.data;
+
     for (const logEntry of logs) {
       const { level, message, context, error } = logEntry;
 
       // Enrich with server-side context
       const enrichedContext = {
-        ...context,
+        ...(context ?? {}),
         source: "browser", // Flag this log as coming from the client
         userAgent: request.headers.get("user-agent"),
         referer: request.headers.get("referer"),
@@ -30,7 +47,7 @@ export async function POST(request: NextRequest) {
       let err: Error | undefined;
       if (error) {
         err = new Error(error.message);
-        err.name = error.name;
+        err.name = error.name ?? "Error";
         err.stack = error.stack;
       }
 

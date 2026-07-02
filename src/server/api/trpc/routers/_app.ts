@@ -1,4 +1,5 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
+import { serverLogger } from "@/libs/logger/pino-logger";
 import { checkHealth } from "@/server/services/health-service";
 import {
   createCallerFactory,
@@ -23,7 +24,8 @@ export const appRouter = createTRPCRouter({
       await checkHealth(db);
       return { status: "ok" };
     } catch (error) {
-      return { status: "error", error };
+      serverLogger.error("Health check failed", error as Error);
+      return { status: "error" };
     }
   }),
 });

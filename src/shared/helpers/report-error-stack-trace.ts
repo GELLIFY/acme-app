@@ -9,8 +9,14 @@ export function reportErrorStackTrace(error: Error, _info?: ErrorInfo): void {
   // especially on page unload.
   // Note: sendBeacon only supports POST and specific data types.
   try {
+    const payload = JSON.stringify({
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+    });
+
     if (navigator.sendBeacon) {
-      const blob = new Blob([JSON.stringify(error)], {
+      const blob = new Blob([payload], {
         type: "application/json",
       });
       navigator.sendBeacon("/api/rum/errors", blob);
@@ -20,7 +26,7 @@ export function reportErrorStackTrace(error: Error, _info?: ErrorInfo): void {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(error),
+        body: payload,
         keepalive: true, // Important for reliability
       });
     }
