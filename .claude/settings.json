@@ -1,5 +1,18 @@
 {
   "env": {
     "OTEL_RESOURCE_ATTRIBUTES": "gellify.project=acme-app"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/worktree-setup.sh"
+          }
+        ]
+      }
+    ]
   }
 }
