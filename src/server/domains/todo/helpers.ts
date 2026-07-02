@@ -1,8 +1,6 @@
-import type { getTodosQuery } from "./queries";
+import type { TodoListItem } from "./todo-service";
 
-type Todo = Awaited<ReturnType<typeof getTodosQuery>>[number];
-
-export function shuffleTodos(todos: Todo[]): Todo[] {
+export function shuffleTodos(todos: TodoListItem[]): TodoListItem[] {
   // create copy
   const result = [...todos];
 

@@ -1,10 +1,8 @@
 import { describe, expect, it } from "bun:test";
 import { shuffleTodos } from "./helpers";
-import type { getTodosQuery } from "./queries";
+import type { TodoListItem } from "./todo-service";
 
-type Todo = Awaited<ReturnType<typeof getTodosQuery>>[number];
-
-function makeTodos(count: number): Todo[] {
+function makeTodos(count: number): TodoListItem[] {
   return Array.from(
     { length: count },
     (_, i) =>
@@ -12,7 +10,7 @@ function makeTodos(count: number): Todo[] {
         id: `id-${i}`,
         text: `Todo ${i}`,
         completed: false,
-      }) satisfies Todo,
+      }) satisfies TodoListItem,
   );
 }
 

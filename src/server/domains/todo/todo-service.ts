@@ -1,7 +1,11 @@
 "server-only";
 
+import { and, desc, eq, ilike } from "drizzle-orm";
 import type z from "zod";
+
 import type { DBClient } from "@/server/db";
+import type { DB_TodoType } from "@/server/db/schema/todos";
+import { todoTable } from "@/server/db/schema/todos";
 import type {
   createTodoSchema,
   getTodoByIdSchema,
@@ -9,53 +13,96 @@ import type {
   updateTodoSchema,
 } from "@/shared/validators/todo.schema";
 import { shuffleTodos } from "./helpers";
-import {
-  createTodoMutation,
-  deleteTodoMutation,
-  updateTodoMutation,
-} from "./mutations";
-import { getTodoByIdQuery, getTodosQuery } from "./queries";
+
+// The projection every list/detail read returns. Exported so domain logic
+// (helpers) and its tests share one source of truth for the row shape.
+export type TodoListItem = Pick<DB_TodoType, "id" | "text" | "completed">;
+
+const todoColumns = {
+  id: todoTable.id,
+  text: todoTable.text,
+  completed: todoTable.completed,
+};
 
 export async function getTodos(
   db: DBClient,
   filters: z.infer<typeof getTodosSchema>,
   userId: string,
 ) {
-  const todos = await getTodosQuery(db, { ...filters, userId });
+  const where = [eq(todoTable.userId, userId)];
 
-  // NOTE: do whatever you want here, map, aggregate filter...
-  // result will be cached and typesafety preserved
+  if (filters.text) {
+    where.push(ilike(todoTable.text, `%${filters.text}%`));
+  }
+  if (filters.completed) {
+    where.push(eq(todoTable.completed, filters.completed));
+  }
+
+  const todos = await db
+    .select(todoColumns)
+    .from(todoTable)
+    .where(and(...where))
+    .orderBy(desc(todoTable.createdAt))
+    .limit(10);
+
+  // Domain logic lives in the service: shape/aggregate rows before returning.
   return shuffleTodos(todos);
 }
 
 export async function getTodoById(
   db: DBClient,
-  filters: z.infer<typeof getTodoByIdSchema>,
+  { id }: z.infer<typeof getTodoByIdSchema>,
   userId: string,
 ) {
-  return await getTodoByIdQuery(db, { ...filters, userId });
+  const [todo] = await db
+    .select(todoColumns)
+    .from(todoTable)
+    .where(and(eq(todoTable.id, id), eq(todoTable.userId, userId)))
+    .limit(1);
+
+  return todo;
 }
 
 export async function createTodo(
   db: DBClient,
-  params: z.infer<typeof createTodoSchema>,
+  { text }: z.infer<typeof createTodoSchema>,
   userId: string,
 ) {
-  return await createTodoMutation(db, { ...params, userId });
+  const [todo] = await db
+    .insert(todoTable)
+    .values({ text, userId })
+    .returning();
+
+  if (!todo) {
+    throw new Error("Failed to create todo");
+  }
+
+  return todo;
 }
 
 export async function updateTodo(
   db: DBClient,
-  params: z.infer<typeof updateTodoSchema>,
+  { id, ...rest }: z.infer<typeof updateTodoSchema>,
   userId: string,
 ) {
-  return await updateTodoMutation(db, { ...params, userId });
+  const [todo] = await db
+    .update(todoTable)
+    .set(rest)
+    .where(and(eq(todoTable.id, id), eq(todoTable.userId, userId)))
+    .returning();
+
+  return todo;
 }
 
 export async function deleteTodo(
   db: DBClient,
-  params: z.infer<typeof getTodoByIdSchema>,
+  { id }: z.infer<typeof getTodoByIdSchema>,
   userId: string,
 ) {
-  return await deleteTodoMutation(db, { ...params, userId });
+  const [todo] = await db
+    .delete(todoTable)
+    .where(and(eq(todoTable.id, id), eq(todoTable.userId, userId)))
+    .returning();
+
+  return todo;
 }
