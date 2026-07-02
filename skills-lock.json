@@ -14,6 +14,7 @@
     "logging-best-practices": {
       "source": "boristane/agent-skills",
       "sourceType": "github",
+      "skillPath": "skills/logging-best-practices/SKILL.md",
       "computedHash": "b4810947c33b5356bf385c84cfe387afa9c54af652baaedb7d642a083cceaa4c"
     },
     "next-best-practices": {
@@ -24,7 +25,8 @@
     "shadcn": {
       "source": "shadcn/ui",
       "sourceType": "github",
-      "computedHash": "507f011a70e8b3ae242bdc0bb5b39fd91a1d4049a0f3c281991ccf84973d591c"
+      "skillPath": "skills/shadcn/SKILL.md",
+      "computedHash": "d81caa0f86aabab65b25e302d454f23a3328760386ed9078345584c0d5c8058e"
     },
     "vercel-composition-patterns": {
       "source": "vercel-labs/agent-skills",
