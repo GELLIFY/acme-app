@@ -222,6 +222,9 @@ export const twoFactor = createTable(
 
     secret: d.text("secret").notNull(),
     backupCodes: d.text("backup_codes").notNull(),
+    verified: d.boolean("verified").default(true),
+    failedVerificationCount: d.integer("failed_verification_count").default(0),
+    lockedUntil: d.timestamp("locked_until"),
   }),
   (table) => [
     index("twoFactor_secret_idx").on(table.secret),

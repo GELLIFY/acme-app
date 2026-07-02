@@ -1,7 +1,6 @@
 import "@/globals.css";
 
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { ImpersonationIndicator } from "@/components/auth/admin/impersonation-indicator";
@@ -28,10 +27,6 @@ export const metadata: Metadata = {
   description: "Bolierplate for GELLIFY App",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
-
-const WebVitals = dynamic(() =>
-  import("@/components/web-vitals").then((m) => m.WebVitals),
-);
 
 export default async function RootLayout({
   params,
@@ -60,7 +55,6 @@ export default async function RootLayout({
                   {children}
                   <Toaster />
                   <ImpersonationIndicator />
-                  <WebVitals />
                 </TooltipProvider>
               </ThemeProvider>
             </NuqsAdapter>
