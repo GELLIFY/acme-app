@@ -1,4 +1,4 @@
-import { getCookie } from "hono/cookie";
+import { getSessionCookie } from "better-auth/cookies";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import { auth } from "@/libs/better-auth/auth";
@@ -19,7 +19,7 @@ import type { Context } from "../init";
  */
 export const withAuth = createMiddleware<Context>(async (c, next) => {
   // 1. Handle authentication with session cookie
-  const sessionToken = getCookie(c, "better-auth.session_token");
+  const sessionToken = getSessionCookie(c.req.raw);
 
   if (sessionToken) {
     const session = await auth.api.getSession({ headers: c.req.raw.headers });
