@@ -20,7 +20,7 @@ empty database before it merges.
 
 ## Env loading for db tooling
 
-`drizzle-kit` (migrate/push/studio) and the `tsx` seed scripts load env through
+`drizzle-kit` (migrate/push/studio) and the `bun`-run seed scripts load env through
 `src/load-env.ts`, which mirrors `next dev` precedence: `.env.local` overrides
 `.env`. This is what makes `pnpm db:migrate` / `db:seed` / `db:studio` target the
 **current worktree's** branch database (written to `.env.local` by `predev`)
