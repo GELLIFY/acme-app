@@ -1,0 +1,24 @@
+diff --git a/lib/typescript.js b/lib/typescript.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..56f0b4a4561f5843b85edd28f27dd94e286891c4
+--- /dev/null
++++ b/lib/typescript.js
+@@ -0,0 +1,18 @@
++// Compatibility shim, not the real TypeScript compiler API.
++//
++// TypeScript 7 dropped this file: the classic Compiler API entry point
++// (createProgram, SyntaxKind, etc.) no longer exists — see
++// typescript/unstable/* for the new API surface. Next.js (through at least
++// 16.2.10 and 16.3.0-canary.81) still probes for this exact path via
++// fs.existsSync to decide whether TypeScript is "installed", and throws a
++// fatal error under CI if it's missing (it silently no-ops outside CI).
++//
++// This repo sets `typescript.ignoreBuildErrors: true` in next.config, so
++// Next never actually requires this file for real type-checking — it only
++// needs it to exist. Real type safety is enforced separately by `tsc
++// --noEmit` in `pnpm typecheck`, which uses the native TS7 binary directly.
++//
++// Remove this patch once Next.js recognizes TypeScript 7's package layout.
++import { version, versionMajorMinor } from "./version.cjs";
++export { version, versionMajorMinor };
++export default { version, versionMajorMinor };
