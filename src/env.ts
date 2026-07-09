@@ -13,7 +13,15 @@ export const env = createEnv({
       .default("development"),
 
     BETTER_AUTH_SECRET: z.string().min(32),
-    BETTER_AUTH_URL: z.url(),
+    BETTER_AUTH_URL: z
+      .url()
+      .default(
+        process.env.VERCEL_BRANCH_URL
+          ? `https://${process.env.VERCEL_BRANCH_URL}`
+          : process.env.VERCEL_URL
+            ? `https://${process.env.VERCEL_URL}`
+            : "http://localhost:3000",
+      ),
     RESEND_API_KEY: z.string().min(1),
 
     OTEL_EXPORTER_OTLP_ENDPOINT: z.string().default("http://localhost:4318"),
