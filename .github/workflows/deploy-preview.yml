@@ -20,16 +20,18 @@ jobs:
     name: Code quality
     uses: ./.github/workflows/ci.yml
 
-  deploy_preview:
+  provision_and_migrate:
     if: ${{ !startsWith(github.head_ref, 'renovate/') }}
-    name: Deploy Preview
-    environment: Preview
+    name: Provision & Migrate
     runs-on: ubuntu-24.04-arm
     permissions:
       contents: read
       pull-requests: write
       id-token: write
       issues: write
+    outputs:
+      current_branch: ${{ steps.branch_name.outputs.current_branch }}
+      branch_id: ${{ steps.create_branch.outputs.branch_id }}
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
 
@@ -77,12 +79,29 @@ jobs:
           base_branch: main
           api_key: ${{ secrets.NEON_API_KEY }}
 
+  deploy_app:
+    if: ${{ !startsWith(github.head_ref, 'renovate/') }}
+    name: Deploy Preview
+    environment: Preview
+    runs-on: ubuntu-24.04-arm
+    needs: [provision_and_migrate]
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+      issues: write
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Install dependencies & tooling
+        uses: ./.github/workflows/setup
+
       - name: Deploy to Preview (Vercel)
         id: deploy_vercel
         uses: ./.github/workflows/cd/vercel/deploy-preview
         with:
           VERCEL_TOKEN: ${{ secrets.vercel_token }}
-          GIT_BRANCH: ${{ steps.branch_name.outputs.current_branch }}
+          GIT_BRANCH: ${{ needs.provision_and_migrate.outputs.current_branch }}
 
       - name: Comment on Pull Request
         uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3
@@ -90,4 +109,4 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           message: |
             Vercel Preview URL :rocket: : ${{ steps.deploy_vercel.outputs.preview_url }}
-            Neon branch :elephant: : https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ steps.create_branch.outputs.branch_id }}
+            Neon branch :elephant: : https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ needs.provision_and_migrate.outputs.branch_id }}
