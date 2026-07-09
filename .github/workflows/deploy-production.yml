@@ -16,7 +16,7 @@ jobs:
 
   run_migrations:
     name: Run Migrations
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     needs: [code_quality]
     permissions:
       contents: read
@@ -36,7 +36,7 @@ jobs:
 
   deploy_production:
     name: Deploy Production
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     environment: production
     needs: [code_quality, run_migrations]
     permissions:
@@ -47,13 +47,6 @@ jobs:
 
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
-
-      - name: Apply Migrations
-        run: |
-          touch .env
-          echo SKIP_ENV_VALIDATION=1 >> .env
-          echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env
-          pnpm run db:migrate
 
       - name: Deploy to Production
         uses: ./.github/workflows/cd/vercel/deploy-production
