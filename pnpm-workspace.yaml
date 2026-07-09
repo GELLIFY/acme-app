@@ -1,4 +1,8 @@
-enableGlobalVirtualStore: false
-minimumReleaseAge: 10080
 blockExoticSubdeps: true
-trustPolicy: no-downgrade
+
+enableGlobalVirtualStore: false
+
+minimumReleaseAge: 0
+
+patchedDependencies:
+  typescript@7.0.2: patches/typescript@7.0.2.patch
