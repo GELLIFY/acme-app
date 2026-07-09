@@ -1,5 +1,9 @@
 name: Cleanup Preview
 
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
 on:
   pull_request:
     types:
@@ -40,8 +44,13 @@ jobs:
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
 
+      - name: Get branch name
+        id: branch_name
+        uses: tj-actions/branch-names@dde14ac574a8b9b1cedc59a1cf312788af43d8d8 # v8
+
       - name: Cleanup Preview Deployment
         id: cleanup_vercel
         uses: ./.github/workflows/cd/vercel/cleanup-preview
         with:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          GIT_BRANCH: ${{ steps.branch_name.outputs.current_branch }}

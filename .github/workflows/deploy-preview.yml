@@ -1,5 +1,9 @@
 name: Deploy Preview
 
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
 on:
   pull_request:
     types:
@@ -47,11 +51,20 @@ jobs:
           role: neondb_owner
           api_key: ${{ secrets.NEON_API_KEY }}
 
+      - name: Mask database connection strings
+        run: |
+          echo "::add-mask::${{ steps.create_branch.outputs.db_url }}"
+          echo "::add-mask::${{ steps.create_branch.outputs.db_url_pooled }}"
+          echo "::add-mask::${{ steps.create_branch.outputs.password }}"
+
+      - name: Push database URL to Vercel (scoped to this branch)
+        run: |
+          echo "${{ steps.create_branch.outputs.db_url_pooled }}" | pnpm dlx vercel env add DATABASE_URL preview "${{ steps.branch_name.outputs.current_branch }}" --force --token=${{ secrets.VERCEL_TOKEN }}
+
       - name: Apply Migrations
         run: |
-          touch .env
+          pnpm dlx vercel env pull .env --yes --environment=preview --git-branch="${{ steps.branch_name.outputs.current_branch }}" --token=${{ secrets.VERCEL_TOKEN }}
           echo SKIP_ENV_VALIDATION=1 >> .env
-          echo DATABASE_URL=${{ steps.create_branch.outputs.db_url_pooled }} >> .env
           pnpm run db:migrate
 
       - name: Post Schema Diff Comment to PR
@@ -69,6 +82,7 @@ jobs:
         uses: ./.github/workflows/cd/vercel/deploy-preview
         with:
           VERCEL_TOKEN: ${{ secrets.vercel_token }}
+          GIT_BRANCH: ${{ steps.branch_name.outputs.current_branch }}
 
       - name: Comment on Pull Request
         uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3
