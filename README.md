@@ -2,48 +2,76 @@
 
 The GELLIFY Stack is a modern web development stack designed for simplicity, modularity, and full-stack TypeScript safety. Created and refined by [Matteo Badini↗](https://x.com/badini_matteo) and the GELLIFY team, it brings together battle-tested technologies to help developers build scalable, maintainable, and performant applications with minimal friction. Please refer to the [official documentation↗](https://gellify.dev)
 
+Built with Next.js 16, TypeScript, tRPC, Hono, Drizzle, Better Auth and Shadcn.
+
 ## Prerequisites
 
 Before you begin, make sure you have the following:
 
-- `docker` ➡️ localstack for local development
-- `fnm` ➡️ node version manager
-- `bun` ➡️ test runner
+- [`fnm`↗](https://github.com/Schniz/fnm) ➡️ Node version manager (the repo pins Node `24.15.0` in `.nvmrc`)
+- [`pnpm`↗](https://pnpm.io) ➡️ package manager (version pinned in `package.json`)
+- [`docker`↗](https://www.docker.com/) ➡️ runs the local Postgres database via `docker-compose.yml`
+- [`bun`↗](https://bun.sh/) ➡️ test runner (`pnpm test` runs `bun test`)
+- [`portless`↗](https://github.com/vercel-labs/portless) (optional) ➡️ serves each worktree at its own `https://<branch>.localhost` URL
 
 ## Getting started
 
-First you have to create a copy of the environment variables.
+Install dependencies:
+
+```sh
+pnpm install
+```
+
+Create your environment file from the example and fill in the required secrets
+(at minimum `BETTER_AUTH_SECRET` and `RESEND_API_KEY`):
 
 ```sh
 cp .env.example .env
 ```
 
-Then follow the instruction below to fill the `.env` with the required pieces to get you started.
+You do **not** need to set `DATABASE_URL` for local development — `pnpm dev`
+auto-writes a per-worktree `DATABASE_URL` and `BETTER_AUTH_URL` to `.env.local`
+(which overrides `.env`), pointing at a database named after your current git
+branch. See [`docs/agents/build.md`](docs/agents/build.md) for details.
 
 ### Database
 
-GELLIFY app will come with a `start-localstack.sh` bash script that can create a docker container with a database for local development.
-If you already have a database, feel free to delete this file and put your database credentials in `.env`.
+The local Postgres runs in Docker (one shared instance for all worktrees). Start it:
 
 ```sh
-./start-localstack.sh
+docker compose up -d --wait db
 ```
 
-The `.env` file in your project directory already contains a valid DB url for local development via Docker. No initial setup on your part is needed.
+Then start the dev server:
 
-## Editor Setup
+```sh
+pnpm dev
+```
 
-We recommended using [Cursor↗](https://www.cursor.com/) a fork of VSCode with a deeper integration with different AI models. We also provide a `.cursorrules` file to give the AI the necessary context on technologies, patterns, conventions...
-The following extensions are recommended for an optimal developer experience. The links below provide editor specific plugin support.
+On first run for a branch, the `predev` hook creates the branch database, applies
+migrations (`pnpm db:migrate`) and seeds it (`pnpm db:seed`). Use the URL printed
+by `pnpm dev` — in the portless path the app is **not** served at `localhost:3000`.
 
-- [Tailwind CSS IntelliSense Extension↗](https://tailwindcss.com/docs/editor-setup)
-- [Biome Extension↗](https://biomejs.dev/reference/vscode/)
-- [Pretty TypeScript Errors↗](https://marketplace.visualstudio.com/items?itemName=yoavbls.pretty-ts-errors)
+The seed creates a default local login:
 
-## Next Steps
+- Email: `matteo.badini@gellify.com`
+- Password: `password`
 
-Have a look around the [docs↗](https://gellify.dev), as well as the docs of the packages that your app includes.
+### One-time machine setup: portless proxy
 
-## Notes 2025-10-23
+If you use portless, its proxy binds port 443 and must be started once per machine
+before `pnpm dev` (it needs sudo and a TTY, so it cannot self-start):
 
-- [ ] fix 422 example
+```sh
+sudo portless proxy start --https
+```
+
+Without portless installed, `pnpm dev` falls back to a plain `next dev` on a
+deterministic per-branch port.
+
+## More
+
+See [`docs/agents/`](docs/agents/) for build, database and testing details, and
+[`CONTRIBUTING.md`](CONTRIBUTING.md) for the contribution workflow.
+</content>
+</invoke>
