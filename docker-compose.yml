@@ -1,16 +1,4 @@
 services:
-  app:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    ports:
-      - "3000:3000"
-    environment:
-      NODE_ENV: "production"
-      DATABASE_URL: ${DATABASE_URL}
-    depends_on:
-      - db
-
   db:
     image: postgres:17@sha256:7ad98329d513dd497293b951c195ca354274a77f12ddbbbbf85e68a811823d72
     command: "-d 1"
