@@ -1,0 +1,76 @@
+// Annotated template — extracted from src/server/domains/todo/mutations.ts
+// PURE DB WRITES. Drizzle only.
+"server-only";
+
+import { and, eq } from "drizzle-orm";
+
+import type { DBClient } from "@/server/db";
+import { todoTable } from "@/server/db/schema/todos";
+
+type CreateTodoParams = {
+  text: string;
+  userId: string;
+};
+
+export async function createTodoMutation(
+  db: DBClient,
+  params: CreateTodoParams,
+) {
+  // .returning() so the caller gets the row back (id, defaults, timestamps).
+  const [todo] = await db.insert(todoTable).values(params).returning();
+
+  // Throw on impossible-but-typed-as-possible empty arrays.
+  if (!todo) {
+    throw new Error("Failed to create todo");
+  }
+
+  return todo;
+}
+
+type UpdateTodoParams = {
+  id: string;
+  text?: string;
+  completed?: boolean;
+  userId: string;
+};
+
+export async function updateTodoMutation(
+  db: DBClient,
+  params: UpdateTodoParams,
+) {
+  // Strip the id/userId before passing to .set() — they go in WHERE, not SET.
+  const { id, userId, ...rest } = params;
+
+  // Drizzle generates invalid SQL (`SET WHERE ...`) on an empty .set() — guard.
+  if (Object.keys(rest).length === 0) {
+    throw new Error("At least one field must be provided for update");
+  }
+
+  const [todo] = await db
+    .update(todoTable)
+    .set(rest)
+    .where(and(eq(todoTable.id, id), eq(todoTable.userId, userId)))
+    .returning();
+
+  // Returns undefined if no row matched (e.g. wrong user) — caller maps to 404.
+  return todo;
+}
+
+type DeleteTodoParams = {
+  id: string;
+  userId: string;
+};
+
+export async function deleteTodoMutation(
+  db: DBClient,
+  params: DeleteTodoParams,
+) {
+  const [result] = await db
+    .delete(todoTable)
+    .where(
+      and(eq(todoTable.id, params.id), eq(todoTable.userId, params.userId)),
+    )
+    .returning();
+
+  return result;
+}

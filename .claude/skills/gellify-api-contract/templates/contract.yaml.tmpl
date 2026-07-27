@@ -1,0 +1,224 @@
+# OpenAPI 3.1 contract — extracted/aligned with src/server/api/rest/init.ts
+# Replace <Resource>, <resource>, <resources>, descriptions, examples.
+
+openapi: 3.1.0
+info:
+  title: "<Resource> API"
+  version: "0.1.0"
+  description: |
+    Contract for the <resource> resource.
+    Source issue: <link to Linear/GitHub/Jira issue>
+  contact:
+    name: GELLIFY Support
+    email: engineer@gellify.dev
+servers:
+  - url: /api/rest
+    description: Application API base
+
+# Security: cookie session OR api key. Per-endpoint can override.
+security:
+  - cookieAuth: []
+  - apiKeyAuth: []
+
+tags:
+  - name: <Resources>
+    description: <One-line purpose>
+
+paths:
+  /<resources>:
+    get:
+      tags: [<Resources>]
+      operationId: list<Resources>
+      summary: List <resources>
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+        # Add filter params here, one per filterable field
+      responses:
+        "200":
+          description: Page of <resources>
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/<Resource>Page" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+        "500": { $ref: "#/components/responses/InternalError" }
+    post:
+      tags: [<Resources>]
+      operationId: create<Resource>
+      summary: Create a <resource>
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/<Resource>Create" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/<Resource>" }
+          headers:
+            Location:
+              description: URL of the created resource
+              schema: { type: string, format: uri }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+  /<resources>/{id}:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
+    get:
+      tags: [<Resources>]
+      operationId: get<Resource>ById
+      summary: Retrieve a <resource>
+      responses:
+        "200":
+          description: The <resource>
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/<Resource>" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+    patch:
+      tags: [<Resources>]
+      operationId: update<Resource>
+      summary: Update a <resource>
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/<Resource>Update" }
+      responses:
+        "200":
+          description: Updated <resource>
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/<Resource>" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+    delete:
+      tags: [<Resources>]
+      operationId: delete<Resource>
+      summary: Delete a <resource>
+      responses:
+        "204": { description: Deleted }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: better-auth.session_token
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+
+  parameters:
+    ResourceId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+      example: "b3b7c1e2-4c2a-4e7a-9c1a-2b7c1e24c2a4"
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+    Cursor:
+      name: cursor
+      in: query
+      schema: { type: [string, "null"] }
+
+  schemas:
+    <Resource>:
+      type: object
+      required: [id, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        # ... domain fields
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    <Resource>Create:
+      type: object
+      required: []  # list required-on-create fields
+      properties:
+        # ... input fields (omit id/createdAt/updatedAt)
+
+    <Resource>Update:
+      type: object
+      properties:
+        # ... all updatable fields, all optional
+
+    <Resource>Page:
+      type: object
+      required: [data, nextCursor]
+      properties:
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/<Resource>" }
+        nextCursor:
+          type: [string, "null"]
+          description: Opaque cursor for the next page; null when no more pages
+
+    ErrorResponse:
+      type: object
+      required: [message]
+      properties:
+        message: { type: string }
+        code: { type: string, description: "Stable machine-readable code" }
+        details: { type: object, additionalProperties: true }
+
+    ValidationErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          # Matches the Zod tree shape produced by createErrorSchema in the codebase
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid credentials
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    Forbidden:
+      description: Authenticated but not permitted
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    Conflict:
+      description: State conflict (duplicate, version mismatch, illegal transition)
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    ValidationError:
+      description: Request validation failed
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ValidationErrorResponse" }
+    InternalError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }

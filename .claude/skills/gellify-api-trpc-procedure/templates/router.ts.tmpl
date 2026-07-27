@@ -1,0 +1,63 @@
+// Annotated template — extracted from src/server/api/trpc/routers/todo.ts
+// Replace <Domain>, <domain>, and procedure names. Keep imports tidy.
+
+import {
+  // Service functions live in src/server/domains/<domain>/<domain>-service.ts
+  createTodo,
+  deleteTodo,
+  getTodos,
+  updateTodo,
+} from "@/server/domains/todo/todo-service";
+import {
+  // Zod schemas live in src/shared/validators/<domain>.schema.ts
+  // Use `@hono/zod-openapi` z if the schema is shared with REST.
+  createTodoSchema,
+  getTodoByIdSchema,
+  getTodosSchema,
+  updateTodoSchema,
+} from "@/shared/validators/todo.schema";
+import { createTRPCRouter, protectedProcedure } from "../init";
+
+export const todoRouter = createTRPCRouter({
+  // QUERY — reads data. Use .query().
+  get: protectedProcedure
+    .input(getTodosSchema) // Zod validator — same one used by REST when shared.
+    .query(async ({ ctx: { db, session, wideEvent }, input }) => {
+      const res = await getTodos(db, input, session.user.id);
+
+      // wideEvent: canonical log line context (see `logging-best-practices` skill).
+      // Use stable keys grouped under a domain namespace.
+      wideEvent.todos = {
+        todo_count: res.length,
+      };
+
+      return res;
+    }),
+
+  // MUTATION — writes data. Use .mutation().
+  create: protectedProcedure
+    .input(createTodoSchema)
+    .mutation(async ({ ctx: { db, session, wideEvent }, input }) => {
+      const res = await createTodo(db, input, session.user.id);
+
+      // Attach the new resource id so the canonical log has it.
+      wideEvent.todo = {
+        todo_id: res.id,
+      };
+
+      return res;
+    }),
+
+  update: protectedProcedure
+    .input(updateTodoSchema)
+    .mutation(async ({ ctx: { db, session }, input }) => {
+      // wideEvent not strictly required, but recommended for write paths.
+      return await updateTodo(db, input, session.user.id);
+    }),
+
+  delete: protectedProcedure
+    .input(getTodoByIdSchema)
+    .mutation(async ({ ctx: { db, session }, input }) => {
+      return await deleteTodo(db, input, session.user.id);
+    }),
+});
