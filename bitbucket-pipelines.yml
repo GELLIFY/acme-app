@@ -1,0 +1,175 @@
+image: node:22
+
+options:
+  max-time: 30
+
+definitions:
+  caches:
+    pnpm: ~/.pnpm-store
+    bun: ~/.bun
+
+  steps:
+    - step: &lint
+        name: Lint
+        caches:
+          - node
+        script:
+          - npm exec -y @biomejs/biome@2.3.6 --version
+          - npm exec -y @biomejs/biome@2.3.6 ci .
+
+    - step: &typecheck
+        name: Typecheck
+        caches:
+          - pnpm
+        script:
+          - corepack enable
+          - corepack prepare pnpm@9.15.4 --activate
+          - pnpm config set store-dir ~/.pnpm-store
+          - pnpm install --frozen-lockfile
+          - pnpm run typecheck
+
+    - step: &test
+        name: Test
+        caches:
+          - pnpm
+          - bun
+        script:
+          - corepack enable
+          - corepack prepare pnpm@9.15.4 --activate
+          - pnpm config set store-dir ~/.pnpm-store
+          - pnpm install --frozen-lockfile
+          - curl -fsSL https://bun.sh/install | bash
+          - export BUN_INSTALL="$HOME/.bun"
+          - export PATH="$BUN_INSTALL/bin:$PATH"
+          - echo "SKIP_ENV_VALIDATION=1" > .env
+          - pnpm test
+
+    - step: &deploy-pr
+        name: PR
+        caches:
+          - node
+          - pnpm
+        script:
+          - if [ -z "$BITBUCKET_PR_ID" ]; then echo "Not a PR, skipping"; exit 0; fi
+          - NEON_BRANCH="pr-${BITBUCKET_PR_ID}"
+          - npm install -g neonctl
+          - |
+            echo "Ensuring Neon branch '$NEON_BRANCH' exists (create once)"
+            if neonctl branches create --project-id "$NEON_PROJECT_ID" --name "$NEON_BRANCH" --parent main; then
+              echo "Created Neon branch $NEON_BRANCH"
+            else
+              echo "Neon branch $NEON_BRANCH already exists, skipping creation"
+            fi
+
+          # Parte comune a tutte le esecuzioni
+          - NEON_DB_URL=$(neonctl connection-string "$NEON_BRANCH" --project-id "$NEON_PROJECT_ID")
+          - echo "SKIP_ENV_VALIDATION=1" > .env
+          - echo "DATABASE_URL=$NEON_DB_URL" >> .env
+
+          - npm install -g vercel@latest
+          - corepack enable
+          - corepack prepare pnpm@9.15.4 --activate
+          - pnpm config set store-dir ~/.pnpm-store
+          - pnpm install
+
+          - pnpm run db:migrate
+          - pnpm run db:seed
+          
+          - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
+          - vercel build --token=$VERCEL_TOKEN
+          - vercel deploy --prebuilt --token=$VERCEL_TOKEN
+
+    - step: &deploy-prod-db
+        name: "Run Migrations & Seed"
+        caches:
+          - node
+          - pnpm
+        script:
+          - npm install -g vercel@latest
+          - corepack enable
+          - corepack prepare pnpm@9.15.4 --activate
+          - pnpm config set store-dir ~/.pnpm-store
+          - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+          - pnpm install
+          - cp .vercel/.env.production.local .env
+          - echo "SKIP_ENV_VALIDATION=1" >> .env
+          - pnpm run db:migrate
+          - pnpm run db:seed
+
+    - step: &deploy-prod
+        name: Pull Vercel Environment Information
+        caches:
+          - pnpm
+          - node
+        script:
+          - npm install -g vercel@latest
+          - corepack enable
+          - corepack prepare pnpm@9.15.4 --activate
+          - pnpm config set store-dir ~/.pnpm-store
+          - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+          - vercel build --token=$VERCEL_TOKEN
+          - vercel deploy --prod --token=$VERCEL_TOKEN
+
+    - step: &cleanup-neon-branch
+        name: Cleanup dynamic Neon branch after PR merge
+        caches:
+          - node
+        script:
+          - |
+            if [ -n "$BITBUCKET_PR_ID" ]; then
+              PR_ID="$BITBUCKET_PR_ID"
+            else
+              PR_ID=$(git log -1 --pretty=%B | sed -n 's/.*pull request #\([0-9]\+\).*/\1/p')
+            fi
+            if [ -z "$PR_ID" ]; then
+              echo "No PR context detected (not a PR merge?). Skipping cleanup."
+              exit 0
+            fi
+            echo "Detected PR #$PR_ID for cleanup"
+            export PR_ID
+          - NEON_BRANCH="pr-${PR_ID}"
+          - echo "Deleting Neon branch $NEON_BRANCH after PR merge"
+          - npm install -g neonctl
+          - neonctl branches delete "$NEON_BRANCH" --project-id "$NEON_PROJECT_ID" || true
+
+pipelines:
+  pull-requests:
+    '**':
+      - parallel:
+          - step:
+              <<: *lint
+              allow-failure: true
+          - step:
+              <<: *typecheck
+              allow-failure: true
+          - step:
+              <<: *test
+              allow-failure: true
+          - step:
+              <<: *deploy-pr
+
+  custom:
+    cleanup-neon:
+      - step:
+          <<: *cleanup-neon-branch
+      - step:
+          <<: *lint
+      - step:
+          <<: *typecheck
+      - step:
+          <<: *test
+      - step:
+          <<: *deploy-prod-db
+      - step:
+          <<: *deploy-prod
+
+triggers:
+  repository-push:
+    - condition: BITBUCKET_BRANCH == "main"
+      pipelines:
+        - cleanup-neon
+
+
+
+
+
