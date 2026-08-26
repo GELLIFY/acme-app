@@ -27,7 +27,7 @@ importers:
         version: 1.6.23(@better-auth/core@1.6.23(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@opentelemetry/api@1.9.0)(better-call@1.3.7(zod@4.4.3))(jose@6.1.3)(kysely@0.29.2)(nanostores@1.1.1))(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-auth@1.6.23(e03c740502ec463088f62fc944bc7333))(better-call@1.3.7(zod@4.4.3))(nanostores@1.1.1)
       '@hono/zod-openapi':
         specifier: 1.2.1
-        version: 1.2.1(hono@4.12.27)(zod@4.4.3)
+        version: 1.2.1(hono@4.12.34)(zod@4.4.3)
       '@hookform/resolvers':
         specifier: 5.2.2
         version: 5.2.2(react-hook-form@7.80.0(react@19.2.7))
@@ -63,7 +63,7 @@ importers:
         version: 1.39.0
       '@scalar/hono-api-reference':
         specifier: 0.9.40
-        version: 0.9.40(hono@4.12.27)
+        version: 0.9.40(hono@4.12.34)
       '@t3-oss/env-nextjs':
         specifier: 0.13.11
         version: 0.13.11(typescript@7.0.2(patch_hash=6cc113fd0729b166536b746ea87473da8af4b7d84d90b00a40decfd649ad9154))(valibot@1.2.0(typescript@7.0.2(patch_hash=6cc113fd0729b166536b746ea87473da8af4b7d84d90b00a40decfd649ad9154)))(zod@4.4.3)
@@ -119,11 +119,11 @@ importers:
         specifier: 6.0.1
         version: 6.0.1
       hono:
-        specifier: 4.12.27
-        version: 4.12.27
+        specifier: 4.12.34
+        version: 4.12.34
       hono-rate-limiter:
         specifier: 0.5.3
-        version: 0.5.3(hono@4.12.27)
+        version: 0.5.3(hono@4.12.34)
       input-otp:
         specifier: 1.4.2
         version: 1.4.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -644,11 +644,11 @@ packages:
 
   '@esbuild-kit/core-utils@3.3.2':
     resolution: {integrity: sha512-sPRAnw9CdSsRmEtnsl2WXWdyquogVpB3yZ3dgwJfe8zrOzTsV7cJvmwrKVa+0ma5BoiGJ+BoqkMvawbayKUsqQ==}
-    deprecated: 'Merged into tsx: https://tsx.is'
+    deprecated: 'Merged into tsx: https://tsx.hirok.io'
 
   '@esbuild-kit/esm-loader@2.6.5':
     resolution: {integrity: sha512-FxEMIkJKnodyA1OaCUoEvbYRkoZlLZ4d/eXFu9Fh8CbBBgP5EmZxrfTRyN0qpXZ4vOvqnE5YdRdcrmUUXuU+dA==}
-    deprecated: 'Merged into tsx: https://tsx.is'
+    deprecated: 'Merged into tsx: https://tsx.hirok.io'
 
   '@esbuild/aix-ppc64@0.25.5':
     resolution: {integrity: sha512-9o3TMmpmftaCMepOdA5k/yDw8SfInyzWWTjYTFCX3kPSDJMROQTb8jg+h9Cnwnmm1vOzvxN7gIfB5V2ewpjtGA==}
@@ -3066,8 +3066,8 @@ packages:
     resolution: {integrity: sha512-U7tt8JsyrxSRKspfhtLET79pU8K+tInj5QZXs1jSugO1Vq5dFj3kmZsRldo29mTBfcjDRVRXrEZ6LS63Cog9ZA==}
     engines: {node: '>=16.9.0'}
 
-  hono@4.12.27:
-    resolution: {integrity: sha512-1yrb/+w6HWQJrUCLkJ2IF5jNIPvvFkblV5RNOYl6bV+OA6p9GLcMpHFFGTosSvHvcAUibuUukRqhlYI4z32C7Q==}
+  hono@4.12.34:
+    resolution: {integrity: sha512-GqXJqY/xJkJmuloTrnV1ZEXG3fqte+VjkUqoRNZXcrUidiUOP4fMSIHHY4tsqZBK++kVyWmt/AAfSUuy57/eSA==}
     engines: {node: '>=16.9.0'}
 
   html-to-text@9.0.5:
@@ -5199,21 +5199,21 @@ snapshots:
       hono: 4.11.4
     optional: true
 
-  '@hono/node-server@1.19.9(hono@4.12.27)':
+  '@hono/node-server@1.19.9(hono@4.12.34)':
     dependencies:
-      hono: 4.12.27
+      hono: 4.12.34
 
-  '@hono/zod-openapi@1.2.1(hono@4.12.27)(zod@4.4.3)':
+  '@hono/zod-openapi@1.2.1(hono@4.12.34)(zod@4.4.3)':
     dependencies:
       '@asteasolutions/zod-to-openapi': 8.1.0(zod@4.4.3)
-      '@hono/zod-validator': 0.7.6(hono@4.12.27)(zod@4.4.3)
-      hono: 4.12.27
+      '@hono/zod-validator': 0.7.6(hono@4.12.34)(zod@4.4.3)
+      hono: 4.12.34
       openapi3-ts: 4.5.0
       zod: 4.4.3
 
-  '@hono/zod-validator@0.7.6(hono@4.12.27)(zod@4.4.3)':
+  '@hono/zod-validator@0.7.6(hono@4.12.34)(zod@4.4.3)':
     dependencies:
-      hono: 4.12.27
+      hono: 4.12.34
       zod: 4.4.3
 
   '@hookform/resolvers@5.2.2(react-hook-form@7.80.0(react@19.2.7))':
@@ -5353,7 +5353,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.26.0(zod@3.25.76)':
     dependencies:
-      '@hono/node-server': 1.19.9(hono@4.12.27)
+      '@hono/node-server': 1.19.9(hono@4.12.34)
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
       content-type: 1.0.5
@@ -5363,7 +5363,7 @@ snapshots:
       eventsource-parser: 3.0.6
       express: 5.2.1
       express-rate-limit: 8.2.1(express@5.2.1)
-      hono: 4.12.27
+      hono: 4.12.34
       jose: 6.1.3
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
@@ -5835,10 +5835,10 @@ snapshots:
 
   '@scalar/helpers@0.2.11': {}
 
-  '@scalar/hono-api-reference@0.9.40(hono@4.12.27)':
+  '@scalar/hono-api-reference@0.9.40(hono@4.12.34)':
     dependencies:
       '@scalar/core': 0.3.37
-      hono: 4.12.27
+      hono: 4.12.34
 
   '@scalar/types@0.6.2':
     dependencies:
@@ -7040,14 +7040,14 @@ snapshots:
 
   help-me@5.0.0: {}
 
-  hono-rate-limiter@0.5.3(hono@4.12.27):
+  hono-rate-limiter@0.5.3(hono@4.12.34):
     dependencies:
-      hono: 4.12.27
+      hono: 4.12.34
 
   hono@4.11.4:
     optional: true
 
-  hono@4.12.27: {}
+  hono@4.12.34: {}
 
   html-to-text@9.0.5:
     dependencies:
