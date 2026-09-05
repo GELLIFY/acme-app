@@ -33,18 +33,18 @@ jobs:
       current_branch: ${{ steps.branch_name.outputs.current_branch }}
       branch_id: ${{ steps.create_branch.outputs.branch_id }}
     steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
 
       - name: Get branch name
         id: branch_name
-        uses: tj-actions/branch-names@5250492686b253f06fa55861556d1027b067aeb5 # v9
+        uses: tj-actions/branch-names@5250492686b253f06fa55861556d1027b067aeb5 # v9.0.2
 
       - name: Create Neon Branch
         id: create_branch
-        uses: neondatabase/create-branch-action@fb620d43d4c565abaf088b848a4e28e5c4ea4d9c # v6
+        uses: neondatabase/create-branch-action@72ed4f69a12b6be9c16aebfad893f6a21e9aba8b # v6.4.0
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
           # parent: main # optional (defaults to your primary branch)
@@ -71,7 +71,7 @@ jobs:
           pnpm run db:migrate
 
       - name: Post Schema Diff Comment to PR
-        uses: neondatabase/schema-diff-action@80cfa8521628e890015b60f5291a7738926617dc # v1
+        uses: neondatabase/schema-diff-action@80cfa8521628e890015b60f5291a7738926617dc # v1.0.1
         with:
           project_id: ${{ vars.NEON_PROJECT_ID }}
           compare_branch: preview/pr-${{ github.event.number }}-${{ steps.branch_name.outputs.current_branch }}
@@ -92,7 +92,7 @@ jobs:
       id-token: write
       issues: write
     steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
@@ -105,7 +105,7 @@ jobs:
           GIT_BRANCH: ${{ needs.provision_and_migrate.outputs.current_branch }}
 
       - name: Comment on Pull Request
-        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3
+        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3.0.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           message: |
