@@ -1,8 +1,32 @@
 name: Deploy Preview
 
+# The configuration of the deployment target. Every action under `cd/` reads it from here rather
+# than taking it as inputs, which is what keeps the jobs below free of provider-specific wiring:
+# only the `uses:` paths and these lines name a provider.
+#
+# #if isTemplate
+# One block with both providers' variables, rather than one block each: two top-level `env:` keys
+# would be a duplicate mapping key, and the template has to stay valid YAML with every marker
+# still in place.
+# #endif
 env:
+  # #if deployVercel
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  # #endif
+  # #if deployAws
+  AWS_REGION: eu-central-1
+  AWS_ROLE: arn:aws:iam::988267347351:role/Pipeline
+  # The repository holding the Pulumi program, checked out by the actions that need it.
+  INFRA_REPO: GELLIFY/acme-app-aws
+  INFRA_SSH_KEY: ${{ secrets.INFRA_ACTION_SSH_KEY }}
+  # The environment previews are previews *of*, and whose registry and secrets they reuse.
+  BASE_ENV: test
+  PRODUCTION_ENV: prod
+  PULUMI_BACKEND_URL: s3://acme-app-aws-pulumi-state
+  PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
+  # #endif
 
 on:
   pull_request:
@@ -59,9 +83,22 @@ jobs:
           echo "::add-mask::${{ steps.create_branch.outputs.db_url_pooled }}"
           echo "::add-mask::${{ steps.create_branch.outputs.password }}"
 
-      - name: Push database URL to Vercel (scoped to this branch)
-        run: |
-          echo "${{ steps.create_branch.outputs.db_url_pooled }}" | pnpm dlx vercel env add DATABASE_URL preview "${{ steps.branch_name.outputs.current_branch }}" --force --no-sensitive --token=${{ secrets.VERCEL_TOKEN }}
+      # #if deployVercel
+      - name: Provision the preview environment
+        uses: ./.github/workflows/cd/vercel/provision-preview
+        with:
+          PR_NUMBER: ${{ github.event.number }}
+          GIT_BRANCH: ${{ steps.branch_name.outputs.current_branch }}
+          DATABASE_URL: ${{ steps.create_branch.outputs.db_url_pooled }}
+      # #endif
+      # #if deployAws
+      - name: Provision the preview environment
+        uses: ./.github/workflows/cd/aws/provision-preview
+        with:
+          PR_NUMBER: ${{ github.event.number }}
+          GIT_BRANCH: ${{ steps.branch_name.outputs.current_branch }}
+          DATABASE_URL: ${{ steps.create_branch.outputs.db_url_pooled }}
+      # #endif
 
       - name: Apply Migrations
         run: |
@@ -97,17 +134,27 @@ jobs:
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
 
-      - name: Deploy to Preview (Vercel)
-        id: deploy_vercel
+      # #if deployVercel
+      - name: Deploy to Preview
+        id: deploy
         uses: ./.github/workflows/cd/vercel/deploy-preview
         with:
-          VERCEL_TOKEN: ${{ secrets.vercel_token }}
+          PR_NUMBER: ${{ github.event.number }}
           GIT_BRANCH: ${{ needs.provision_and_migrate.outputs.current_branch }}
+      # #endif
+      # #if deployAws
+      - name: Deploy to Preview
+        id: deploy
+        uses: ./.github/workflows/cd/aws/deploy-preview
+        with:
+          PR_NUMBER: ${{ github.event.number }}
+          GIT_BRANCH: ${{ needs.provision_and_migrate.outputs.current_branch }}
+      # #endif
 
       - name: Comment on Pull Request
         uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           message: |
-            Vercel Preview URL :rocket: : ${{ steps.deploy_vercel.outputs.preview_url }}
+            Preview URL :rocket: : ${{ steps.deploy.outputs.preview_url }}
             Neon branch :elephant: : https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ needs.provision_and_migrate.outputs.branch_id }}

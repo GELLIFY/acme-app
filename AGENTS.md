@@ -24,6 +24,54 @@ For UI/UX/copy/visual decisions and the "estratto-conto" ledger idiom, load the 
 skill (`.agents/skills/product-design/`) — it is the canonical base documentation for product design
 (STANDARDS, surfaces, exemplars). Set a request-mode first; Review is flag-only.
 
+## Deployment
+
+The three CD workflows -- `deploy-preview.yml`, `cleanup-preview.yml`, `deploy-production.yml` --
+know *when* to deploy and nothing about *where*. The target is a directory under
+`.github/workflows/cd/`, and every target implements the same five composite actions:
+
+| Action | Responsibility |
+|---|---|
+| `provision-preview` | make this pull request's database reachable by the deployment that follows |
+| `deploy-preview` | build and deploy the pull request; output `preview_url` |
+| `cleanup-preview` | tear down whatever `provision-preview` and `deploy-preview` created |
+| `production-env` | write the production environment into `.env`, for the migrations that run first |
+| `deploy-production` | build and deploy the production branch |
+
+Two rules keep that boundary intact, and both are easy to break by accident:
+
+- **An action takes no credentials as inputs.** It reads them from the workflow-level `env:` block.
+  Inputs carry only what the workflow itself knows -- the branch, the pull request number, a
+  connection string. A target that needs a credential adds it to that block; it never appears in a
+  `with:`.
+- **Inputs are the same for every target, even the ones a given target ignores.** The AWS actions
+  take a `GIT_BRANCH` they do not use, and the Vercel actions a `PR_NUMBER` they do not use, so that
+  the call site is identical whichever target is active. Declare the input and say it is unused.
+
+<!-- #if isTemplate -->
+## This repository is also a template
+
+It is a working application *and* the template new ones are scaffolded from. The generator lives in
+its own repository, `GELLIFY/create-acme-app`, and it scaffolds this repository together with the
+infrastructure repository `GELLIFY/acme-app-aws` when the deployment target is AWS.
+
+Two consequences for anyone changing this repository:
+
+- **The deployment target is exclusive.** `#if deployVercel` and `#if deployAws` mark the two sides
+  of every choice; exactly one survives generation. Unlike the optional pieces in the
+  infrastructure template these are not additive, so the checked-in template is the only place
+  where both exist at once -- which is why the marked regions must stay valid YAML side by side. A
+  second top-level `env:` key would not be, hence the single block with marked lines.
+- **Adding a deployment target is three things**, and two of them live in `create-acme-app`: the
+  `cd/<target>/` directory here with all five actions and a marked step at each of the six call
+  sites; the target listed in that generator's `FEATURE_FILES`, so declining it removes the
+  directory; and a row in its `scaffold` matrix. Forgetting either of the last two produces a
+  generator that emits projects whose workflows reference a directory that is not there.
+
+This section never reaches a generated project: it sits behind an `#if isTemplate` marker, and no
+generated project sets that flag.
+<!-- #endif -->
+
 <!-- intent-skills:start -->
 ## Skill Loading
 

@@ -69,6 +69,25 @@ sudo portless proxy start --https
 Without portless installed, `pnpm dev` falls back to a plain `next dev` on a
 deterministic per-branch port.
 
+<!-- #if isTemplate -->
+## This repository is also a template
+
+It is a working application *and* the template new projects are scaffolded from, by the generator
+in **GELLIFY/create-acme-app**:
+
+```bash
+npx @gellify/create-acme-app my-app
+```
+
+It asks what the project is and where it is deployed, rewrites the placeholders, and drops the
+deployment target you did not choose. When that target is AWS it scaffolds the infrastructure
+repository alongside, into a sibling `my-app-aws/`.
+
+Read `AGENTS.md` before touching anything under `.github/workflows/cd/`: the pieces there are
+delimited by `#if` markers the generator reads, and adding or renaming one without updating the
+generator produces projects whose workflows do not run.
+<!-- #endif -->
+
 ## More
 
 See [`docs/agents/`](docs/agents/) for build, database and testing details, and

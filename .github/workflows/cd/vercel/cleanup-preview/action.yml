@@ -1,9 +1,13 @@
 name: Cleanup Vercel deployment
 
+description: >
+  Tears down what the preview provisioned. Credentials come from the workflow environment
+  (VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID), not from inputs.
+
 inputs:
-  VERCEL_TOKEN:
-    description: vercel token
-    required: true
+  PR_NUMBER:
+    description: pull request the preview belongs to; unused here, part of the shared CD contract
+    required: false
   GIT_BRANCH:
     description: git branch whose scoped preview DATABASE_URL should be removed
     required: true
@@ -17,9 +21,11 @@ runs:
 
     # NOTE: `vercel env rm` is only documented as `[name] [environment]`, unlike
     # add/update/ls which document a [gitbranch] form too. Unverified against a
-    # real branch-scoped variable — continue-on-error so a miss here never blocks
+    # real branch-scoped variable -- continue-on-error so a miss here never blocks
     # PR cleanup, but confirm on the Vercel dashboard after the first run.
     - name: Remove branch-scoped DATABASE_URL from Vercel
-      run: vercel env rm DATABASE_URL preview "${{ inputs.GIT_BRANCH }}" --yes --token=${{ inputs.VERCEL_TOKEN }}
+      env:
+        GIT_BRANCH: ${{ inputs.GIT_BRANCH }}
+      run: vercel env rm DATABASE_URL preview "$GIT_BRANCH" --yes
       continue-on-error: true
       shell: bash

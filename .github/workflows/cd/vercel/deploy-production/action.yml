@@ -1,9 +1,8 @@
 name: Deploy Production on Vercel
 
-inputs:
-  VERCEL_TOKEN:
-    description: vercel token
-    required: true
+description: >
+  Builds and deploys the production branch. Credentials come from the workflow environment
+  (VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID), not from inputs.
 
 runs:
   using: composite
@@ -13,13 +12,13 @@ runs:
       shell: bash
 
     - name: Pull Vercel Environment Information
-      run: vercel pull --yes --environment=production --token=${{ inputs.VERCEL_TOKEN }}
+      run: vercel pull --yes --environment=production
       shell: bash
 
     - name: Build Project Artifacts
-      run: vercel build --prod --token=${{ inputs.VERCEL_TOKEN }}
+      run: vercel build --prod
       shell: bash
 
     - name: Deploy Project Artifacts to Vercel
-      run: vercel deploy --prebuilt --prod --token=${{ inputs.VERCEL_TOKEN }}
+      run: vercel deploy --prebuilt --prod
       shell: bash

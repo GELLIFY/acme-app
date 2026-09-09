@@ -22,7 +22,7 @@ describe("databaseName", () => {
 });
 
 describe("appName", () => {
-  it("maps main to acme", () => {
+  it("maps main to the app short name", () => {
     expect(appName("main")).toBe("acme");
   });
 

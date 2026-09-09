@@ -1,15 +1,20 @@
 name: Deploy Preview on Vercel
 
+description: >
+  Builds and deploys the pull request, and reports the URL it landed on. Credentials come from the
+  workflow environment (VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID), not from inputs.
+
 inputs:
-  VERCEL_TOKEN:
-    description: vercel token
-    required: true
+  PR_NUMBER:
+    description: pull request the preview belongs to; unused here, part of the shared CD contract
+    required: false
   GIT_BRANCH:
     description: git branch to scope the pulled preview environment variables to
     required: true
+
 outputs:
   preview_url:
-    description: "Preview URL"
+    description: URL the preview was deployed to
     value: ${{ steps.deploy.outputs.preview_url }}
 
 runs:
@@ -20,14 +25,16 @@ runs:
       shell: bash
 
     - name: Pull Vercel Environment Information
-      run: vercel pull --yes --environment=preview --git-branch="${{ inputs.GIT_BRANCH }}" --token=${{ inputs.VERCEL_TOKEN }}
+      env:
+        GIT_BRANCH: ${{ inputs.GIT_BRANCH }}
+      run: vercel pull --yes --environment=preview --git-branch="$GIT_BRANCH"
       shell: bash
 
     - name: Build Project Artifacts
-      run: vercel build --token=${{ inputs.VERCEL_TOKEN }}
+      run: vercel build
       shell: bash
 
     - name: Deploy Preview to Vercel
       id: deploy
-      run: echo preview_url=$(vercel deploy --prebuilt --token=${{ inputs.VERCEL_TOKEN }}) >> $GITHUB_OUTPUT
+      run: echo preview_url=$(vercel deploy --prebuilt) >> $GITHUB_OUTPUT
       shell: bash
