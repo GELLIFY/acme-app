@@ -1,0 +1,33 @@
+name: Provision a Vercel preview
+
+description: >
+  Scopes the preview database connection string to this branch, so the deployment that follows
+  picks it up. Credentials come from the workflow environment (VERCEL_TOKEN, VERCEL_ORG_ID,
+  VERCEL_PROJECT_ID), not from inputs: that keeps the caller free of provider-specific wiring.
+
+inputs:
+  PR_NUMBER:
+    description: pull request the preview belongs to; unused here, part of the shared CD contract
+    required: false
+  GIT_BRANCH:
+    description: git branch the variable is scoped to
+    required: true
+  DATABASE_URL:
+    description: connection string of the database provisioned for this preview
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Install Vercel CLI
+      run: npm install --global vercel@latest
+      shell: bash
+
+    # Through the environment rather than interpolated into the script: the value is a secret, and
+    # an expression expanded into a shell line is one quoting mistake away from leaking or running.
+    - name: Push database URL to Vercel (scoped to this branch)
+      env:
+        DATABASE_URL: ${{ inputs.DATABASE_URL }}
+        GIT_BRANCH: ${{ inputs.GIT_BRANCH }}
+      run: printf '%s' "$DATABASE_URL" | vercel env add DATABASE_URL preview "$GIT_BRANCH" --force --no-sensitive
+      shell: bash

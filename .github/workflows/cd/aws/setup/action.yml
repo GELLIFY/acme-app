@@ -1,0 +1,55 @@
+name: Prepare an AWS deployment
+
+description: >
+  What every action under `cd/aws/` needs before it can talk to AWS: a session on the target
+  account, and a checkout of the infrastructure repository with its Pulumi program installed. The
+  Pulumi program lives in its own repository -- this one holds the application -- so it is fetched
+  into `.infra` rather than being part of the workspace.
+
+  Configuration comes from the workflow environment (AWS_REGION, AWS_ROLE, INFRA_REPO,
+  INFRA_SSH_KEY, PULUMI_BACKEND_URL), not from inputs.
+
+outputs:
+  registry:
+    description: ECR registry the image should be pushed to
+    value: ${{ steps.ecr.outputs.registry }}
+
+runs:
+  using: composite
+  steps:
+    - name: Check out the infrastructure repository
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ env.INFRA_REPO }}
+        path: .infra
+        ssh-key: ${{ env.INFRA_SSH_KEY }}
+        ssh-strict: false
+        persist-credentials: false
+
+    - name: Configure AWS credentials (OIDC)
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ env.AWS_ROLE }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Log in to ECR
+      id: ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: npm
+        cache-dependency-path: .infra/infrastructure/package-lock.json
+
+    - name: Install the Pulumi program
+      working-directory: .infra/infrastructure
+      run: npm ci
+      shell: bash
+
+    - uses: pulumi/actions@v6
+
+    - name: Point Pulumi at the state backend
+      working-directory: .infra/infrastructure
+      run: pulumi login "$PULUMI_BACKEND_URL"
+      shell: bash

@@ -1,0 +1,17 @@
+name: Read the production environment from Vercel
+
+description: >
+  Writes the production environment into `.env` in the workspace, for the steps that need it before
+  anything is deployed -- database migrations, above all. Credentials come from the workflow
+  environment (VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID), not from inputs.
+
+runs:
+  using: composite
+  steps:
+    - name: Install Vercel CLI
+      run: npm install --global vercel@latest
+      shell: bash
+
+    - name: Pull the production environment
+      run: vercel env pull .env --yes --environment=production
+      shell: bash

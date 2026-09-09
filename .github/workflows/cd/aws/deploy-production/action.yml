@@ -1,0 +1,45 @@
+name: Deploy Production on AWS
+
+description: >
+  Builds the application image, pushes it to the production registry, and applies the production
+  Pulumi stack. The preview is recorded in the job log before anything changes, so an unexpected
+  replace is auditable after the fact rather than only visible in the apply output.
+
+  Configuration comes from the workflow environment (AWS_REGION, AWS_ROLE, INFRA_REPO,
+  INFRA_SSH_KEY, PRODUCTION_ENV, PULUMI_BACKEND_URL, PULUMI_CONFIG_PASSPHRASE), not from inputs.
+
+runs:
+  using: composite
+  steps:
+    - name: Prepare the AWS session and the Pulumi program
+      id: aws
+      uses: ./.github/workflows/cd/aws/setup
+
+    # The registry rejects mutable tags, so the commit SHA names the exact image shipped.
+    - name: Build and push the image
+      id: image
+      env:
+        REGISTRY: ${{ steps.aws.outputs.registry }}
+      run: |
+        set -euo pipefail
+        TAG=$(git rev-parse HEAD)
+        IMAGE="$REGISTRY/$PRODUCTION_ENV-acme-app-aws:$TAG"
+        BUILDX_NO_DEFAULT_ATTESTATIONS=1 docker build -t "$IMAGE" .
+        docker push "$IMAGE"
+        echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    - name: Pulumi preview
+      working-directory: .infra/infrastructure
+      env:
+        APP_VERSION: ${{ steps.image.outputs.tag }}
+      run: |
+        set -euo pipefail
+        pulumi config set appVersion "$APP_VERSION" --stack "$PRODUCTION_ENV"
+        pulumi preview --stack "$PRODUCTION_ENV"
+      shell: bash
+
+    - name: Pulumi up
+      working-directory: .infra/infrastructure
+      run: pulumi up --yes --stack "$PRODUCTION_ENV"
+      shell: bash
