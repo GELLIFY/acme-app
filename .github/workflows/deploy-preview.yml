@@ -2,12 +2,13 @@ name: Deploy Preview
 
 # The configuration of the deployment target. Every action under `cd/` reads it from here rather
 # than taking it as inputs, which is what keeps the jobs below free of provider-specific wiring:
-# only the `uses:` paths and these lines name a provider.
+# only these lines and the `cd/<target>/` paths name a provider.
 #
 # #if isTemplate
-# One block with both providers' variables, rather than one block each: two top-level `env:` keys
-# would be a duplicate mapping key, and the template has to stay valid YAML with every marker
-# still in place.
+# The steps below are not duplicated per target, and must not be: two `#if`-marked copies of a step
+# would both be live in this repository, running two deployments and colliding on their step id.
+# This repository deploys to Vercel, full stop; scaffolding for AWS rewrites the `cd/vercel/` paths
+# to `cd/aws/` and drops the block below that does not apply.
 # #endif
 env:
   # #if deployVercel
@@ -17,7 +18,7 @@ env:
   # #endif
   # #if deployAws
   AWS_REGION: eu-central-1
-  AWS_ROLE: arn:aws:iam::988267347351:role/Pipeline
+  AWS_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/Pipeline
   # The repository holding the Pulumi program, checked out by the actions that need it.
   INFRA_REPO: GELLIFY/acme-app-aws
   INFRA_SSH_KEY: ${{ secrets.INFRA_ACTION_SSH_KEY }}
@@ -55,7 +56,9 @@ jobs:
       issues: write
     outputs:
       current_branch: ${{ steps.branch_name.outputs.current_branch }}
+      # #if useNeon
       branch_id: ${{ steps.create_branch.outputs.branch_id }}
+      # #endif
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
 
@@ -66,6 +69,7 @@ jobs:
         id: branch_name
         uses: tj-actions/branch-names@5250492686b253f06fa55861556d1027b067aeb5 # v9
 
+      # #if useNeon
       - name: Create Neon Branch
         id: create_branch
         uses: neondatabase/create-branch-action@fb620d43d4c565abaf088b848a4e28e5c4ea4d9c # v6
@@ -82,31 +86,59 @@ jobs:
           echo "::add-mask::${{ steps.create_branch.outputs.db_url }}"
           echo "::add-mask::${{ steps.create_branch.outputs.db_url_pooled }}"
           echo "::add-mask::${{ steps.create_branch.outputs.password }}"
+      # #endif
 
-      # #if deployVercel
+      # Where the preview's database comes from, and the only step that knows: everything below
+      # reads the connection string from this step's output, so its source is chosen in one place.
+      #
+      # #if isTemplate
+      # The sources are separate keys, and separate lines, rather than one of each marked twice:
+      # both are present, unresolved, in this repository, and a mapping cannot carry the same key
+      # twice. The order matters for the same reason -- with both lines live, the last one wins,
+      # and this repository has a Neon branch to use.
+      # #endif
+      - name: Resolve the preview database
+        id: database
+        env:
+          # #if useExternalDatabase
+          DATABASE_SOURCE: ${{ secrets.PREVIEW_DATABASE_URL }}
+          # #endif
+          # #if useNeon
+          NEON_BRANCH_URL: ${{ steps.create_branch.outputs.db_url_pooled }}
+          # #endif
+        run: |
+          set -euo pipefail
+          # #if useExternalDatabase
+          URL="${DATABASE_SOURCE:-}"
+          # #endif
+          # #if useNeon
+          URL="${NEON_BRANCH_URL:-}"
+          # #endif
+          if [ -z "$URL" ]; then
+            echo "::error::No preview database. Set the PREVIEW_DATABASE_URL repository secret." >&2
+            exit 1
+          fi
+          echo "::add-mask::$URL"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+        shell: bash
+
       - name: Provision the preview environment
         uses: ./.github/workflows/cd/vercel/provision-preview
         with:
           PR_NUMBER: ${{ github.event.number }}
           GIT_BRANCH: ${{ steps.branch_name.outputs.current_branch }}
-          DATABASE_URL: ${{ steps.create_branch.outputs.db_url_pooled }}
-      # #endif
-      # #if deployAws
-      - name: Provision the preview environment
-        uses: ./.github/workflows/cd/aws/provision-preview
-        with:
-          PR_NUMBER: ${{ github.event.number }}
-          GIT_BRANCH: ${{ steps.branch_name.outputs.current_branch }}
-          DATABASE_URL: ${{ steps.create_branch.outputs.db_url_pooled }}
-      # #endif
+          DATABASE_URL: ${{ steps.database.outputs.url }}
 
       - name: Apply Migrations
+        env:
+          DATABASE_URL: ${{ steps.database.outputs.url }}
         run: |
           touch .env
           echo SKIP_ENV_VALIDATION=1 >> .env
-          echo DATABASE_URL=${{ steps.create_branch.outputs.db_url_pooled }} >> .env
+          echo "DATABASE_URL=$DATABASE_URL" >> .env
           pnpm run db:migrate
 
+      # #if useNeon
       - name: Post Schema Diff Comment to PR
         uses: neondatabase/schema-diff-action@80cfa8521628e890015b60f5291a7738926617dc # v1
         with:
@@ -116,6 +148,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           base_branch: main
           api_key: ${{ secrets.NEON_API_KEY }}
+      # #endif
 
   deploy_app:
     if: ${{ !startsWith(github.head_ref, 'renovate/') }}
@@ -134,22 +167,12 @@ jobs:
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
 
-      # #if deployVercel
       - name: Deploy to Preview
         id: deploy
         uses: ./.github/workflows/cd/vercel/deploy-preview
         with:
           PR_NUMBER: ${{ github.event.number }}
           GIT_BRANCH: ${{ needs.provision_and_migrate.outputs.current_branch }}
-      # #endif
-      # #if deployAws
-      - name: Deploy to Preview
-        id: deploy
-        uses: ./.github/workflows/cd/aws/deploy-preview
-        with:
-          PR_NUMBER: ${{ github.event.number }}
-          GIT_BRANCH: ${{ needs.provision_and_migrate.outputs.current_branch }}
-      # #endif
 
       - name: Comment on Pull Request
         uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3
@@ -157,4 +180,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           message: |
             Preview URL :rocket: : ${{ steps.deploy.outputs.preview_url }}
+            # #if useNeon
             Neon branch :elephant: : https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ needs.provision_and_migrate.outputs.branch_id }}
+            # #endif

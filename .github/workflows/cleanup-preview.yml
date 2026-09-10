@@ -2,12 +2,13 @@ name: Cleanup Preview
 
 # The configuration of the deployment target. Every action under `cd/` reads it from here rather
 # than taking it as inputs, which is what keeps the jobs below free of provider-specific wiring:
-# only the `uses:` paths and these lines name a provider.
+# only these lines and the `cd/<target>/` paths name a provider.
 #
 # #if isTemplate
-# One block with both providers' variables, rather than one block each: two top-level `env:` keys
-# would be a duplicate mapping key, and the template has to stay valid YAML with every marker
-# still in place.
+# The steps below are not duplicated per target, and must not be: two `#if`-marked copies of a step
+# would both be live in this repository, running two deployments and colliding on their step id.
+# This repository deploys to Vercel, full stop; scaffolding for AWS rewrites the `cd/vercel/` paths
+# to `cd/aws/` and drops the block below that does not apply.
 # #endif
 env:
   # #if deployVercel
@@ -17,7 +18,7 @@ env:
   # #endif
   # #if deployAws
   AWS_REGION: eu-central-1
-  AWS_ROLE: arn:aws:iam::988267347351:role/Pipeline
+  AWS_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/Pipeline
   # The repository holding the Pulumi program, checked out by the actions that need it.
   INFRA_REPO: GELLIFY/acme-app-aws
   INFRA_SSH_KEY: ${{ secrets.INFRA_ACTION_SSH_KEY }}
@@ -37,6 +38,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
+  # #if useNeon
   delete_neon_branch:
     if: ${{ !startsWith(github.head_ref, 'renovate/') }}
     name: Delete Neon Branch
@@ -53,11 +55,14 @@ jobs:
           project_id: ${{ vars.NEON_PROJECT_ID }}
           branch: preview/pr-${{ github.event.number }}-${{ steps.branch_name.outputs.current_branch }}
           api_key: ${{ secrets.NEON_API_KEY }}
+  # #endif
 
   cleanup_preview:
     if: ${{ !startsWith(github.head_ref, 'renovate/') }}
     name: Cleanup Preview
+    # #if useNeon
     needs: delete_neon_branch
+    # #endif
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -74,17 +79,8 @@ jobs:
         id: branch_name
         uses: tj-actions/branch-names@dde14ac574a8b9b1cedc59a1cf312788af43d8d8 # v8
 
-      # #if deployVercel
       - name: Cleanup Preview Deployment
         uses: ./.github/workflows/cd/vercel/cleanup-preview
         with:
           PR_NUMBER: ${{ github.event.number }}
           GIT_BRANCH: ${{ steps.branch_name.outputs.current_branch }}
-      # #endif
-      # #if deployAws
-      - name: Cleanup Preview Deployment
-        uses: ./.github/workflows/cd/aws/cleanup-preview
-        with:
-          PR_NUMBER: ${{ github.event.number }}
-          GIT_BRANCH: ${{ steps.branch_name.outputs.current_branch }}
-      # #endif

@@ -2,12 +2,13 @@ name: Deploy Production
 
 # The configuration of the deployment target. Every action under `cd/` reads it from here rather
 # than taking it as inputs, which is what keeps the jobs below free of provider-specific wiring:
-# only the `uses:` paths and these lines name a provider.
+# only these lines and the `cd/<target>/` paths name a provider.
 #
 # #if isTemplate
-# One block with both providers' variables, rather than one block each: two top-level `env:` keys
-# would be a duplicate mapping key, and the template has to stay valid YAML with every marker
-# still in place.
+# The steps below are not duplicated per target, and must not be: two `#if`-marked copies of a step
+# would both be live in this repository, running two deployments and colliding on their step id.
+# This repository deploys to Vercel, full stop; scaffolding for AWS rewrites the `cd/vercel/` paths
+# to `cd/aws/` and drops the block below that does not apply.
 # #endif
 env:
   # #if deployVercel
@@ -17,7 +18,7 @@ env:
   # #endif
   # #if deployAws
   AWS_REGION: eu-central-1
-  AWS_ROLE: arn:aws:iam::988267347351:role/Pipeline
+  AWS_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/Pipeline
   # The repository holding the Pulumi program, checked out by the actions that need it.
   INFRA_REPO: GELLIFY/acme-app-aws
   INFRA_SSH_KEY: ${{ secrets.INFRA_ACTION_SSH_KEY }}
@@ -57,14 +58,8 @@ jobs:
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
 
-      # #if deployVercel
       - name: Read the production environment
         uses: ./.github/workflows/cd/vercel/production-env
-      # #endif
-      # #if deployAws
-      - name: Read the production environment
-        uses: ./.github/workflows/cd/aws/production-env
-      # #endif
 
       - name: Apply Migrations
         run: |
@@ -87,11 +82,5 @@ jobs:
       - name: Install dependencies & tooling
         uses: ./.github/workflows/setup
 
-      # #if deployVercel
       - name: Deploy to Production
         uses: ./.github/workflows/cd/vercel/deploy-production
-      # #endif
-      # #if deployAws
-      - name: Deploy to Production
-        uses: ./.github/workflows/cd/aws/deploy-production
-      # #endif

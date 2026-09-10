@@ -57,16 +57,26 @@ infrastructure repository `GELLIFY/acme-app-aws` when the deployment target is A
 
 Two consequences for anyone changing this repository:
 
-- **The deployment target is exclusive.** `#if deployVercel` and `#if deployAws` mark the two sides
-  of every choice; exactly one survives generation. Unlike the optional pieces in the
-  infrastructure template these are not additive, so the checked-in template is the only place
-  where both exist at once -- which is why the marked regions must stay valid YAML side by side. A
-  second top-level `env:` key would not be, hence the single block with marked lines.
+- **The steps are not marked per target, and must not be.** Two `#if`-marked copies of a step are
+  both live in *this* repository -- the same step twice in one job, which GitHub refuses to load
+  ("the identifier may not be used more than once"), and which would run two deployments if it did.
+  So the workflows call `cd/vercel/` outright: this repository deploys to Vercel, full stop.
+  Scaffolding for another target rewrites those paths to `cd/<target>/`.
+- **Only the `env:` block is marked**, with `#if deployVercel` / `#if deployAws` around each
+  target's variables. That is safe where a duplicated step is not: extra keys in one mapping are
+  valid and inert, whereas a duplicated step id is neither. Keep it one block -- a second top-level
+  `env:` key would be a duplicate mapping key.
+- **The database is a second, independent question.** `#if useNeon` / `#if useExternalDatabase`
+  around the preview pipeline's database steps: with Neon a branch is created per pull request,
+  without it the connection string comes from the `PREVIEW_DATABASE_URL` repository secret. The
+  two are never both off. Nothing outside `deploy-preview.yml` and `cleanup-preview.yml` knows
+  which is which -- the application talks to plain Postgres through `node-postgres` either way,
+  and no Neon package is a dependency -- so keep it that way.
 - **Adding a deployment target is three things**, and two of them live in `create-acme-app`: the
-  `cd/<target>/` directory here with all five actions and a marked step at each of the six call
-  sites; the target listed in that generator's `FEATURE_FILES`, so declining it removes the
-  directory; and a row in its `scaffold` matrix. Forgetting either of the last two produces a
-  generator that emits projects whose workflows reference a directory that is not there.
+  `cd/<target>/` directory here with all five actions; the target listed in that generator's
+  `featureFiles`, so declining it removes the directory; and the path rewrite plus a row in its
+  `scaffold` matrix. Forgetting any of the last two produces a generator that emits projects whose
+  workflows reference a directory that is not there.
 
 This section never reaches a generated project: it sits behind an `#if isTemplate` marker, and no
 generated project sets that flag.
