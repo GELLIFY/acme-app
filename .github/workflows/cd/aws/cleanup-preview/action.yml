@@ -1,0 +1,43 @@
+name: Cleanup AWS deployment
+
+description: >
+  Tears down what the preview provisioned: the Pulumi stack and the SSM parameter holding its
+  connection string. Each step tolerates an already-absent resource -- a closed pull request must
+  not keep a task running because one of them had nothing left to delete.
+
+  Configuration comes from the workflow environment (AWS_REGION, AWS_ROLE, BASE_ENV, INFRA_REPO,
+  INFRA_SSH_KEY, PULUMI_BACKEND_URL, PULUMI_CONFIG_PASSPHRASE), not from inputs.
+
+inputs:
+  PR_NUMBER:
+    description: pull request whose preview should be torn down
+    required: true
+  GIT_BRANCH:
+    description: branch the pull request was on; unused here, part of the shared CD contract
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Prepare the AWS session and the Pulumi program
+      uses: ./.github/workflows/cd/aws/setup
+
+    - name: Destroy the preview stack
+      continue-on-error: true
+      working-directory: .infra/infrastructure
+      env:
+        PR_NUMBER: ${{ inputs.PR_NUMBER }}
+      run: |
+        pulumi destroy --yes --stack "pr-$PR_NUMBER"
+        pulumi stack rm --yes --stack "pr-$PR_NUMBER"
+      shell: bash
+
+    - name: Delete the connection string parameter
+      continue-on-error: true
+      env:
+        PR_NUMBER: ${{ inputs.PR_NUMBER }}
+      run: |
+        aws ssm delete-parameter \
+          --name "/$BASE_ENV/pr-$PR_NUMBER/database_url" \
+          --region "$AWS_REGION"
+      shell: bash

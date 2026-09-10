@@ -1,0 +1,32 @@
+name: Read the production environment from AWS
+
+description: >
+  Writes the production environment into `.env` in the workspace, for the steps that need it before
+  anything is deployed -- database migrations, above all. The values are the same SSM parameters the
+  running task reads, so a migration runs against exactly the database the deployment will use.
+
+  Configuration comes from the workflow environment (AWS_REGION, AWS_ROLE, PRODUCTION_ENV), not from
+  inputs.
+
+runs:
+  using: composite
+  steps:
+    - name: Configure AWS credentials (OIDC)
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ env.AWS_ROLE }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    # Written with `printf %s=%s` from a masked shell variable rather than echoed through an
+    # expression, so the connection string never appears in the job log.
+    - name: Pull the production environment
+      run: |
+        set -euo pipefail
+        DATABASE_URL=$(aws ssm get-parameter \
+          --name "/$PRODUCTION_ENV/database_url" \
+          --with-decryption \
+          --region "$AWS_REGION" \
+          --query 'Parameter.Value' --output text)
+        echo "::add-mask::$DATABASE_URL"
+        printf 'DATABASE_URL=%s\n' "$DATABASE_URL" > .env
+      shell: bash

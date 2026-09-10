@@ -1,0 +1,45 @@
+name: Provision an AWS preview
+
+description: >
+  Publishes the preview database connection string where the task will read it. The Express Mode
+  service reads its secrets from SSM under `/<base env>/pr-<n>/`, so the parameter has to exist
+  before the first deployment, not alongside it.
+
+  Configuration comes from the workflow environment (AWS_REGION, AWS_ROLE, BASE_ENV), not from
+  inputs.
+
+inputs:
+  PR_NUMBER:
+    description: pull request the preview belongs to
+    required: true
+  GIT_BRANCH:
+    description: branch the pull request is on; unused here, part of the shared CD contract
+    required: false
+  DATABASE_URL:
+    description: connection string of the database provisioned for this preview
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Configure AWS credentials (OIDC)
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ env.AWS_ROLE }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    # Through the environment rather than interpolated into the script: the value is a secret, and
+    # an expression expanded into a shell line is one quoting mistake away from leaking or running.
+    - name: Publish the connection string for the task to read
+      env:
+        DATABASE_URL: ${{ inputs.DATABASE_URL }}
+        PR_NUMBER: ${{ inputs.PR_NUMBER }}
+      run: |
+        set -euo pipefail
+        aws ssm put-parameter \
+          --name "/$BASE_ENV/pr-$PR_NUMBER/database_url" \
+          --type SecureString \
+          --value "$DATABASE_URL" \
+          --overwrite \
+          --region "$AWS_REGION" >/dev/null
+      shell: bash

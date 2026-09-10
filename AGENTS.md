@@ -24,6 +24,35 @@ For UI/UX/copy/visual decisions and the "estratto-conto" ledger idiom, load the 
 skill (`.agents/skills/product-design/`) — it is the canonical base documentation for product design
 (STANDARDS, surfaces, exemplars). Set a request-mode first; Review is flag-only.
 
+## Deployment
+
+The three CD workflows -- `deploy-preview.yml`, `cleanup-preview.yml`, `deploy-production.yml` --
+know *when* to deploy and nothing about *where*. The target is a directory under
+`.github/workflows/cd/`, and every target implements the same five composite actions:
+
+| Action | Responsibility |
+|---|---|
+| `provision-preview` | make this pull request's database reachable by the deployment that follows |
+| `deploy-preview` | build and deploy the pull request; output `preview_url` |
+| `cleanup-preview` | tear down whatever `provision-preview` and `deploy-preview` created |
+| `production-env` | write the production environment into `.env`, for the migrations that run first |
+| `deploy-production` | build and deploy the production branch |
+
+Two rules keep that boundary intact, and both are easy to break by accident:
+
+- **An action takes no credentials as inputs.** It reads them from the workflow-level `env:` block.
+  Inputs carry only what the workflow itself knows -- the branch, the pull request number, a
+  connection string. A target that needs a credential adds it to that block; it never appears in a
+  `with:`.
+- **Inputs are the same for every target, even the ones a given target ignores.** The AWS actions
+  take a `GIT_BRANCH` they do not use, so that the call site is identical whichever target is
+  active. Declare the input and say it is unused.
+
+`cd/vercel/` predates both rules -- it takes its token as an input and implements three of the five
+actions -- and the workflows here call `cd/aws/`. Bring it up to the contract before deploying this
+branch to Vercel again.
+
+
 <!-- intent-skills:start -->
 ## Skill Loading
 

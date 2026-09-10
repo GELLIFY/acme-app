@@ -1,0 +1,93 @@
+name: Deploy Preview on AWS
+
+description: >
+  Builds the application image, pushes it to the environment's registry, and brings up a Pulumi
+  stack dedicated to this pull request. The stack is a preview of the base environment: it reuses
+  that environment's registry and Express Mode infrastructure role rather than provisioning its own.
+
+  Configuration comes from the workflow environment (AWS_REGION, AWS_ROLE, BASE_ENV, INFRA_REPO,
+  INFRA_SSH_KEY, PULUMI_BACKEND_URL, PULUMI_CONFIG_PASSPHRASE), not from inputs.
+
+inputs:
+  PR_NUMBER:
+    description: pull request the preview belongs to
+    required: true
+  GIT_BRANCH:
+    description: branch the pull request is on; unused here, part of the shared CD contract
+    required: false
+
+outputs:
+  preview_url:
+    description: URL the preview was deployed to
+    value: ${{ steps.endpoint.outputs.url }}
+
+runs:
+  using: composite
+  steps:
+    - name: Prepare the AWS session and the Pulumi program
+      id: aws
+      uses: ./.github/workflows/cd/aws/setup
+
+    # The registry rejects mutable tags, so the commit SHA names the exact image shipped.
+    - name: Build and push the image
+      id: image
+      env:
+        REGISTRY: ${{ steps.aws.outputs.registry }}
+      run: |
+        set -euo pipefail
+        TAG=$(git rev-parse HEAD)
+        IMAGE="$REGISTRY/$BASE_ENV-acme-app-aws:$TAG"
+        BUILDX_NO_DEFAULT_ATTESTATIONS=1 docker build -t "$IMAGE" .
+        docker push "$IMAGE"
+        echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    - name: Configure the preview stack
+      working-directory: .infra/infrastructure
+      env:
+        PR_NUMBER: ${{ inputs.PR_NUMBER }}
+        APP_VERSION: ${{ steps.image.outputs.tag }}
+      run: |
+        set -euo pipefail
+        pulumi stack select --create "pr-$PR_NUMBER"
+        pulumi config set previewOf "$BASE_ENV"
+        pulumi config set secretsEnv "$BASE_ENV"
+        pulumi config set prefix "$BASE_ENV"
+        pulumi config set cpu 256
+        pulumi config set maxTaskCount 1
+        pulumi config set appVersion "$APP_VERSION"
+        pulumi config set betterAuthUrl "https://pending.invalid"
+      shell: bash
+
+    # Express Mode mints the hostname while creating the service, so the URL cannot be known before
+    # the first up. Deploy once to learn it, then again to hand it to Better Auth, which rejects
+    # callbacks whose origin does not match.
+    - name: Deploy (first pass, endpoint not yet known)
+      working-directory: .infra/infrastructure
+      env:
+        PR_NUMBER: ${{ inputs.PR_NUMBER }}
+      run: pulumi up --yes --stack "pr-$PR_NUMBER"
+      shell: bash
+
+    - name: Read the managed endpoint
+      id: endpoint
+      working-directory: .infra/infrastructure
+      env:
+        PR_NUMBER: ${{ inputs.PR_NUMBER }}
+      run: |
+        set -euo pipefail
+        HOST=$(pulumi stack output endpoint --stack "pr-$PR_NUMBER")
+        test -n "$HOST"
+        echo "url=https://$HOST" >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    - name: Deploy (second pass, endpoint known)
+      working-directory: .infra/infrastructure
+      env:
+        PR_NUMBER: ${{ inputs.PR_NUMBER }}
+        URL: ${{ steps.endpoint.outputs.url }}
+      run: |
+        set -euo pipefail
+        pulumi config set betterAuthUrl "$URL" --stack "pr-$PR_NUMBER"
+        pulumi up --yes --stack "pr-$PR_NUMBER"
+      shell: bash
