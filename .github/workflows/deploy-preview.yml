@@ -6,15 +6,12 @@ name: Deploy Preview
 #
 env:
   AWS_REGION: eu-central-1
-  AWS_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/Pipeline
-  # The repository holding the Pulumi program, checked out by the actions that need it.
-  INFRA_REPO: GELLIFY/acme-app-aws
-  INFRA_SSH_KEY: ${{ secrets.INFRA_ACTION_SSH_KEY }}
-  # The environment previews are previews *of*, and whose registry and secrets they reuse.
+  # Not the production deploy role: a preview creates a service and a log group from nothing, so it
+  # needs a wider one. Provisioned by acme-app-aws's GithubActionsPreviewRole.
+  AWS_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/gh-actions-preview
+  # The environment previews are previews *of*: they reuse its registry, its IAM roles and every
+  # secret but the database.
   BASE_ENV: test
-  PRODUCTION_ENV: prod
-  PULUMI_BACKEND_URL: s3://acme-app-aws-pulumi-state
-  PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
 
 on:
   pull_request:
@@ -82,7 +79,7 @@ jobs:
           set -euo pipefail
           URL="${NEON_BRANCH_URL:-}"
           if [ -z "$URL" ]; then
-            echo "::error::No preview database. Set the PREVIEW_DATABASE_URL repository secret." >&2
+            echo "::error::No preview database was provisioned for this pull request." >&2
             exit 1
           fi
           echo "::add-mask::$URL"
@@ -119,7 +116,10 @@ jobs:
     if: ${{ !startsWith(github.head_ref, 'renovate/') }}
     name: Deploy Preview
     environment: Preview
-    runs-on: ubuntu-24.04-arm
+    # Express Mode services run on X86_64 Fargate with no way to configure otherwise, and arm64
+    # runners have no binfmt/QEMU registered for cross-arch emulation. Matching the runner to the
+    # target architecture avoids emulation entirely instead of fighting it.
+    runs-on: ubuntu-24.04
     needs: [provision_and_migrate]
     permissions:
       contents: read
@@ -139,10 +139,22 @@ jobs:
           PR_NUMBER: ${{ github.event.number }}
           GIT_BRANCH: ${{ needs.provision_and_migrate.outputs.current_branch }}
 
+      # `comment-tag` makes this edit its own comment instead of adding one. The workflow runs on
+      # every push to the pull request, and the URL does not change between them: a new comment per
+      # push would bury the review conversation under identical links.
       - name: Comment on Pull Request
         uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-tag: preview-environment
           message: |
-            Preview URL :rocket: : ${{ steps.deploy.outputs.preview_url }}
-            Neon branch :elephant: : https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ needs.provision_and_migrate.outputs.branch_id }}
+            ### Preview environment
+
+            | | |
+            |---|---|
+            | :rocket: App | ${{ steps.deploy.outputs.preview_url }} |
+            | :elephant: Neon branch | https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ needs.provision_and_migrate.outputs.branch_id }} |
+            | :package: Service | `ecs-pr-${{ github.event.number }}-eu` |
+            | :bookmark: Commit | ${{ github.event.pull_request.head.sha }} |
+
+            Updated on every push. Everything here is torn down when the pull request closes.
