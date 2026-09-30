@@ -1,12 +1,16 @@
 name: Deploy Preview on AWS
 
 description: >
-  Builds the application image, pushes it to the environment's registry, and brings up a Pulumi
-  stack dedicated to this pull request. The stack is a preview of the base environment: it reuses
-  that environment's registry and Express Mode infrastructure role rather than provisioning its own.
+  Builds the application image, pushes it to the base environment's registry, and brings up an ECS
+  Express Mode service dedicated to this pull request.
 
-  Configuration comes from the workflow environment (AWS_REGION, AWS_ROLE, BASE_ENV, INFRA_REPO,
-  INFRA_SSH_KEY, PULUMI_BACKEND_URL, PULUMI_CONFIG_PASSPHRASE), not from inputs.
+  A preview provisions as little as possible: the registry, the execution role, the task role and
+  the Express Mode infrastructure role all belong to the base environment and are reused as they
+  are. What is actually per-pull-request is the log group, the service, and the SSM parameter
+  holding the database branch (written earlier by `provision-preview`).
+
+  Configuration comes from the workflow environment (AWS_REGION, AWS_ROLE, BASE_ENV), not from
+  inputs.
 
 inputs:
   PR_NUMBER:
@@ -24,70 +28,179 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Prepare the AWS session and the Pulumi program
-      id: aws
-      uses: ./.github/workflows/cd/aws/setup
+    - name: Configure AWS credentials (OIDC)
+      uses: aws-actions/configure-aws-credentials@f24d7193d98baebaeacc7e2227925dd47cc267f5 # v4.2.0
+      with:
+        role-to-assume: ${{ env.AWS_ROLE }}
+        aws-region: ${{ env.AWS_REGION }}
 
-    # The registry rejects mutable tags, so the commit SHA names the exact image shipped.
+    - name: Log in to Amazon ECR
+      id: ecr_login
+      uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd # v2.1.7
+
+    # The names every step below builds on, in one place. They follow acme-app-aws's
+    # `resourceName()` convention -- `{aws-service-acronym}-{environment}-{region}` -- because
+    # these resources sit alongside the ones Pulumi owns and are found by the same naming rules.
+    - name: Resolve the preview's names
+      id: names
+      env:
+        PR_NUMBER: ${{ inputs.PR_NUMBER }}
+      run: |
+        set -euo pipefail
+        region_short="${AWS_REGION%%-*}"
+        account=$(aws sts get-caller-identity --query Account --output text)
+
+        {
+          echo "account=$account"
+          echo "base=ecs-$BASE_ENV-$region_short"
+          echo "infra_role=iam-$BASE_ENV-$region_short-infra"
+          echo "repository=ecr-$BASE_ENV-$region_short"
+          echo "service=ecs-pr-$PR_NUMBER-$region_short"
+          echo "log_group=/aws/ecs/default/ecs-pr-$PR_NUMBER-$region_short"
+          echo "service_arn=arn:aws:ecs:$AWS_REGION:$account:service/default/ecs-pr-$PR_NUMBER-$region_short"
+        } >> "$GITHUB_OUTPUT"
+      shell: bash
+
     - name: Build and push the image
       id: image
       env:
-        REGISTRY: ${{ steps.aws.outputs.registry }}
+        REGISTRY: ${{ steps.ecr_login.outputs.registry }}
+        REPOSITORY: ${{ steps.names.outputs.repository }}
       run: |
         set -euo pipefail
-        TAG=$(git rev-parse HEAD)
-        IMAGE="$REGISTRY/$BASE_ENV-acme-app-aws:$TAG"
-        BUILDX_NO_DEFAULT_ATTESTATIONS=1 docker build -t "$IMAGE" .
-        docker push "$IMAGE"
-        echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+        tag=$(git rev-parse HEAD)
+
+        # The repository is immutable-tagged and the tag is the commit SHA, so re-running this job
+        # for a commit already pushed must not re-push: ECR rejects it, and the existing tag is
+        # already the correct image for that commit.
+        if aws ecr describe-images --repository-name "$REPOSITORY" --image-ids imageTag="$tag" >/dev/null 2>&1; then
+          echo "Tag $tag already present in $REPOSITORY, skipping build and push."
+        else
+          BUILDX_NO_DEFAULT_ATTESTATIONS=1 docker build -t "$REGISTRY/$REPOSITORY:$tag" .
+          docker push "$REGISTRY/$REPOSITORY:$tag"
+        fi
+        echo "uri=$REGISTRY/$REPOSITORY:$tag" >> "$GITHUB_OUTPUT"
       shell: bash
 
-    - name: Configure the preview stack
-      working-directory: .infra/infrastructure
+    # Created before the service, which references it by name: a container's log configuration does
+    # not create the group it writes to. Retention is short because a preview outlives its pull
+    # request by nothing.
+    - name: Create the log group
       env:
-        PR_NUMBER: ${{ inputs.PR_NUMBER }}
-        APP_VERSION: ${{ steps.image.outputs.tag }}
+        LOG_GROUP: ${{ steps.names.outputs.log_group }}
       run: |
         set -euo pipefail
-        pulumi stack select --create "pr-$PR_NUMBER"
-        pulumi config set previewOf "$BASE_ENV"
-        pulumi config set secretsEnv "$BASE_ENV"
-        pulumi config set prefix "$BASE_ENV"
-        pulumi config set cpu 256
-        pulumi config set maxTaskCount 1
-        pulumi config set appVersion "$APP_VERSION"
-        pulumi config set betterAuthUrl "https://pending.invalid"
+        aws logs create-log-group --log-group-name "$LOG_GROUP" 2>/dev/null \
+          || echo "Log group $LOG_GROUP already exists."
+        aws logs put-retention-policy --log-group-name "$LOG_GROUP" --retention-in-days 7
       shell: bash
 
-    # Express Mode mints the hostname while creating the service, so the URL cannot be known before
-    # the first up. Deploy once to learn it, then again to hand it to Better Auth, which rejects
-    # callbacks whose origin does not match.
-    - name: Deploy (first pass, endpoint not yet known)
-      working-directory: .infra/infrastructure
+    # This runs on every push to the pull request, so it has to handle both the first deployment
+    # and every one after it. On an existing service only the image changes: the rest of the
+    # container configuration is read back and reused, exactly as deploy-test does, so that a
+    # redeploy cannot quietly drop the secrets or the log configuration.
+    - name: Create or update the service
       env:
+        ACCOUNT: ${{ steps.names.outputs.account }}
+        BASE_SERVICE: ${{ steps.names.outputs.base }}
+        IMAGE: ${{ steps.image.outputs.uri }}
+        INFRA_ROLE: ${{ steps.names.outputs.infra_role }}
+        LOG_GROUP: ${{ steps.names.outputs.log_group }}
         PR_NUMBER: ${{ inputs.PR_NUMBER }}
-      run: pulumi up --yes --stack "pr-$PR_NUMBER"
+        SERVICE: ${{ steps.names.outputs.service }}
+        SERVICE_ARN: ${{ steps.names.outputs.service_arn }}
+      run: |
+        set -euo pipefail
+
+        if aws ecs describe-express-gateway-service --service-arn "$SERVICE_ARN" >/dev/null 2>&1; then
+          echo "Service $SERVICE exists, updating its image."
+          primary_container=$(
+            aws ecs describe-express-gateway-service --service-arn "$SERVICE_ARN" \
+              --query 'service.activeConfigurations[0].primaryContainer' --output json \
+              | jq --arg image "$IMAGE" '.image = $image'
+          )
+          aws ecs update-express-gateway-service \
+            --service-arn "$SERVICE_ARN" \
+            --primary-container "$primary_container"
+          exit 0
+        fi
+
+        echo "Creating service $SERVICE."
+
+        ssm="arn:aws:ssm:$AWS_REGION:$ACCOUNT:parameter"
+        iam="arn:aws:iam::$ACCOUNT:role"
+
+        # Every secret but the database is the base environment's: a preview is a preview *of*
+        # test, and only its data is its own. This mirrors `applicationSecrets` in acme-app-aws's
+        # index.ts, which resolves DATABASE_URL per preview and shares the rest.
+        #
+        # BETTER_AUTH_URL is deliberately absent: `betterAuth()` in src/libs/better-auth/auth.ts
+        # sets no baseURL, so the origin is taken from the request and a preview needs no knowledge
+        # of the hostname Express Mode is about to mint for it.
+        #
+        # The member names here are the API's, which are singular (`environment`,
+        # `awsLogsConfiguration`) where the Pulumi provider pluralises them. Reading them off
+        # acme-app-aws's component would produce JSON the CLI rejects.
+        primary_container=$(jq -n \
+          --arg image "$IMAGE" \
+          --arg db "$ssm/$BASE_ENV/pr-$PR_NUMBER/database_url" \
+          --arg auth_secret "$ssm/$BASE_ENV/better_auth_secret" \
+          --arg log_group "$LOG_GROUP" \
+          '{
+            image: $image,
+            containerPort: 3000,
+            environment: [
+              { name: "HOSTNAME", value: "0.0.0.0" },
+              { name: "PORT", value: "3000" }
+            ],
+            secrets: [
+              { name: "DATABASE_URL", valueFrom: $db },
+              { name: "BETTER_AUTH_SECRET", valueFrom: $auth_secret }
+            ],
+            awsLogsConfiguration: { logGroup: $log_group, logStreamPrefix: "ecs" }
+          }')
+
+        # One object, not a list: the API takes a single `scalingTarget` per service.
+        scaling_target=$(jq -n \
+          '{
+            autoScalingMetric: "AVERAGE_CPU",
+            autoScalingTargetValue: 60,
+            minTaskCount: 1,
+            maxTaskCount: 1
+          }')
+
+        # Smaller than test, which runs 512/1024 with up to two tasks: a preview serves a handful
+        # of reviewers, and one task caps what an idle pull request costs.
+        aws ecs create-express-gateway-service \
+          --service-name "$SERVICE" \
+          --cluster default \
+          --execution-role-arn "$iam/$BASE_SERVICE-execution" \
+          --task-role-arn "$iam/$BASE_SERVICE-task" \
+          --infrastructure-role-arn "$iam/$INFRA_ROLE" \
+          --cpu 256 \
+          --memory 512 \
+          --health-check-path /api/health \
+          --primary-container "$primary_container" \
+          --scaling-target "$scaling_target" \
+          --tags \
+            "key=Environment,value=pr-$PR_NUMBER" \
+            "key=Prefix,value=$BASE_ENV" \
+            "key=Service,value=sinergas-portal" \
+            "key=ManagedBy,value=github-actions"
       shell: bash
 
+    # Express Mode mints the hostname while creating the service, so it cannot be known beforehand
+    # and is read back rather than constructed.
     - name: Read the managed endpoint
       id: endpoint
-      working-directory: .infra/infrastructure
       env:
-        PR_NUMBER: ${{ inputs.PR_NUMBER }}
+        SERVICE_ARN: ${{ steps.names.outputs.service_arn }}
       run: |
         set -euo pipefail
-        HOST=$(pulumi stack output endpoint --stack "pr-$PR_NUMBER")
-        test -n "$HOST"
-        echo "url=https://$HOST" >> "$GITHUB_OUTPUT"
-      shell: bash
-
-    - name: Deploy (second pass, endpoint known)
-      working-directory: .infra/infrastructure
-      env:
-        PR_NUMBER: ${{ inputs.PR_NUMBER }}
-        URL: ${{ steps.endpoint.outputs.url }}
-      run: |
-        set -euo pipefail
-        pulumi config set betterAuthUrl "$URL" --stack "pr-$PR_NUMBER"
-        pulumi up --yes --stack "pr-$PR_NUMBER"
+        host=$(aws ecs describe-express-gateway-service --service-arn "$SERVICE_ARN" \
+          --query 'service.activeConfigurations[0].ingressPaths[0].endpoint' --output text)
+        test -n "$host" && test "$host" != "None"
+        # The API returns the endpoint with its scheme already on it. Stripping one if present,
+        # rather than assuming either way, keeps this right whichever form comes back.
+        echo "url=https://${host#https://}" >> "$GITHUB_OUTPUT"
       shell: bash

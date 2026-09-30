@@ -1,12 +1,15 @@
 name: Cleanup AWS deployment
 
 description: >
-  Tears down what the preview provisioned: the Pulumi stack and the SSM parameter holding its
-  connection string. Each step tolerates an already-absent resource -- a closed pull request must
-  not keep a task running because one of them had nothing left to delete.
+  Tears down what the preview created: the ECS Express Mode service, its log group, and the SSM
+  parameter holding its database connection string. Nothing else was ever its own -- the registry
+  and the roles belong to the base environment and are left alone.
 
-  Configuration comes from the workflow environment (AWS_REGION, AWS_ROLE, BASE_ENV, INFRA_REPO,
-  INFRA_SSH_KEY, PULUMI_BACKEND_URL, PULUMI_CONFIG_PASSPHRASE), not from inputs.
+  Each step tolerates an already-absent resource: a closed pull request must not keep a task
+  running because one of them had nothing left to delete.
+
+  Configuration comes from the workflow environment (AWS_REGION, AWS_ROLE, BASE_ENV), not from
+  inputs.
 
 inputs:
   PR_NUMBER:
@@ -19,17 +22,44 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Prepare the AWS session and the Pulumi program
-      uses: ./.github/workflows/cd/aws/setup
+    - name: Configure AWS credentials (OIDC)
+      uses: aws-actions/configure-aws-credentials@f24d7193d98baebaeacc7e2227925dd47cc267f5 # v4.2.0
+      with:
+        role-to-assume: ${{ env.AWS_ROLE }}
+        aws-region: ${{ env.AWS_REGION }}
 
-    - name: Destroy the preview stack
-      continue-on-error: true
-      working-directory: .infra/infrastructure
+    - name: Resolve the preview's names
+      id: names
       env:
         PR_NUMBER: ${{ inputs.PR_NUMBER }}
       run: |
-        pulumi destroy --yes --stack "pr-$PR_NUMBER"
-        pulumi stack rm --yes --stack "pr-$PR_NUMBER"
+        set -euo pipefail
+        region_short="${AWS_REGION%%-*}"
+        account=$(aws sts get-caller-identity --query Account --output text)
+
+        {
+          echo "log_group=/aws/ecs/default/ecs-pr-$PR_NUMBER-$region_short"
+          echo "service_arn=arn:aws:ecs:$AWS_REGION:$account:service/default/ecs-pr-$PR_NUMBER-$region_short"
+        } >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    # First, because it is the one that costs money while it runs and the one holding a connection
+    # to the database branch the cleanup workflow deletes next.
+    - name: Delete the service
+      continue-on-error: true
+      env:
+        SERVICE_ARN: ${{ steps.names.outputs.service_arn }}
+      run: |
+        aws ecs delete-express-gateway-service --service-arn "$SERVICE_ARN"
+      shell: bash
+
+    # Deleting the group takes its log streams with it, so there is nothing to sweep up per stream.
+    - name: Delete the log group
+      continue-on-error: true
+      env:
+        LOG_GROUP: ${{ steps.names.outputs.log_group }}
+      run: |
+        aws logs delete-log-group --log-group-name "$LOG_GROUP"
       shell: bash
 
     - name: Delete the connection string parameter
