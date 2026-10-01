@@ -44,8 +44,9 @@ is not the same five actions. Its workflows are in `cd/aws/pipelines/` -- see be
 resource names follow `PROJECT_NAME` (`ecr-<name>`, `<name>-cluster`, `ecs-<name>-<env>`), which
 must match `PROJECT_NAME` in the infrastructure repository `GELLIFY/acme-app-aws`. It needs the
 `AWS_ROLE_ARN` secret, the `test` and `prod` GitHub environments, and the `develop` (test) and
-`main` (prod) branches. The worker image (`Dockerfile.worker`) runs `pnpm worker`, so a project
-using AWS must provide a `worker` script, e.g. `scripts/worker.ts`.
+`main` (prod) branches. The worker is optional (generator question, `#if useWorker`): the worker
+image (`Dockerfile.worker`) runs `pnpm worker`, so a project that keeps it must provide a `worker`
+script, e.g. `scripts/worker.ts`.
 
 Two rules keep that boundary intact, and both are easy to break by accident:
 
@@ -94,6 +95,14 @@ Two consequences for anyone changing this repository:
   them up, replacing the Vercel ones, instead of rewriting the `cd/vercel/` paths -- their job
   structure differs, so the path rewrite alone is not enough. Their `PROJECT_NAME` is `acme-app`
   and is replaced by the generator.
+- **The worker is a third, independent question.** `#if useWorker` wraps every use of it in
+  `cd/aws/pipelines/` (the `build_worker` / `deploy_worker` jobs and the `needs` entries that point
+  at them) and in the shared AWS actions (`deploy-preview`, `cleanup-preview`: the worker task
+  definition, security group, subnets and the `JOB_DRIVER` / `ECS_CLUSTER` / `WORKER_*` variables).
+  The worker-only files -- `Dockerfile.worker` and the `build-worker`, `build-{test,prod,preview}-worker`,
+  `deploy-worker`, `deploy-{test,prod,preview}-worker` actions -- go in the generator's `featureFiles`,
+  so declining the worker removes them. Keep a `needs` list that mentions a worker job as a block
+  list (one item per line), so the marked item can be dropped on its own.
 
 This section never reaches a generated project: it sits behind an `#if isTemplate` marker, and no
 generated project sets that flag.
