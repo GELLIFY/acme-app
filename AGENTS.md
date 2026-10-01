@@ -95,14 +95,25 @@ Two consequences for anyone changing this repository:
   them up, replacing the Vercel ones, instead of rewriting the `cd/vercel/` paths -- their job
   structure differs, so the path rewrite alone is not enough. Their `PROJECT_NAME` is `acme-app`
   and is replaced by the generator.
-- **The worker is a third, independent question.** `#if useWorker` wraps every use of it in
-  `cd/aws/pipelines/` (the `build_worker` / `deploy_worker` jobs and the `needs` entries that point
-  at them) and in the shared AWS actions (`deploy-preview`, `cleanup-preview`: the worker task
-  definition, security group, subnets and the `JOB_DRIVER` / `ECS_CLUSTER` / `WORKER_*` variables).
-  The worker-only files -- `Dockerfile.worker` and the `build-worker`, `build-{test,prod,preview}-worker`,
-  `deploy-worker`, `deploy-{test,prod,preview}-worker` actions -- go in the generator's `featureFiles`,
-  so declining the worker removes them. Keep a `needs` list that mentions a worker job as a block
-  list (one item per line), so the marked item can be dropped on its own.
+- **The worker is a third, independent question.** `#if useWorker` wraps every use of it, and
+  declining it removes all of it:
+  - in the workflows: `cd/aws/pipelines/` (the `build_worker` / `deploy_worker` jobs and the `needs`
+    entries that point at them) and the shared AWS actions (`deploy-preview`, `cleanup-preview`: the
+    worker task definition, security group, subnets and the `JOB_DRIVER` / `ECS_CLUSTER` /
+    `WORKER_*` variables). Keep a `needs` list that mentions a worker job as a block list (one item
+    per line), so the marked item can be dropped on its own;
+  - in the application: `src/env.ts`, `.env.example` and `docker-compose.yml` (the `worker` service);
+  - as whole files, for the generator's `featureFiles`: `Dockerfile.worker`, `scripts/worker.ts`,
+    `scripts/direct-database-url.ts` (+ test), `src/server/services/jobs/`, and the
+    `build-worker`, `build-{test,prod,preview}-worker`, `deploy-worker` and
+    `deploy-{test,prod,preview}-worker` actions;
+  - as JSON, which has no comments, so the generator removes the keys: the `worker` script and the
+    `@aws-sdk/client-ecs` dependency in `package.json`.
+
+  `scripts/worker.ts` is a skeleton: the advisory lock and the poll loop are real, `findNextJob` and
+  `processJob` are TODOs for the project's own queue. `configuredTaskRunner()` in
+  `src/server/services/jobs/ecs-task-runner.ts` is what the code that enqueues a job calls to start
+  the task under `JOB_DRIVER=ecs`.
 
 This section never reaches a generated project: it sits behind an `#if isTemplate` marker, and no
 generated project sets that flag.

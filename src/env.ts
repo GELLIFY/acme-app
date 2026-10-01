@@ -24,6 +24,24 @@ export const env = createEnv({
       ),
     RESEND_API_KEY: z.string().min(1),
 
+    // #if useWorker
+    // How a queued background job gets executed, per acme-app-aws's `EcsFargateTask` invocation
+    // contract (infrastructure/components/ecs-fargate-task.md): "local" (default, no AWS needed)
+    // leaves the job queued for scripts/worker.ts's own poll loop to pick up; "ecs" calls
+    // `ecs:RunTask`. The ECS_CLUSTER / WORKER_* variables are injected automatically into the
+    // app's container environment by that stack once `withFargateTask` is enabled.
+    JOB_DRIVER: z.enum(["ecs", "local"]).default("local"),
+    ECS_CLUSTER: z.string().optional(),
+    WORKER_TASK_DEFINITION: z.string().optional(),
+    WORKER_CONTAINER_NAME: z.string().optional(),
+    WORKER_SECURITY_GROUP_ID: z.string().optional(),
+    WORKER_SUBNET_IDS: z.string().optional(),
+    // Only needed outside AWS (no IAM role): static credentials for the ECS client.
+    AWS_REGION: z.string().optional(),
+    AWS_ACCESS_KEY_ID: z.string().optional(),
+    AWS_SECRET_ACCESS_KEY: z.string().optional(),
+    // #endif
+
     OTEL_EXPORTER_OTLP_ENDPOINT: z.string().default("http://localhost:4318"),
     OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: z
       .string()

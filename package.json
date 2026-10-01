@@ -18,6 +18,7 @@
     "db:seed": "bun src/server/db/seed.ts",
     "predev": "bun scripts/provision-db.ts",
     "dev": "bun scripts/dev.ts",
+    "worker": "bun scripts/worker.ts",
     "email:dev": "email dev --dir=src/emails --port=3001",
     "ui:add": "pnpm dlx shadcn@latest add",
     "format": "biome format --write .",
@@ -28,6 +29,7 @@
     "start": "node .next/standalone/server.js"
   },
   "dependencies": {
+    "@aws-sdk/client-ecs": "3.1131.0",
     "@base-ui/react": "1.6.0",
     "@better-auth/api-key": "1.6.23",
     "@better-auth/drizzle-adapter": "1.6.23",
