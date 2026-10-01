@@ -1,0 +1,74 @@
+name: Deploy Image to AWS worker
+
+description: >
+  Registers a new revision of the per-environment background Fargate task definition onto the worker image
+  `build-worker` already pushed. Runs as its own job, after `run_migrations`: the schema a
+  fresh worker expects must be in place before it can pick up work. Building and pushing the image
+  is `build-worker`'s job, not this one -- that way a build failure is caught before
+  migrations run, and this step never repeats work `build-worker` already did. Runs in
+  parallel with `deploy` (app): the app service only ever needs the worker family's latest
+  revision, resolved by `ecs:RunTask` at call time (`ecs-task-runner.ts` uses the family ARN, no
+  revision suffix), so there is nothing here for the app deploy to wait on.
+
+inputs:
+  ENVIRONMENT:
+    description: Pulumi stack the resources belong to ("test" or "prod"), the `{environment}` in resourceName()
+    required: true
+  AWS_ROLE_ARN:
+    description: IAM role assumed via OIDC to push the image and register the task definition
+    required: true
+  IMAGE_TAG:
+    description: The deploying commit SHA; the pushed tag is `<sha>-<ENVIRONMENT>[-worker]` (ECR is immutable-tagged)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@f24d7193d98baebaeacc7e2227925dd47cc267f5 # v4.2.0
+      with:
+        role-to-assume: ${{ inputs.AWS_ROLE_ARN }}
+        aws-region: eu-central-1
+
+    - name: Log in to Amazon ECR
+      id: ecr_login
+      uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd # v2.1.7
+
+    # The background Fargate task (#40, acme-app-aws's EcsFargateTask, `withFargateTask`) is a
+    # plain ECS task definition, not Express Mode: bumping its image is a new task definition
+    # revision in the same family, re-registered with everything but the image read back from the
+    # previous one, so this never becomes a second source of truth for the container's
+    # CPU/memory/secrets/log config. `ecs:RunTask` always resolves the family's latest revision, so
+    # no service or deployment to redrive here.
+    #
+    # Skipped where the family doesn't exist yet: not every environment enables
+    # `withFargateTask`, and describe-task-definition on a family Pulumi never created is exactly
+    # that case, not an error.
+    - name: Redeploy the background Fargate task onto the new worker image
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        worker_image="${{ steps.ecr_login.outputs.registry }}/ecr-acme-app:${{ inputs.IMAGE_TAG }}-${{ inputs.ENVIRONMENT }}-worker"
+        # EcsFargateTask's family is `${name}-worker`, and `name` here (resourceName("ecs", "worker"))
+        # already ends in "-worker" -- so the real family has it twice.
+        family="ecs-acme-app-${{ inputs.ENVIRONMENT }}-worker-worker"
+
+        current=$(aws ecs describe-task-definition --task-definition "$family" --query 'taskDefinition' --output json 2>/dev/null) || {
+          echo "No task definition family '$family' — withFargateTask is off for this stack, nothing to redeploy."
+          exit 0
+        }
+
+        # Every field register-task-definition doesn't accept back from describe-task-definition
+        # (registeredAt, revision, status, ...) is stripped rather than re-declared, so this can
+        # never drift from what Pulumi actually configured.
+        new_definition=$(echo "$current" | jq \
+          --arg image "$worker_image" \
+          '{
+            family, taskRoleArn, executionRoleArn, networkMode, containerDefinitions,
+            requiresCompatibilities, cpu, memory, runtimePlatform
+          }
+          | .containerDefinitions = (.containerDefinitions | map(.image = $image))')
+
+        aws ecs register-task-definition --cli-input-json "$new_definition" >/dev/null
+        echo "Registered a new revision of $family on $worker_image."

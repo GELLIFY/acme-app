@@ -1,0 +1,89 @@
+name: Deploy Image to AWS
+
+description: >
+  Redeploys the per-environment ECS Express Mode service onto the image `build` already pushed, with
+  UpdateExpressGatewayService. Runs as its own job, after `run_migrations`: the schema a fresh
+  image expects must be in place before traffic can reach it. Building and pushing the image is
+  `build`'s job, not this one -- that way a build failure is caught before migrations run,
+  and this step never repeats work `build` already did.
+
+  Express Mode is its own resource type, not a plain ECS service: DescribeServices does not return
+  it, and it owns the task definition. The classic describe-services / register-task-definition /
+  update-service sequence therefore cannot drive it.
+
+  aws-actions/amazon-ecs-deploy-express-service is deliberately not used: it resets every input it
+  is not given, so an image bump through it would drop the secrets and the health check path
+  Pulumi configured. Pulumi owns the service; the image is the one field CI owns.
+
+inputs:
+  ENVIRONMENT:
+    description: Pulumi stack the resources belong to ("test" or "prod"), the `{environment}` in resourceName()
+    required: true
+  AWS_ROLE_ARN:
+    description: IAM role assumed via OIDC to push the image and update the ECS service
+    required: true
+  IMAGE_TAG:
+    description: The deploying commit SHA; the pushed tag is `<sha>-<ENVIRONMENT>[-worker]` (ECR is immutable-tagged)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@f24d7193d98baebaeacc7e2227925dd47cc267f5 # v4.2.0
+      with:
+        role-to-assume: ${{ inputs.AWS_ROLE_ARN }}
+        aws-region: eu-central-1
+
+    - name: Log in to Amazon ECR
+      id: ecr_login
+      uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd # v2.1.7
+
+    - name: Redeploy the Express Mode service onto the new image
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        image="${{ steps.ecr_login.outputs.registry }}/ecr-acme-app:${{ inputs.IMAGE_TAG }}-${{ inputs.ENVIRONMENT }}"
+        account=$(aws sts get-caller-identity --query Account --output text)
+        service_arn="arn:aws:ecs:eu-central-1:$account:service/acme-app-cluster/ecs-acme-app-${{ inputs.ENVIRONMENT }}"
+
+        active_config=$(aws ecs describe-express-gateway-service --service-arn "$service_arn" \
+          --query 'service.activeConfigurations[0]' --output json)
+
+        # Unlike a PR preview, a base environment is a standing service: its hostname is stable and already
+        # known from earlier deploys, so — unlike deploy-preview, which can't know its hostname
+        # until after the service exists — BETTER_AUTH_URL can just be read back and set here.
+        endpoint=$(echo "$active_config" | jq -r '.ingressPaths[0].endpoint')
+        # Fail loudly rather than deploying with BETTER_AUTH_URL=https://null, which would break
+        # every auth call without the deploy ever going red.
+        test -n "$endpoint" && test "$endpoint" != "null"
+        # The API returns the endpoint with a scheme on it. Stripping whatever scheme is there,
+        # rather than just "https://", keeps this correct if it ever comes back bare or as http.
+        better_auth_url="https://${endpoint#*://}"
+
+        # --primary-container is a merge, not a full replace: UpdateExpressGatewayService keeps
+        # whatever field is left out of the payload rather than clearing it (confirmed by hand --
+        # omitting `command` entirely left the previous one in place). So the running config is
+        # read back and only its image swapped (and BETTER_AUTH_URL upserted into its environment).
+        # Everything else there is Pulumi's - the port, the SSM-backed secrets, the log group - and
+        # re-declaring it here would be a second source of truth that silently drifts from
+        # infrastructure/index.ts.
+        #
+        # `command` is explicitly emptied rather than left alone: it only ever holds the bootstrap
+        # placeholder's `-listen`/`-text` http-echo arguments (see compose.ts's `appCommand`), and
+        # because this is a merge, omitting the key (e.g. via `del`) would leave that stale value
+        # in place. The real application image has its own entrypoint and errors out on unknown CLI
+        # args, crashing every task and tripping the deployment circuit breaker back to the
+        # placeholder -- exactly what happened before this was caught.
+        primary_container=$(echo "$active_config" | jq \
+          --arg image "$image" \
+          --arg url "$better_auth_url" \
+          '.primaryContainer
+           | .command = []
+           | .image = $image
+           | .environment = ((.environment // []) | map(select(.name != "BETTER_AUTH_URL")) + [{name: "BETTER_AUTH_URL", value: $url}])')
+
+        aws ecs update-express-gateway-service \
+          --service-arn "$service_arn" \
+          --primary-container "$primary_container"

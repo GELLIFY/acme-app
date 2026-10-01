@@ -28,7 +28,7 @@ skill (`.agents/skills/product-design/`) — it is the canonical base documentat
 
 The three CD workflows -- `deploy-preview.yml`, `cleanup-preview.yml`, `deploy-production.yml` --
 know *when* to deploy and nothing about *where*. The target is a directory under
-`.github/workflows/cd/`, and every target implements the same five composite actions:
+`.github/workflows/cd/`, and the `vercel` target implements these five composite actions:
 
 | Action | Responsibility |
 |---|---|
@@ -37,6 +37,15 @@ know *when* to deploy and nothing about *where*. The target is a directory under
 | `cleanup-preview` | tear down whatever `provision-preview` and `deploy-preview` created |
 | `production-env` | write the production environment into `.env`, for the migrations that run first |
 | `deploy-production` | build and deploy the production branch |
+
+The `aws` target is the exception: it has its own pipeline (one image per environment in a shared
+ECR repository, an app and a worker image, `test` and `prod` environments, previews on ECS), so it
+is not the same five actions. Its workflows are in `cd/aws/pipelines/` -- see below -- and its
+resource names follow `PROJECT_NAME` (`ecr-<name>`, `<name>-cluster`, `ecs-<name>-<env>`), which
+must match `PROJECT_NAME` in the infrastructure repository `GELLIFY/acme-app-aws`. It needs the
+`AWS_ROLE_ARN` secret, the `test` and `prod` GitHub environments, and the `develop` (test) and
+`main` (prod) branches. The worker image (`Dockerfile.worker`) runs `pnpm worker`, so a project
+using AWS must provide a `worker` script, e.g. `scripts/worker.ts`.
 
 Two rules keep that boundary intact, and both are easy to break by accident:
 
@@ -73,10 +82,16 @@ Two consequences for anyone changing this repository:
   which is which -- the application talks to plain Postgres through `node-postgres` either way,
   and no Neon package is a dependency -- so keep it that way.
 - **Adding a deployment target is three things**, and two of them live in `create-acme-app`: the
-  `cd/<target>/` directory here with all five actions; the target listed in that generator's
+  `cd/<target>/` directory here with its actions (all five for `vercel`; `aws` has its own set); the target listed in that generator's
   `featureFiles`, so declining it removes the directory; and the path rewrite plus a row in its
   `scaffold` matrix. Forgetting any of the last two produces a generator that emits projects whose
   workflows reference a directory that is not there.
+- **The AWS pipeline lives in `cd/aws/pipelines/`.** Those workflows (`deploy-preview`,
+  `deploy-production`, `cleanup-preview`, `deploy-test`, `reconcile-previews`) are inert here:
+  GitHub only loads `.yml` files directly under `.github/workflows/`. Scaffolding for AWS copies
+  them up, replacing the Vercel ones, instead of rewriting the `cd/vercel/` paths -- their job
+  structure differs, so the path rewrite alone is not enough. Their `PROJECT_NAME` is `acme-app`
+  and is replaced by the generator.
 
 This section never reaches a generated project: it sits behind an `#if isTemplate` marker, and no
 generated project sets that flag.

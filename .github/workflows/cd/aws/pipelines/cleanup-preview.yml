@@ -1,0 +1,68 @@
+name: Cleanup Preview
+
+# The configuration of the deployment target. Every action under `cd/` reads it from here rather
+# than taking it as inputs, which is what keeps the jobs below free of provider-specific wiring:
+# only these lines and the `cd/<target>/` paths name a provider.
+#
+env:
+  AWS_REGION: eu-central-1
+  AWS_ROLE: ${{ secrets.AWS_PREVIEW_ROLE_ARN }}
+  BASE_ENV: test
+  # Matches acme-app-aws's PROJECT_NAME (see infrastructure/.env there): every resource name below
+  # follows its `resourceName()` convention, `{aws-service-acronym}-{project}-{environment}`.
+  PROJECT_NAME: acme-app
+
+on:
+  pull_request:
+    types:
+      - closed
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  # The ECS service goes first: it holds an open connection to the database branch, so deleting
+  # the branch out from under a still-running task would only produce a noisy crash loop until the
+  # stack is torn down anyway.
+  cleanup_preview:
+    if: ${{ !startsWith(github.head_ref, 'renovate/') }}
+    name: Cleanup Preview
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      # Required by the OIDC login the AWS deployment target uses.
+      id-token: write
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Install dependencies & tooling
+        uses: ./.github/workflows/setup
+
+      - name: Get branch name
+        id: branch_name
+        uses: tj-actions/branch-names@dde14ac574a8b9b1cedc59a1cf312788af43d8d8 # v8
+
+      - name: Cleanup Preview Deployment
+        uses: ./.github/workflows/cd/aws/cleanup-preview
+        with:
+          PR_NUMBER: ${{ github.event.number }}
+          GIT_BRANCH: ${{ steps.branch_name.outputs.current_branch }}
+
+  delete_neon_branch:
+    if: ${{ !startsWith(github.head_ref, 'renovate/') }}
+    name: Delete Neon Branch
+    needs: cleanup_preview
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get branch name
+        id: branch_name
+        uses: tj-actions/branch-names@dde14ac574a8b9b1cedc59a1cf312788af43d8d8 # v8
+
+      - name: Delete Neon Branch
+        continue-on-error: true
+        uses: neondatabase/delete-branch-action@4468d825d5a88ef4012f1705a82f02ec3072f776 # v3
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch: preview/pr-${{ github.event.number }}-${{ steps.branch_name.outputs.current_branch }}
+          api_key: ${{ secrets.NEON_API_KEY }}

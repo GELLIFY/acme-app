@@ -1,0 +1,133 @@
+name: Deploy Test
+
+on:
+  push:
+    branches:
+      - develop
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  code_quality:
+    name: Code quality
+    uses: ./.github/workflows/ci.yml
+
+  # Split into its own job -- rather than a step alongside build_worker's -- because a job is the
+  # unit GitHub Actions actually schedules concurrently: two `needs: [code_quality]` jobs run in
+  # parallel and show as parallel branches in the workflow graph, where two steps inside one job
+  # would not. The two builds share nothing at runtime, so there is nothing to serialize.
+  #
+  # Runs before migrations on purpose: a build failure is caught here, before anything touches the
+  # database, and the image is ready and waiting by the time migrations clear it to deploy.
+  build_app:
+    name: Build Test (app)
+    # Express Mode services run on X86_64 Fargate with no way to configure otherwise, and
+    # arm64 GitHub runners don't have binfmt/QEMU registered for cross-arch emulation (confirmed:
+    # even the Alpine base image's own RUN steps fail with "exec format error" under buildx
+    # --platform on ubuntu-24.04-arm). Matching the runner to the target architecture avoids
+    # emulation entirely instead of fighting it.
+    runs-on: ubuntu-24.04
+    environment: test
+    needs: [code_quality]
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Build and push image to AWS
+        uses: ./.github/workflows/cd/aws/build-test
+        with:
+          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+          IMAGE_TAG: ${{ github.sha }}
+
+  build_worker:
+    name: Build Test (worker)
+    # The worker's task definition targets X86_64 Fargate, same as the app -- see build_app's own
+    # comment on why that means an x86 runner, not arm64.
+    runs-on: ubuntu-24.04
+    environment: test
+    needs: [code_quality]
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Build and push worker image to AWS
+        uses: ./.github/workflows/cd/aws/build-test-worker
+        with:
+          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+          IMAGE_TAG: ${{ github.sha }}
+
+  # Runs after both images are built and pushed, not before: migrating against a schema no pushed
+  # image exists for yet would be wasted work the moment either build fails.
+  run_migrations:
+    name: Run Migrations
+    runs-on: ubuntu-24.04
+    environment: test
+    needs: [build_app, build_worker]
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Install dependencies & tooling
+        uses: ./.github/workflows/setup
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@f24d7193d98baebaeacc7e2227925dd47cc267f5 # v4.2.0
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-central-1
+
+      - name: Apply Migrations
+        run: |
+          echo "DATABASE_URL=$(aws ssm get-parameter --name /test/database_url --with-decryption --query Parameter.Value --output text)" >> .env
+          echo SKIP_ENV_VALIDATION=1 >> .env
+          pnpm run db:migrate
+
+  # Split into its own job -- rather than a step alongside deploy_worker's -- because a job is the
+  # unit GitHub Actions actually schedules concurrently: two `needs: [run_migrations]` jobs run in
+  # parallel and show as parallel branches in the workflow graph, where two steps inside one job
+  # would not. The two deploy jobs share nothing at runtime, so there is nothing to serialize (see
+  # deploy-preview.yml's own comment on the same split).
+  deploy_app:
+    name: Deploy Test (app)
+    runs-on: ubuntu-24.04
+    environment: test
+    needs: [run_migrations]
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Deploy image to AWS
+        uses: ./.github/workflows/cd/aws/deploy-test
+        with:
+          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+          IMAGE_TAG: ${{ github.sha }}
+
+  # Runs alongside deploy_app rather than after it: the app service only ever needs the worker task
+  # definition's ARN, a predictable string it builds itself, never a live handle to what this job
+  # produces (see deploy-worker/action.yml's own comment).
+  deploy_worker:
+    name: Deploy Test (worker)
+    runs-on: ubuntu-24.04
+    environment: test
+    needs: [run_migrations]
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Deploy worker image to AWS
+        uses: ./.github/workflows/cd/aws/deploy-test-worker
+        with:
+          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+          IMAGE_TAG: ${{ github.sha }}

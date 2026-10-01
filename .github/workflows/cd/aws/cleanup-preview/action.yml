@@ -1,14 +1,15 @@
 name: Cleanup AWS deployment
 
 description: >
-  Tears down what the preview created: the ECS Express Mode service, its log group, and the SSM
-  parameter holding its database connection string. Nothing else was ever its own -- the registry
-  and the roles belong to the base environment and are left alone.
+  Tears down what the preview created: the ECS Express Mode service, the worker task definition
+  family, both their log groups, and the SSM parameter holding its database connection string.
+  Nothing else was ever its own -- the registry, the worker's execution/task roles and security
+  group, and the Express Mode roles belong to the base environment and are left alone.
 
   Each step tolerates an already-absent resource: a closed pull request must not keep a task
   running because one of them had nothing left to delete.
 
-  Configuration comes from the workflow environment (AWS_REGION, AWS_ROLE, BASE_ENV), not from
+  Configuration comes from the workflow environment (AWS_REGION, AWS_ROLE, BASE_ENV, PROJECT_NAME), not from
   inputs.
 
 inputs:
@@ -34,12 +35,14 @@ runs:
         PR_NUMBER: ${{ inputs.PR_NUMBER }}
       run: |
         set -euo pipefail
-        region_short="${AWS_REGION%%-*}"
         account=$(aws sts get-caller-identity --query Account --output text)
 
         {
-          echo "log_group=/aws/ecs/default/ecs-pr-$PR_NUMBER-$region_short"
-          echo "service_arn=arn:aws:ecs:$AWS_REGION:$account:service/default/ecs-pr-$PR_NUMBER-$region_short"
+          echo "log_group=/aws/ecs/$PROJECT_NAME-cluster/ecs-$PROJECT_NAME-pr-$PR_NUMBER"
+          echo "service_arn=arn:aws:ecs:$AWS_REGION:$account:service/$PROJECT_NAME-cluster/ecs-$PROJECT_NAME-pr-$PR_NUMBER"
+          echo "worker_log_group=/aws/ecs/$PROJECT_NAME-cluster/ecs-$PROJECT_NAME-pr-$PR_NUMBER-worker"
+          echo "worker_family=ecs-$PROJECT_NAME-pr-$PR_NUMBER-worker"
+          echo "bucket=s3-$PROJECT_NAME-$BASE_ENV-storage-$account"
         } >> "$GITHUB_OUTPUT"
       shell: bash
 
@@ -70,4 +73,45 @@ runs:
         aws ssm delete-parameter \
           --name "/$BASE_ENV/pr-$PR_NUMBER/database_url" \
           --region "$AWS_REGION"
+      shell: bash
+
+    # The task definition family itself, not a service, so there is nothing to stop first -- only
+    # every revision to deregister. Deregistering doesn't delete the family record, but it stops
+    # counting toward the account's active task definition limits and makes clear this PR's worker
+    # is gone.
+    - name: Deregister the worker task definition
+      continue-on-error: true
+      env:
+        WORKER_FAMILY: ${{ steps.names.outputs.worker_family }}
+      run: |
+        revisions=$(aws ecs list-task-definitions --family-prefix "$WORKER_FAMILY" --status ACTIVE --query 'taskDefinitionArns[]' --output text)
+        for arn in $revisions; do
+          aws ecs deregister-task-definition --task-definition "$arn" >/dev/null
+        done
+      shell: bash
+
+    - name: Delete the worker log group
+      continue-on-error: true
+      env:
+        WORKER_LOG_GROUP: ${{ steps.names.outputs.worker_log_group }}
+      run: |
+        aws logs delete-log-group --log-group-name "$WORKER_LOG_GROUP"
+      shell: bash
+
+    # Undoes deploy-preview's "Allow the preview's origin" step: drops only this PR's own
+    # `pr-<number>` rule from the base environment's bucket, leaving every other rule as it is.
+    - name: Remove the preview's CORS rule from the storage bucket
+      continue-on-error: true
+      env:
+        PR_NUMBER: ${{ inputs.PR_NUMBER }}
+        BUCKET: ${{ steps.names.outputs.bucket }}
+      run: |
+        set -euo pipefail
+        current=$(aws s3api get-bucket-cors --bucket "$BUCKET" --query 'CORSRules' --output json 2>/dev/null || echo '[]')
+        rules=$(echo "$current" | jq -c --arg id "pr-$PR_NUMBER" '(. // []) | map(select(.ID != $id))')
+        if [ "$rules" = "[]" ]; then
+          aws s3api delete-bucket-cors --bucket "$BUCKET"
+        else
+          aws s3api put-bucket-cors --bucket "$BUCKET" --cors-configuration "{\"CORSRules\": $rules}"
+        fi
       shell: bash

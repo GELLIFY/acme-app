@@ -1,0 +1,281 @@
+name: Deploy Preview
+
+# The configuration of the deployment target. Every action under `cd/` reads it from here rather
+# than taking it as inputs, which is what keeps the jobs below free of provider-specific wiring:
+# only these lines and the `cd/<target>/` paths name a provider.
+#
+env:
+  AWS_REGION: eu-central-1
+  # Not the deploy role used by deploy-test: that one may only push to ECR and update the existing
+  # service. A preview creates a service and a log group from nothing, so it needs a wider one.
+  AWS_ROLE: ${{ secrets.AWS_PREVIEW_ROLE_ARN }}
+  # The environment previews are previews *of*: they reuse its registry, its IAM roles and every
+  # secret but the database.
+  BASE_ENV: test
+  # Matches acme-app-aws's PROJECT_NAME (see infrastructure/.env there): every resource name below
+  # follows its `resourceName()` convention, `{aws-service-acronym}-{project}-{environment}`.
+  PROJECT_NAME: acme-app
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  code_quality:
+    name: Code quality
+    uses: ./.github/workflows/ci.yml
+
+  # Runs unqualified, same as provision_and_migrate below: neither waits on code_quality, so a
+  # broken build or a broken lint each surface as fast as they can rather than queuing behind the
+  # other. Runs alongside provision_and_migrate rather than after it for the same reason: the
+  # build depends on nothing that job produces, and a build failure is caught without having
+  # provisioned (or migrated) anything for a preview that would then need tearing down anyway.
+  # Split into its own job -- rather than a step alongside build_worker's -- for the same reason
+  # deploy_app/deploy_worker are split below: two parallel jobs run concurrently, two steps in one
+  # job would not.
+  build_app:
+    if: ${{ !startsWith(github.head_ref, 'renovate/') }}
+    name: Build Preview (app)
+    environment: Preview
+    # Express Mode services run on X86_64 Fargate with no way to configure otherwise, and arm64
+    # runners have no binfmt/QEMU registered for cross-arch emulation. Matching the runner to the
+    # target architecture avoids emulation entirely instead of fighting it (see deploy-test.yml).
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Build and push image to AWS
+        uses: ./.github/workflows/cd/aws/build-preview
+
+  build_worker:
+    if: ${{ !startsWith(github.head_ref, 'renovate/') }}
+    name: Build Preview (worker)
+    environment: Preview
+    # The worker's task definition targets X86_64 Fargate, same as the app -- see build_app's own
+    # comment on why that means an x86 runner, not arm64.
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Build and push worker image to AWS
+        uses: ./.github/workflows/cd/aws/build-preview-worker
+
+  provision_and_migrate:
+    if: ${{ !startsWith(github.head_ref, 'renovate/') }}
+    name: Provision & Migrate
+    runs-on: ubuntu-24.04-arm
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+      issues: write
+    outputs:
+      current_branch: ${{ steps.branch_name.outputs.current_branch }}
+      branch_id: ${{ steps.create_branch.outputs.branch_id }}
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Install dependencies & tooling
+        uses: ./.github/workflows/setup
+
+      - name: Get branch name
+        id: branch_name
+        uses: tj-actions/branch-names@5250492686b253f06fa55861556d1027b067aeb5 # v9
+
+      - name: Create Neon Branch
+        id: create_branch
+        uses: neondatabase/create-branch-action@fb620d43d4c565abaf088b848a4e28e5c4ea4d9c # v6
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          parent_branch: develop
+          branch_name: preview/pr-${{ github.event.number }}-${{ steps.branch_name.outputs.current_branch }}
+          database: neondb
+          role: neondb_owner
+          api_key: ${{ secrets.NEON_API_KEY }}
+
+      - name: Mask database connection strings
+        run: |
+          echo "::add-mask::${{ steps.create_branch.outputs.db_url }}"
+          echo "::add-mask::${{ steps.create_branch.outputs.db_url_pooled }}"
+          echo "::add-mask::${{ steps.create_branch.outputs.password }}"
+
+      # Where the preview's database comes from, and the only step that knows: everything below
+      # reads the connection string from this step's output, so its source is chosen in one place.
+      #
+      - name: Resolve the preview database
+        id: database
+        env:
+          NEON_BRANCH_URL: ${{ steps.create_branch.outputs.db_url_pooled }}
+        run: |
+          set -euo pipefail
+          URL="${NEON_BRANCH_URL:-}"
+          if [ -z "$URL" ]; then
+            echo "::error::No preview database was provisioned for this pull request." >&2
+            exit 1
+          fi
+          echo "::add-mask::$URL"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+        shell: bash
+
+      - name: Provision the preview environment
+        uses: ./.github/workflows/cd/aws/provision-preview
+        with:
+          PR_NUMBER: ${{ github.event.number }}
+          GIT_BRANCH: ${{ steps.branch_name.outputs.current_branch }}
+          DATABASE_URL: ${{ steps.database.outputs.url }}
+
+      - name: Apply Migrations
+        env:
+          DATABASE_URL: ${{ steps.database.outputs.url }}
+        run: |
+          touch .env
+          echo SKIP_ENV_VALIDATION=1 >> .env
+          echo "DATABASE_URL=$DATABASE_URL" >> .env
+          pnpm run db:migrate
+
+  # Split into its own job -- rather than a step alongside deploy_worker's -- because a job is the
+  # unit GitHub Actions actually schedules concurrently: two `needs: [provision_and_migrate,
+  # build_app]` jobs run in parallel and show as parallel branches in the workflow graph, where two
+  # steps (or two backgrounded shell processes) inside one job would not. The two deploy jobs share
+  # nothing at runtime -- see deploy-preview/action.yml's own comment -- so there is nothing to
+  # serialize. Needs `build_app` too, not just `provision_and_migrate`: the image it deploys has to
+  # exist in the registry before this can reference it.
+  deploy_app:
+    if: ${{ !startsWith(github.head_ref, 'renovate/') }}
+    name: Deploy Preview (app)
+    environment: Preview
+    # Express Mode services run on X86_64 Fargate with no way to configure otherwise, and arm64
+    # runners have no binfmt/QEMU registered for cross-arch emulation. Matching the runner to the
+    # target architecture avoids emulation entirely instead of fighting it (see deploy-test.yml).
+    runs-on: ubuntu-24.04
+    needs: [provision_and_migrate, build_app]
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      preview_url: ${{ steps.deploy.outputs.preview_url }}
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Install dependencies & tooling
+        uses: ./.github/workflows/setup
+
+      - name: Deploy to Preview
+        id: deploy
+        uses: ./.github/workflows/cd/aws/deploy-preview
+        with:
+          PR_NUMBER: ${{ github.event.number }}
+          GIT_BRANCH: ${{ needs.provision_and_migrate.outputs.current_branch }}
+
+  # Runs alongside deploy_app rather than after it: the app service only ever needs the worker task
+  # definition's ARN, a predictable string it builds itself, never a live handle to what this job
+  # produces (see deploy-preview-worker/action.yml's own comment). Needs `build_worker` too, not
+  # just `provision_and_migrate`: the image it registers has to exist in the registry first.
+  deploy_worker:
+    if: ${{ !startsWith(github.head_ref, 'renovate/') }}
+    name: Deploy Preview (worker)
+    environment: Preview
+    # The worker's task definition targets X86_64 Fargate, same as the app -- see deploy_app's own
+    # comment on why that means an x86 runner, not arm64.
+    runs-on: ubuntu-24.04
+    needs: [provision_and_migrate, build_worker]
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Deploy worker to Preview
+        uses: ./.github/workflows/cd/aws/deploy-preview-worker
+        with:
+          PR_NUMBER: ${{ github.event.number }}
+
+  comment:
+    if: ${{ !startsWith(github.head_ref, 'renovate/') }}
+    name: Comment on Pull Request
+    runs-on: ubuntu-24.04-arm
+    needs: [provision_and_migrate, deploy_app, deploy_worker]
+    permissions:
+      pull-requests: write
+      issues: write
+    steps:
+      # `comment-tag` makes this edit its own comment instead of adding one. The workflow runs on
+      # every push to the pull request, and the URL does not change between them: a new comment per
+      # push would bury the review conversation under identical links.
+      - name: Comment on Pull Request
+        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-tag: preview-environment
+          message: |
+            ### Preview environment
+
+            | | |
+            |---|---|
+            | :rocket: App | ${{ needs.deploy_app.outputs.preview_url }} |
+            | :elephant: Neon branch | https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ needs.provision_and_migrate.outputs.branch_id }} |
+            | :package: Service | `ecs-acme-app-pr-${{ github.event.number }}` |
+            | :bookmark: Commit | ${{ github.event.pull_request.head.sha }} |
+
+            Updated on every push. Everything here is torn down when the pull request closes.
+
+      # GitHub only turns "Closes #123" into a queryable closingIssuesReferences link when the PR
+      # targets the repo's default branch (main here). This repo's PRs target `develop` (see
+      # docs/agents/git-workflow.md), so that link never forms -- parse the keyword out of the PR
+      # body ourselves instead. Each linked issue gets the same preview info, edited in place on
+      # later pushes (matching comment-tag above) instead of piling up a new comment per push.
+      - name: Comment on linked issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          APP_URL: ${{ needs.deploy_app.outputs.preview_url }}
+          NEON_URL: https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ needs.provision_and_migrate.outputs.branch_id }}
+          COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+
+          issues=$(printf '%s\n' "$PR_BODY" \
+            | grep -ioE '(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)[[:space:]]+#[0-9]+' \
+            | grep -oE '[0-9]+' | sort -un || true)
+
+          if [ -z "$issues" ]; then
+            echo "No linked issues found for PR #$PR_NUMBER."
+            exit 0
+          fi
+
+          message=$(cat <<EOF
+          ### Preview environment
+
+          | | |
+          |---|---|
+          | :rocket: App | $APP_URL |
+          | :elephant: Neon branch | $NEON_URL |
+          | :package: Service | \`ecs-acme-app-pr-$PR_NUMBER\` |
+          | :bookmark: Commit | $COMMIT_SHA |
+          | :arrow_right_hook: Pull request | #$PR_NUMBER |
+
+          Updated on every push. Everything here is torn down when the pull request closes.
+          EOF
+          )
+
+          for issue in $issues; do
+            gh issue comment "$issue" --repo "$REPO_OWNER/$REPO_NAME" --edit-last --create-if-none --body "$message" \
+              || gh issue comment "$issue" --repo "$REPO_OWNER/$REPO_NAME" --body "$message"
+          done
+        shell: bash

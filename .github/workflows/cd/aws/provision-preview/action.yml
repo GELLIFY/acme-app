@@ -5,7 +5,7 @@ description: >
   service reads its secrets from SSM under `/<base env>/pr-<n>/`, so the parameter has to exist
   before the first deployment, not alongside it.
 
-  Configuration comes from the workflow environment (AWS_REGION, AWS_ROLE, BASE_ENV), not from
+  Configuration comes from the workflow environment (AWS_REGION, AWS_ROLE, BASE_ENV, PROJECT_NAME), not from
   inputs.
 
 inputs:

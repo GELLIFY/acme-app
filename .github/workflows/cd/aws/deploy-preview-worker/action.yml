@@ -1,0 +1,156 @@
+name: Deploy Preview on AWS (worker)
+
+description: >
+  Registers this pull request's own worker task definition, onto the worker image
+  `build-preview-worker` already pushed -- a Fargate task dispatched via ecs:RunTask
+  (JOB_DRIVER=ecs) exactly as test/prod do, since this preview's Runs live in its own Neon branch
+  and need their own DATABASE_URL secret. Runs as its own job, after both `provision_and_migrate`
+  and `build-preview-worker`: the schema a fresh worker expects must be in place before it can
+  pick up work, and the image itself is `build-preview-worker`'s job, not this one -- that way a
+  build failure is caught before anything is provisioned or migrated, and this step never repeats
+  work `build-preview-worker` already did. Runs in parallel with `deploy-preview`: the app service
+  only ever needs this task definition's *ARN*, a predictable string it can construct itself, so
+  there is nothing here it has to wait on.
+
+  A preview provisions as little as possible: the registry and the worker's execution/task roles and
+  security group belong to the base environment and are reused as they are. What is actually
+  per-pull-request is the worker task definition and its log group.
+
+  Configuration comes from the workflow environment (AWS_REGION, AWS_ROLE, BASE_ENV, PROJECT_NAME), not from
+  inputs.
+
+inputs:
+  PR_NUMBER:
+    description: pull request the preview belongs to
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Configure AWS credentials (OIDC)
+      uses: aws-actions/configure-aws-credentials@f24d7193d98baebaeacc7e2227925dd47cc267f5 # v4.2.0
+      with:
+        role-to-assume: ${{ env.AWS_ROLE }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Log in to Amazon ECR
+      id: ecr_login
+      uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd # v2.1.7
+
+    # Mirrors the naming in `deploy-preview`'s own "Resolve the preview's names" step -- see its
+    # comment for the convention -- but only the names this job actually touches.
+    - name: Resolve the preview's names
+      id: names
+      env:
+        PR_NUMBER: ${{ inputs.PR_NUMBER }}
+      run: |
+        set -euo pipefail
+        account=$(aws sts get-caller-identity --query Account --output text)
+
+        {
+          echo "account=$account"
+          echo "repository=ecr-$PROJECT_NAME"
+          # No revision suffix: ecs:RunTask always resolves the family's latest active one.
+          echo "worker_family=ecs-$PROJECT_NAME-pr-$PR_NUMBER-worker"
+          echo "worker_log_group=/aws/ecs/$PROJECT_NAME-cluster/ecs-$PROJECT_NAME-pr-$PR_NUMBER-worker"
+        } >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    # `build-preview-worker` already built and pushed this exact tag -- see its own comment for why
+    # the build happens there instead of here.
+    - name: Resolve the worker image `build-preview-worker` pushed
+      id: worker_image
+      env:
+        REGISTRY: ${{ steps.ecr_login.outputs.registry }}
+        REPOSITORY: ${{ steps.names.outputs.repository }}
+      run: |
+        set -euo pipefail
+        tag="$(git rev-parse HEAD)-worker"
+        echo "uri=$REGISTRY/$REPOSITORY:$tag" >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    - name: Create the worker log group
+      env:
+        LOG_GROUP: ${{ steps.names.outputs.worker_log_group }}
+      run: |
+        set -euo pipefail
+        aws logs create-log-group --log-group-name "$LOG_GROUP" 2>/dev/null \
+          || echo "Log group $LOG_GROUP already exists."
+        aws logs put-retention-policy --log-group-name "$LOG_GROUP" --retention-in-days 7
+      shell: bash
+
+    # The worker's execution/task roles belong to the base environment (its `EcsFargateTask`,
+    # acme-app-aws), published there as plain (non-secret) SSM parameters specifically so a preview
+    # can read them with a bare `aws ssm get-parameter`, no Pulumi CLI or backend access needed in
+    # this workflow. The security group is deliberately not read here: only the app service needs it
+    # (for its WORKER_SECURITY_GROUP_ID env var), and reading it there instead keeps this job
+    # independent of `deploy-preview`.
+    - name: Read the base environment's shared worker roles
+      id: worker_config
+      run: |
+        set -euo pipefail
+        {
+          echo "execution_role_arn=$(aws ssm get-parameter --name "/$BASE_ENV/worker_execution_role_arn" --query 'Parameter.Value' --output text)"
+          echo "task_role_arn=$(aws ssm get-parameter --name "/$BASE_ENV/worker_task_role_arn" --query 'Parameter.Value' --output text)"
+        } >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    # Registered fresh on every push (unlike the web service, a task definition has no notion of
+    # "update in place" -- registering always adds a revision, and the first call implicitly
+    # creates the family). `ecs:RunTask` is always invoked with the family ARN, no revision
+    # suffix, so it resolves to whichever revision this step just registered.
+    - name: Register the worker task definition
+      env:
+        WORKER_IMAGE: ${{ steps.worker_image.outputs.uri }}
+        WORKER_FAMILY: ${{ steps.names.outputs.worker_family }}
+        WORKER_LOG_GROUP: ${{ steps.names.outputs.worker_log_group }}
+        EXECUTION_ROLE_ARN: ${{ steps.worker_config.outputs.execution_role_arn }}
+        TASK_ROLE_ARN: ${{ steps.worker_config.outputs.task_role_arn }}
+        ACCOUNT: ${{ steps.names.outputs.account }}
+        PR_NUMBER: ${{ inputs.PR_NUMBER }}
+      run: |
+        set -euo pipefail
+
+        ssm="arn:aws:ssm:$AWS_REGION:$ACCOUNT:parameter"
+
+        definition=$(jq -n \
+          --arg family "$WORKER_FAMILY" \
+          --arg executionRoleArn "$EXECUTION_ROLE_ARN" \
+          --arg taskRoleArn "$TASK_ROLE_ARN" \
+          --arg image "$WORKER_IMAGE" \
+          --arg db "$ssm/$BASE_ENV/pr-$PR_NUMBER/database_url" \
+          --arg aws_region "$ssm/$BASE_ENV/aws_region" \
+          --arg aws_s3_bucket "$ssm/$BASE_ENV/aws_s3_bucket" \
+          --arg aws_access_key_id "$ssm/$BASE_ENV/aws_access_key_id" \
+          --arg aws_secret_access_key "$ssm/$BASE_ENV/aws_secret_access_key" \
+          --arg log_group "$WORKER_LOG_GROUP" \
+          --arg region "$AWS_REGION" \
+          '{
+            family: $family,
+            executionRoleArn: $executionRoleArn,
+            taskRoleArn: $taskRoleArn,
+            networkMode: "awsvpc",
+            requiresCompatibilities: ["FARGATE"],
+            cpu: "512",
+            memory: "1024",
+            runtimePlatform: { operatingSystemFamily: "LINUX", cpuArchitecture: "X86_64" },
+            containerDefinitions: [{
+              name: "worker",
+              image: $image,
+              essential: true,
+              secrets: [
+                { name: "DATABASE_URL", valueFrom: $db },
+                { name: "AWS_REGION", valueFrom: $aws_region },
+                { name: "AWS_S3_BUCKET", valueFrom: $aws_s3_bucket },
+                { name: "AWS_ACCESS_KEY_ID", valueFrom: $aws_access_key_id },
+                { name: "AWS_SECRET_ACCESS_KEY", valueFrom: $aws_secret_access_key }
+              ],
+              logConfiguration: {
+                logDriver: "awslogs",
+                options: { "awslogs-group": $log_group, "awslogs-region": $region, "awslogs-stream-prefix": "worker" }
+              }
+            }]
+          }')
+
+        aws ecs register-task-definition --cli-input-json "$definition" >/dev/null
+      shell: bash

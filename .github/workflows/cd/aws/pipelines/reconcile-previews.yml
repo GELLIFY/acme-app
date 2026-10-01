@@ -1,0 +1,75 @@
+name: Reconcile Preview Runs
+
+# Sweeps stuck forecast Runs (#40, #82) across every open PR preview.
+#
+# The base environments (test, prod) get this via acme-app-aws's own EventBridge rule, one per
+# stack, calling that stack's own `/internal/forecast/reconcile`. A preview has no Pulumi stack of
+# its own (see deploy-preview/action.yml), so there is nowhere to hang a per-PR EventBridge rule --
+# instead, this single scheduled workflow discovers every currently open preview and calls each
+# one's own reconcile endpoint in turn.
+#
+env:
+  AWS_REGION: eu-central-1
+  AWS_ROLE: ${{ secrets.AWS_PREVIEW_ROLE_ARN }}
+  BASE_ENV: test
+  # Matches acme-app-aws's PROJECT_NAME (see infrastructure/.env there): every resource name below
+  # follows its `resourceName()` convention, `{aws-service-acronym}-{project}-{environment}`.
+  PROJECT_NAME: acme-app
+
+on:
+  schedule:
+    # Same cadence acme-app-aws uses for test/prod's own reconcile rule (rate(1 minute) there);
+    # every 2 minutes here is enough slack for a scheduled workflow's own start-up latency while
+    # still comfortably inside FORECAST_RUN_WAIT_CAP_MS/FORECAST_RUN_MAX_EXECUTION_MS's defaults.
+    - cron: "*/2 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  reconcile:
+    name: Reconcile open previews
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@f24d7193d98baebaeacc7e2227925dd47cc267f5 # v4.2.0
+        with:
+          role-to-assume: ${{ env.AWS_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Reconcile every open preview
+        run: |
+          set -euo pipefail
+
+          secret=$(aws ssm get-parameter --name "/$BASE_ENV/internal_reconcile_secret" \
+            --with-decryption --query 'Parameter.Value' --output text)
+
+          # Express Mode services aren't returned by describe-services, so there is no way to
+          # tag-filter server-side here -- the naming convention (ecs-$PROJECT_NAME-pr-<n>, see
+          # deploy-preview/action.yml) is what tells a preview apart from the base environments'
+          # own always-on services in this same cluster.
+          service_arns=$(aws ecs list-services --cluster "$PROJECT_NAME-cluster" --max-items 200 \
+            --query 'serviceArns[]' --output text)
+
+          for arn in $service_arns; do
+            name="${arn##*/}"
+            case "$name" in
+              ecs-"$PROJECT_NAME"-pr-*)
+                endpoint=$(aws ecs describe-express-gateway-service --service-arn "$arn" \
+                  --query 'service.activeConfigurations[0].ingressPaths[0].endpoint' --output text)
+                if [ -z "$endpoint" ] || [ "$endpoint" = "None" ]; then
+                  echo "::warning::$name has no endpoint yet, skipping."
+                  continue
+                fi
+                url="https://${endpoint#*://}/api/rest/internal/forecast/reconcile"
+                status=$(curl -sS -o /dev/null -w '%{http_code}' -X POST "$url" \
+                  -H "x-internal-secret: $secret" || echo "curl-failed")
+                echo "$name -> $status"
+                ;;
+            esac
+          done
+        shell: bash

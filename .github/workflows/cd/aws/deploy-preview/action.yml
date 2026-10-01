@@ -1,15 +1,22 @@
-name: Deploy Preview on AWS
+name: Deploy Preview on AWS (app)
 
 description: >
-  Builds the application image, pushes it to the base environment's registry, and brings up an ECS
-  Express Mode service dedicated to this pull request.
+  Brings up an ECS Express Mode service dedicated to this pull request, onto the image
+  `build-preview` already pushed. Runs as its own job, after both `provision_and_migrate` and
+  `build-preview`: the schema a fresh image expects must be in place before traffic can reach it,
+  and the image itself is `build-preview`'s job, not this one -- that way a build failure is
+  caught before anything is provisioned or migrated, and this step never repeats work
+  `build-preview` already did. Runs in parallel with `deploy-preview-worker`: the two share
+  nothing at deploy time (the service only ever needs the worker's task definition *ARN*, a
+  predictable string, never a live handle to it), so there is nothing to gain from serializing
+  them.
 
-  A preview provisions as little as possible: the registry, the execution role, the task role and
-  the Express Mode infrastructure role all belong to the base environment and are reused as they
-  are. What is actually per-pull-request is the log group, the service, and the SSM parameter
-  holding the database branch (written earlier by `provision-preview`).
+  A preview provisions as little as possible: the registry and the Express Mode infrastructure role
+  belong to the base environment and are reused as they are. What is actually per-pull-request is
+  the web service, its log group, and the SSM parameter holding the database branch (written earlier
+  by `provision-preview`).
 
-  Configuration comes from the workflow environment (AWS_REGION, AWS_ROLE, BASE_ENV), not from
+  Configuration comes from the workflow environment (AWS_REGION, AWS_ROLE, BASE_ENV, PROJECT_NAME), not from
   inputs.
 
 inputs:
@@ -39,29 +46,36 @@ runs:
       uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd # v2.1.7
 
     # The names every step below builds on, in one place. They follow acme-app-aws's
-    # `resourceName()` convention -- `{aws-service-acronym}-{environment}-{region}` -- because
+    # `resourceName()` convention -- `{aws-service-acronym}-{project}-{environment}` -- because
     # these resources sit alongside the ones Pulumi owns and are found by the same naming rules.
+    # `worker_task_definition_arn` is reproduced here too: it is a predictable string built from the
+    # PR number alone, so this job can reference it without waiting on (or even knowing whether)
+    # `deploy-preview-worker` has registered it yet -- `ecs:RunTask` always resolves the family ARN
+    # to whichever revision exists when the app actually calls it, at runtime.
     - name: Resolve the preview's names
       id: names
       env:
         PR_NUMBER: ${{ inputs.PR_NUMBER }}
       run: |
         set -euo pipefail
-        region_short="${AWS_REGION%%-*}"
         account=$(aws sts get-caller-identity --query Account --output text)
 
         {
           echo "account=$account"
-          echo "base=ecs-$BASE_ENV-$region_short"
-          echo "infra_role=iam-$BASE_ENV-$region_short-infra"
-          echo "repository=ecr-$BASE_ENV-$region_short"
-          echo "service=ecs-pr-$PR_NUMBER-$region_short"
-          echo "log_group=/aws/ecs/default/ecs-pr-$PR_NUMBER-$region_short"
-          echo "service_arn=arn:aws:ecs:$AWS_REGION:$account:service/default/ecs-pr-$PR_NUMBER-$region_short"
+          echo "base=ecs-$PROJECT_NAME-$BASE_ENV"
+          echo "infra_role=iam-$PROJECT_NAME-$BASE_ENV-infra"
+          echo "repository=ecr-$PROJECT_NAME"
+          echo "service=ecs-$PROJECT_NAME-pr-$PR_NUMBER"
+          echo "cluster=$PROJECT_NAME-cluster"
+          echo "log_group=/aws/ecs/$PROJECT_NAME-cluster/ecs-$PROJECT_NAME-pr-$PR_NUMBER"
+          echo "service_arn=arn:aws:ecs:$AWS_REGION:$account:service/$PROJECT_NAME-cluster/ecs-$PROJECT_NAME-pr-$PR_NUMBER"
+          echo "worker_task_definition_arn=arn:aws:ecs:$AWS_REGION:$account:task-definition/ecs-$PROJECT_NAME-pr-$PR_NUMBER-worker"
         } >> "$GITHUB_OUTPUT"
       shell: bash
 
-    - name: Build and push the image
+    # `build-preview` already built and pushed this exact tag -- see its own comment for why the
+    # build happens there instead of here.
+    - name: Resolve the image `build-preview` pushed
       id: image
       env:
         REGISTRY: ${{ steps.ecr_login.outputs.registry }}
@@ -69,16 +83,6 @@ runs:
       run: |
         set -euo pipefail
         tag=$(git rev-parse HEAD)
-
-        # The repository is immutable-tagged and the tag is the commit SHA, so re-running this job
-        # for a commit already pushed must not re-push: ECR rejects it, and the existing tag is
-        # already the correct image for that commit.
-        if aws ecr describe-images --repository-name "$REPOSITORY" --image-ids imageTag="$tag" >/dev/null 2>&1; then
-          echo "Tag $tag already present in $REPOSITORY, skipping build and push."
-        else
-          BUILDX_NO_DEFAULT_ATTESTATIONS=1 docker build -t "$REGISTRY/$REPOSITORY:$tag" .
-          docker push "$REGISTRY/$REPOSITORY:$tag"
-        fi
         echo "uri=$REGISTRY/$REPOSITORY:$tag" >> "$GITHUB_OUTPUT"
       shell: bash
 
@@ -95,6 +99,30 @@ runs:
         aws logs put-retention-policy --log-group-name "$LOG_GROUP" --retention-in-days 7
       shell: bash
 
+    # The worker's security group belongs to the base environment (its `EcsFargateTask`,
+    # acme-app-aws), published there as a plain (non-secret) SSM parameter specifically so a preview
+    # can read it with a bare `aws ssm get-parameter`, no Pulumi CLI or backend access needed in this
+    # workflow. Read here rather than from `deploy-preview-worker` because the app service is what
+    # actually needs it (baked into its WORKER_SECURITY_GROUP_ID env var, for when it calls
+    # ecs:RunTask), and because it lets this job stay fully independent of that one.
+    - name: Read the base environment's shared worker security group
+      id: worker_config
+      run: |
+        set -euo pipefail
+        echo "security_group_id=$(aws ssm get-parameter --name "/$BASE_ENV/worker_security_group_id" --query 'Parameter.Value' --output text)" >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    # Same default VPC / default subnets `EcsFargateTask` uses in acme-app-aws -- public subnets,
+    # no NAT Gateway, relying on `assignPublicIp` for egress.
+    - name: Discover the default VPC's subnets
+      id: subnets
+      run: |
+        set -euo pipefail
+        vpc_id=$(aws ec2 describe-vpcs --filters Name=isDefault,Values=true --query 'Vpcs[0].VpcId' --output text)
+        ids=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$vpc_id" --query 'Subnets[].SubnetId' --output text | tr '\t' ',')
+        echo "ids=$ids" >> "$GITHUB_OUTPUT"
+      shell: bash
+
     # This runs on every push to the pull request, so it has to handle both the first deployment
     # and every one after it. On an existing service only the image changes: the rest of the
     # container configuration is read back and reused, exactly as deploy-test does, so that a
@@ -103,25 +131,81 @@ runs:
       env:
         ACCOUNT: ${{ steps.names.outputs.account }}
         BASE_SERVICE: ${{ steps.names.outputs.base }}
+        CLUSTER: ${{ steps.names.outputs.cluster }}
         IMAGE: ${{ steps.image.outputs.uri }}
         INFRA_ROLE: ${{ steps.names.outputs.infra_role }}
         LOG_GROUP: ${{ steps.names.outputs.log_group }}
         PR_NUMBER: ${{ inputs.PR_NUMBER }}
         SERVICE: ${{ steps.names.outputs.service }}
         SERVICE_ARN: ${{ steps.names.outputs.service_arn }}
+        WORKER_TASK_DEFINITION: ${{ steps.names.outputs.worker_task_definition_arn }}
+        WORKER_SECURITY_GROUP_ID: ${{ steps.worker_config.outputs.security_group_id }}
+        WORKER_SUBNET_IDS: ${{ steps.subnets.outputs.ids }}
       run: |
         set -euo pipefail
 
-        if aws ecs describe-express-gateway-service --service-arn "$SERVICE_ARN" >/dev/null 2>&1; then
-          echo "Service $SERVICE exists, updating its image."
-          primary_container=$(
-            aws ecs describe-express-gateway-service --service-arn "$SERVICE_ARN" \
-              --query 'service.activeConfigurations[0].primaryContainer' --output json \
-              | jq --arg image "$IMAGE" '.image = $image'
-          )
+        # Express Mode mints the hostname while creating the service, so BETTER_AUTH_URL can only
+        # ever be set from a configuration read back *after* the service exists. Both paths below
+        # therefore end in the same place: read the active configuration, put the endpoint in
+        # BETTER_AUTH_URL, push it back.
+        # `set -e` is suspended inside a function called as an `if` condition, so every step here
+        # returns explicitly instead of relying on it: a failed describe must not fall through to
+        # an update built from empty JSON.
+        #
+        # JOB_DRIVER/ECS_CLUSTER/WORKER_* are rewritten here too, not just read back and preserved:
+        # a preview created before the worker existed (or before one of its settings changed) must
+        # pick up the current values on its very next redeploy, rather than staying pinned to
+        # whatever was present when its service was first created.
+        set_container() {
+          local active_config endpoint primary_container
+
+          active_config=$(aws ecs describe-express-gateway-service --service-arn "$SERVICE_ARN" \
+            --query 'service.activeConfigurations[0]' --output json) || return 1
+
+          endpoint=$(echo "$active_config" | jq -r '.ingressPaths[0].endpoint') || return 1
+          # Refuse to deploy BETTER_AUTH_URL=https://null, which would 403 every auth call in the
+          # preview without the deployment ever going red.
+          test -n "$endpoint" && test "$endpoint" != "null" || return 1
+
+          # Strip whatever scheme the API put on the endpoint, rather than just "https://", so a
+          # bare or http form doesn't turn into https://http://…
+          #
+          # `command` is explicitly emptied rather than left alone: --primary-container is a merge,
+          # not a full replace (confirmed by hand -- omitting a field entirely leaves the previous
+          # value in place), and this field only ever holds the bootstrap placeholder's
+          # `-listen`/`-text` http-echo arguments (see compose.ts's `appCommand`). The real
+          # application image has its own entrypoint and errors out on unknown CLI args, crashing
+          # every task and tripping the deployment circuit breaker back to the placeholder.
+          primary_container=$(echo "$active_config" | jq \
+            --arg image "$IMAGE" \
+            --arg url "https://${endpoint#*://}" \
+            --arg cluster "$CLUSTER" \
+            --arg worker_task_definition "$WORKER_TASK_DEFINITION" \
+            --arg worker_security_group_id "$WORKER_SECURITY_GROUP_ID" \
+            --arg worker_subnet_ids "$WORKER_SUBNET_IDS" \
+            '.primaryContainer
+             | .command = []
+             | .image = $image
+             | .environment = ((.environment // [])
+                 | map(select(.name | IN("BETTER_AUTH_URL", "JOB_DRIVER", "ECS_CLUSTER", "WORKER_TASK_DEFINITION", "WORKER_CONTAINER_NAME", "WORKER_SECURITY_GROUP_ID", "WORKER_SUBNET_IDS") | not))
+                 + [
+                     {name: "BETTER_AUTH_URL", value: $url},
+                     {name: "JOB_DRIVER", value: "ecs"},
+                     {name: "ECS_CLUSTER", value: $cluster},
+                     {name: "WORKER_TASK_DEFINITION", value: $worker_task_definition},
+                     {name: "WORKER_CONTAINER_NAME", value: "worker"},
+                     {name: "WORKER_SECURITY_GROUP_ID", value: $worker_security_group_id},
+                     {name: "WORKER_SUBNET_IDS", value: $worker_subnet_ids}
+                   ])' ) || return 1
+
           aws ecs update-express-gateway-service \
             --service-arn "$SERVICE_ARN" \
-            --primary-container "$primary_container"
+            --primary-container "$primary_container" || return 1
+        }
+
+        if aws ecs describe-express-gateway-service --service-arn "$SERVICE_ARN" >/dev/null 2>&1; then
+          echo "Service $SERVICE exists, updating its image."
+          set_container
           exit 0
         fi
 
@@ -134,28 +218,53 @@ runs:
         # test, and only its data is its own. This mirrors `applicationSecrets` in acme-app-aws's
         # index.ts, which resolves DATABASE_URL per preview and shares the rest.
         #
-        # BETTER_AUTH_URL is deliberately absent: `betterAuth()` in src/libs/better-auth/auth.ts
-        # sets no baseURL, so the origin is taken from the request and a preview needs no knowledge
-        # of the hostname Express Mode is about to mint for it.
+        # BETTER_AUTH_URL is absent *here* because the hostname it needs does not exist yet: Express
+        # Mode mints it while creating the service. It is set by the `set_container` call below,
+        # which is why creating a preview costs one extra deployment that updating one does not.
         #
         # The member names here are the API's, which are singular (`environment`,
         # `awsLogsConfiguration`) where the Pulumi provider pluralises them. Reading them off
         # acme-app-aws's component would produce JSON the CLI rejects.
+        # JOB_DRIVER/ECS_CLUSTER/WORKER_* mirror what acme-app-aws wires into the base
+        # environment's own app container once `withFargateTask` is on -- here assembled by hand
+        # since a preview has no Pulumi stack of its own. Set only at creation: none of these
+        # values change between redeploys of the same pull request, and `set_container` above
+        # reads back and preserves whatever the active configuration already has.
         primary_container=$(jq -n \
           --arg image "$IMAGE" \
           --arg db "$ssm/$BASE_ENV/pr-$PR_NUMBER/database_url" \
           --arg auth_secret "$ssm/$BASE_ENV/better_auth_secret" \
+          --arg aws_region "$ssm/$BASE_ENV/aws_region" \
+          --arg aws_s3_bucket "$ssm/$BASE_ENV/aws_s3_bucket" \
+          --arg aws_access_key_id "$ssm/$BASE_ENV/aws_access_key_id" \
+          --arg aws_secret_access_key "$ssm/$BASE_ENV/aws_secret_access_key" \
+          --arg reconcile_secret "$ssm/$BASE_ENV/internal_reconcile_secret" \
           --arg log_group "$LOG_GROUP" \
+          --arg cluster "$CLUSTER" \
+          --arg worker_task_definition "$WORKER_TASK_DEFINITION" \
+          --arg worker_security_group_id "$WORKER_SECURITY_GROUP_ID" \
+          --arg worker_subnet_ids "$WORKER_SUBNET_IDS" \
           '{
             image: $image,
             containerPort: 3000,
             environment: [
               { name: "HOSTNAME", value: "0.0.0.0" },
-              { name: "PORT", value: "3000" }
+              { name: "PORT", value: "3000" },
+              { name: "JOB_DRIVER", value: "ecs" },
+              { name: "ECS_CLUSTER", value: $cluster },
+              { name: "WORKER_TASK_DEFINITION", value: $worker_task_definition },
+              { name: "WORKER_CONTAINER_NAME", value: "worker" },
+              { name: "WORKER_SECURITY_GROUP_ID", value: $worker_security_group_id },
+              { name: "WORKER_SUBNET_IDS", value: $worker_subnet_ids }
             ],
             secrets: [
               { name: "DATABASE_URL", valueFrom: $db },
-              { name: "BETTER_AUTH_SECRET", valueFrom: $auth_secret }
+              { name: "BETTER_AUTH_SECRET", valueFrom: $auth_secret },
+              { name: "AWS_REGION", valueFrom: $aws_region },
+              { name: "AWS_S3_BUCKET", valueFrom: $aws_s3_bucket },
+              { name: "AWS_ACCESS_KEY_ID", valueFrom: $aws_access_key_id },
+              { name: "AWS_SECRET_ACCESS_KEY", valueFrom: $aws_secret_access_key },
+              { name: "INTERNAL_RECONCILE_SECRET", valueFrom: $reconcile_secret }
             ],
             awsLogsConfiguration: { logGroup: $log_group, logStreamPrefix: "ecs" }
           }')
@@ -169,24 +278,45 @@ runs:
             maxTaskCount: 1
           }')
 
-        # Smaller than test, which runs 512/1024 with up to two tasks: a preview serves a handful
-        # of reviewers, and one task caps what an idle pull request costs.
+        # Capped at one task (test allows up to two): a preview serves a handful of reviewers, so
+        # one task is enough. 256/512 was OOM-killing the Next.js server under SSR load
+        # (`JavaScript heap out of memory`) -- see PR #104 -- and 512/1024 starved the health
+        # check during the Run export (100k+ PDR rows), hence 1024/2048.
         aws ecs create-express-gateway-service \
           --service-name "$SERVICE" \
-          --cluster default \
+          --cluster "$CLUSTER" \
           --execution-role-arn "$iam/$BASE_SERVICE-execution" \
           --task-role-arn "$iam/$BASE_SERVICE-task" \
           --infrastructure-role-arn "$iam/$INFRA_ROLE" \
-          --cpu 256 \
-          --memory 512 \
+          --cpu 1024 \
+          --memory 2048 \
           --health-check-path /api/health \
           --primary-container "$primary_container" \
           --scaling-target "$scaling_target" \
           --tags \
             "key=Environment,value=pr-$PR_NUMBER" \
             "key=Prefix,value=$BASE_ENV" \
-            "key=Service,value=sinergas-portal" \
+            "key=Service,value=acme-app" \
             "key=ManagedBy,value=github-actions"
+
+        # The hostname exists only now, so this is the earliest BETTER_AUTH_URL can be set. The
+        # service may still be settling from its own creation, so the update is retried rather than
+        # failing the whole deployment on a transient rejection.
+        echo "Service created, setting BETTER_AUTH_URL on it."
+        attempts=5
+        for attempt in $(seq "$attempts"); do
+          if set_container; then
+            exit 0
+          fi
+          # No sleep after the last attempt: there is nothing left to wait for.
+          if [ "$attempt" -lt "$attempts" ]; then
+            echo "Attempt $attempt failed, the service is likely still provisioning. Retrying in 15s."
+            sleep 15
+          fi
+        done
+
+        echo "::error::Could not set BETTER_AUTH_URL on $SERVICE after $attempts attempts."
+        exit 1
       shell: bash
 
     # Express Mode mints the hostname while creating the service, so it cannot be known beforehand
@@ -203,4 +333,31 @@ runs:
         # The API returns the endpoint with its scheme already on it. Stripping one if present,
         # rather than assuming either way, keeps this right whichever form comes back.
         echo "url=https://${host#https://}" >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    # Browser uploads go straight to S3 through presigned URLs, and a preview shares its base
+    # environment's bucket -- so that bucket must allow this preview's own origin too. Pulumi owns
+    # the base environment's rule (acme-app-aws compose.ts, "Bucket CORS") and keeps every `pr-*`
+    # rule it finds across `pulumi up`; this step only upserts this PR's own `pr-<number>` rule.
+    # PutBucketCors replaces the whole configuration, hence the read-modify-write.
+    - name: Allow the preview's origin on the storage bucket
+      env:
+        PR_NUMBER: ${{ inputs.PR_NUMBER }}
+        ORIGIN: ${{ steps.endpoint.outputs.url }}
+        BUCKET: s3-${{ env.PROJECT_NAME }}-${{ env.BASE_ENV }}-storage-${{ steps.names.outputs.account }}
+      run: |
+        set -euo pipefail
+        current=$(aws s3api get-bucket-cors --bucket "$BUCKET" --query 'CORSRules' --output json 2>/dev/null || echo '[]')
+        rules=$(echo "$current" | jq -c \
+          --arg id "pr-$PR_NUMBER" --arg origin "$ORIGIN" \
+          '(. // []) | map(select(.ID != $id)) + [{
+             ID: $id,
+             AllowedMethods: ["GET", "PUT", "POST", "HEAD"],
+             AllowedOrigins: [$origin],
+             AllowedHeaders: ["*"],
+             ExposeHeaders: ["ETag"],
+             MaxAgeSeconds: 3000
+           }]')
+        aws s3api put-bucket-cors --bucket "$BUCKET" --cors-configuration "{\"CORSRules\": $rules}"
+        echo "CORS rule pr-$PR_NUMBER allows $ORIGIN on $BUCKET."
       shell: bash
