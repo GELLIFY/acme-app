@@ -84,7 +84,9 @@ jobs:
       issues: write
     outputs:
       current_branch: ${{ steps.branch_name.outputs.current_branch }}
+      # #if useNeon
       branch_id: ${{ steps.create_branch.outputs.branch_id }}
+      # #endif
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
 
@@ -95,6 +97,7 @@ jobs:
         id: branch_name
         uses: tj-actions/branch-names@5250492686b253f06fa55861556d1027b067aeb5 # v9
 
+      # #if useNeon
       - name: Create Neon Branch
         id: create_branch
         uses: neondatabase/create-branch-action@fb620d43d4c565abaf088b848a4e28e5c4ea4d9c # v6
@@ -111,19 +114,36 @@ jobs:
           echo "::add-mask::${{ steps.create_branch.outputs.db_url }}"
           echo "::add-mask::${{ steps.create_branch.outputs.db_url_pooled }}"
           echo "::add-mask::${{ steps.create_branch.outputs.password }}"
+      # #endif
 
       # Where the preview's database comes from, and the only step that knows: everything below
       # reads the connection string from this step's output, so its source is chosen in one place.
       #
+      # #if isTemplate
+      # The sources are separate keys, and separate lines, rather than one of each marked twice:
+      # both are present, unresolved, in this repository, and a mapping cannot carry the same key
+      # twice. The order matters for the same reason -- with both lines live, the last one wins,
+      # and this repository has a Neon branch to use.
+      # #endif
       - name: Resolve the preview database
         id: database
         env:
+          # #if useExternalDatabase
+          DATABASE_SOURCE: ${{ secrets.PREVIEW_DATABASE_URL }}
+          # #endif
+          # #if useNeon
           NEON_BRANCH_URL: ${{ steps.create_branch.outputs.db_url_pooled }}
+          # #endif
         run: |
           set -euo pipefail
+          # #if useExternalDatabase
+          URL="${DATABASE_SOURCE:-}"
+          # #endif
+          # #if useNeon
           URL="${NEON_BRANCH_URL:-}"
+          # #endif
           if [ -z "$URL" ]; then
-            echo "::error::No preview database was provisioned for this pull request." >&2
+            echo "::error::No preview database. Set the PREVIEW_DATABASE_URL repository secret." >&2
             exit 1
           fi
           echo "::add-mask::$URL"
@@ -226,7 +246,9 @@ jobs:
             | | |
             |---|---|
             | :rocket: App | ${{ needs.deploy_app.outputs.preview_url }} |
+            # #if useNeon
             | :elephant: Neon branch | https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ needs.provision_and_migrate.outputs.branch_id }} |
+            # #endif
             | :package: Service | `ecs-acme-app-pr-${{ github.event.number }}` |
             | :bookmark: Commit | ${{ github.event.pull_request.head.sha }} |
 
@@ -245,7 +267,9 @@ jobs:
           REPO_NAME: ${{ github.event.repository.name }}
           PR_BODY: ${{ github.event.pull_request.body }}
           APP_URL: ${{ needs.deploy_app.outputs.preview_url }}
+          # #if useNeon
           NEON_URL: https://console.neon.tech/app/projects/${{ vars.NEON_PROJECT_ID }}/branches/${{ needs.provision_and_migrate.outputs.branch_id }}
+          # #endif
           COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
@@ -265,7 +289,9 @@ jobs:
           | | |
           |---|---|
           | :rocket: App | $APP_URL |
+          # #if useNeon
           | :elephant: Neon branch | $NEON_URL |
+          # #endif
           | :package: Service | \`ecs-acme-app-pr-$PR_NUMBER\` |
           | :bookmark: Commit | $COMMIT_SHA |
           | :arrow_right_hook: Pull request | #$PR_NUMBER |

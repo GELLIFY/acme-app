@@ -49,6 +49,7 @@ jobs:
           PR_NUMBER: ${{ github.event.number }}
           GIT_BRANCH: ${{ steps.branch_name.outputs.current_branch }}
 
+  # #if useNeon
   delete_neon_branch:
     if: ${{ !startsWith(github.head_ref, 'renovate/') }}
     name: Delete Neon Branch
@@ -66,3 +67,4 @@ jobs:
           project_id: ${{ vars.NEON_PROJECT_ID }}
           branch: preview/pr-${{ github.event.number }}-${{ steps.branch_name.outputs.current_branch }}
           api_key: ${{ secrets.NEON_API_KEY }}
+  # #endif

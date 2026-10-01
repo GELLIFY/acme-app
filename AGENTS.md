@@ -76,7 +76,9 @@ Two consequences for anyone changing this repository:
   valid and inert, whereas a duplicated step id is neither. Keep it one block -- a second top-level
   `env:` key would be a duplicate mapping key.
 - **The database is a second, independent question.** `#if useNeon` / `#if useExternalDatabase`
-  around the preview pipeline's database steps: with Neon a branch is created per pull request,
+  around the preview pipeline's database steps (also in `cd/aws/pipelines/deploy-preview.yml` and
+  `cleanup-preview.yml`, where `useNeon` also wraps the `delete_neon_branch` job and the Neon rows of
+  the PR comments): with Neon a branch is created per pull request,
   without it the connection string comes from the `PREVIEW_DATABASE_URL` repository secret. The
   two are never both off. Nothing outside `deploy-preview.yml` and `cleanup-preview.yml` knows
   which is which -- the application talks to plain Postgres through `node-postgres` either way,

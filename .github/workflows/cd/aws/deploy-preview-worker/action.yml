@@ -3,7 +3,7 @@ name: Deploy Preview on AWS (worker)
 description: >
   Registers this pull request's own worker task definition, onto the worker image
   `build-preview-worker` already pushed -- a Fargate task dispatched via ecs:RunTask
-  (JOB_DRIVER=ecs) exactly as test/prod do, since this preview's Runs live in its own Neon branch
+  (JOB_DRIVER=ecs) exactly as test/prod do, since this preview's Runs live in its own preview database
   and need their own DATABASE_URL secret. Runs as its own job, after both `provision_and_migrate`
   and `build-preview-worker`: the schema a fresh worker expects must be in place before it can
   pick up work, and the image itself is `build-preview-worker`'s job, not this one -- that way a
