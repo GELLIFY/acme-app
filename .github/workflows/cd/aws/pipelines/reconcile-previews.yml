@@ -18,10 +18,10 @@ env:
 
 on:
   schedule:
-    # Same cadence acme-app-aws uses for test/prod's own reconcile rule (rate(1 minute) there);
-    # every 2 minutes here is enough slack for a scheduled workflow's own start-up latency while
-    # still comfortably inside FORECAST_RUN_WAIT_CAP_MS/FORECAST_RUN_MAX_EXECUTION_MS's defaults.
-    - cron: "*/2 * * * *"
+    # acme-app-aws reconciles test/prod every minute (rate(1 minute) there). Every 5 minutes is
+    # the most GitHub runs a scheduled workflow: a shorter cron is delayed anyway, and actionlint
+    # rejects it.
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 concurrency:

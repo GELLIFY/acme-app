@@ -130,6 +130,14 @@ describe("gellify.template.json", () => {
     expect(manifest.templateOnly).toContain("src/modules/manifest.test.ts");
   });
 
+  // A stale entry would leave the template's own file, renamed, in every
+  // project: the template workflow, which needs a secret no project has.
+  test("every template-only file exists", () => {
+    for (const file of manifest.templateOnly) {
+      expect(existsSync(join(ROOT, file)), file).toBe(true);
+    }
+  });
+
   test("the migrations are regenerated, not shipped", () => {
     expect(manifest.regenerate).toContain("src/server/db/migrations");
   });

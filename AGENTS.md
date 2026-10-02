@@ -132,9 +132,9 @@ once that commit is moved forward in `gelly` (and the App's vendored CLI is refr
 Consequences for anyone changing this repository:
 
 - **No `#if` marker in code.** A module is removed through the registries and the manifest (see
-  "Optional modules" and the last point below). Markers remain only where there is no code: the
-  workflow and action YAML, `.env.example`, `docker-compose.yml` and Markdown. The generator
-  refuses a marker whose flag it does not know.
+  "Optional modules" and the `gellify.template.json` point below). Markers remain only where
+  there is no code: the workflow and action YAML, `.env.example`, `docker-compose.yml` and
+  Markdown. The generator refuses a marker whose flag it does not know.
 
 - **The steps are not marked per target, and must not be.** Two `#if`-marked copies of a step are
   both live in *this* repository -- the same step twice in one job, which GitHub refuses to load
@@ -196,6 +196,14 @@ Consequences for anyone changing this repository:
   of a module or a flag goes in there, in the same pull request that adds it. The generator
   validates the manifest against its own list of modules and flags and refuses what it does not
   know, so a new module or flag also needs a change in `create-gellify-app`.
+- **`.github/workflows/template.yml` scaffolds from every pull request** (and every push to `main`
+  and `feat/create-acme-app`): it archives the commit, runs `create-gellify-app`'s smoke on it with
+  the reduced matrix (each combination scaffolded, installed, linted, typechecked, tested without
+  the database, built, its workflows checked by `actionlint`), and runs `actionlint` on this
+  repository's workflows, `cd/aws/pipelines/` included. The CLI comes from a checkout of the private
+  `GELLIFY/gelly` (branch: the `GELLY_REF` variable, default `feat/integra-create-acme-app`), with
+  the `GELLY_READ_TOKEN` secret: a fine-grained token with Contents: read on that repository only.
+  The workflow is `templateOnly`.
 
 This section never reaches a generated project: it sits behind an `#if isTemplate` marker, and no
 generated project sets that flag.

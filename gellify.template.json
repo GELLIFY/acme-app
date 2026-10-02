@@ -22,7 +22,8 @@
     "src/server/db/migrations"
   ],
   "templateOnly": [
-    "src/modules/manifest.test.ts"
+    "src/modules/manifest.test.ts",
+    ".github/workflows/template.yml"
   ],
   "modules": {
     "auth.admin": {

@@ -1,0 +1,176 @@
+name: Template
+
+# This repository is the template `create-gellify-app` scaffolds from (AGENTS.md, "This repository
+# is also a template"). This workflow scaffolds from the commit under review, so that a renamed
+# registry, a stale manifest entry or a step id the generator removes fails here, in the pull request
+# that breaks it, rather than at the next `TEMPLATE_SOURCE` bump in GELLIFY/gelly. It is about the
+# template itself and never reaches a generated project (`templateOnly` in gellify.template.json).
+#
+# The CLI lives in GELLIFY/gelly, which is private, so it is checked out with a read-only token:
+# the `GELLY_READ_TOKEN` secret, a fine-grained personal access token with access to GELLIFY/gelly
+# only and the "Contents: read" repository permission. Chosen as the option with the least new
+# infrastructure (one secret). The alternatives, if that token's owner or expiry becomes a problem:
+#   - a GitHub App installed on GELLIFY/gelly only, with "Contents: read": a step
+#     `actions/create-github-app-token` (`app-id: vars.GELLY_APP_ID`,
+#     `private-key: secrets.GELLY_APP_PRIVATE_KEY`, `owner: GELLIFY`, `repositories: gelly`)
+#     before the checkout, whose `token` output replaces the secret below. Bound to no person and
+#     never expires. Not the Provisioner's App: its key can do far more than read one repository.
+#   - the CLI published to GitHub Packages (`release-create-gellify-app.yml` in gelly): no gelly
+#     checkout, but the tarball ships `dist/` only, not `scripts/smoke.ts`, and a release lags the
+#     branch this is meant to track; reading the package from another repository needs a token too.
+
+# The smoke needs nothing from this repository but its git tree; the token above is the only
+# credential, and it reads gelly.
+permissions:
+  contents: read
+
+env:
+  # The release that is downloaded and checked below; bump both together, the checksum is the
+  # `linux_amd64` line of the release's `actionlint_<version>_checksums.txt`.
+  ACTIONLINT_VERSION: "1.7.12"
+  ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+  # The branches a `TEMPLATE_SOURCE` is pinned from.
+  push:
+    branches:
+      - main
+      - feat/create-acme-app
+  workflow_dispatch:
+    inputs:
+      gelly_ref:
+        description: "Branch, tag or commit of GELLIFY/gelly whose create-gellify-app runs the smoke"
+        required: false
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # acme-app's own workflows. `cd/aws/pipelines/` are linted too: GitHub does not load them here,
+  # but scaffolding for AWS copies them up to `.github/workflows/`, where they must be valid. The
+  # composite actions under `cd/` and `setup/` are not workflows: actionlint checks them through the
+  # workflows that use them, and fed them directly it reports them as workflows with no `on`.
+  actionlint:
+    name: "actionlint"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          persist-credentials: false
+
+      - name: Install actionlint
+        id: install_actionlint
+        run: |
+          set -euo pipefail
+          dir="${RUNNER_TEMP}/actionlint"
+          mkdir -p "$dir"
+          curl -fsSL -o "${dir}/actionlint.tar.gz" \
+            "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          echo "${ACTIONLINT_SHA256}  ${dir}/actionlint.tar.gz" | sha256sum -c -
+          tar -xzf "${dir}/actionlint.tar.gz" -C "$dir" actionlint
+          echo "$dir" >> "$GITHUB_PATH"
+
+      # The runner ships shellcheck, so the `run:` scripts are checked as well.
+      - name: Run actionlint
+        id: run_actionlint
+        run: actionlint -color .github/workflows/*.yml .github/workflows/cd/aws/pipelines/*.yml
+
+  # create-gellify-app on this commit: the reduced matrix of its smoke (a handful of module and
+  # flag combinations), each scaffolded, installed and put through its own lint, typecheck, tests
+  # and `next build`. The database tests are skipped: no Postgres here.
+  scaffold:
+    name: "Scaffold (create-gellify-app smoke, reduced matrix)"
+    runs-on: ubuntu-latest
+    # A combo is an install and a `next build`, about three minutes.
+    timeout-minutes: 30
+    env:
+      # The pull request's head, not the merge commit `github.sha` is on a pull request: the CLI is
+      # given a commit of this repository, and the archive must be that same commit.
+      TEMPLATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      # Set it as a repository variable to follow another gelly branch without editing this file.
+      GELLY_REF: ${{ inputs.gelly_ref || vars.GELLY_REF || 'feat/integra-create-acme-app' }}
+    steps:
+      # A pull request from a fork, or from Dependabot, does not get the repository's secrets.
+      - name: Check the gelly token
+        id: check_token
+        env:
+          GELLY_READ_TOKEN: ${{ secrets.GELLY_READ_TOKEN }}
+        run: |
+          if [ -z "$GELLY_READ_TOKEN" ]; then
+            echo "::error::The GELLY_READ_TOKEN secret is not available: a fine-grained token with Contents: read on GELLIFY/gelly. See the top of .github/workflows/template.yml."
+            exit 1
+          fi
+
+      # gelly at the root of the workspace, so that its own setup action below finds its `.nvmrc`,
+      # its `packageManager` and its lockfile where it expects them.
+      - name: Checkout create-gellify-app (GELLIFY/gelly)
+        id: checkout_gelly
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          repository: GELLIFY/gelly
+          ref: ${{ env.GELLY_REF }}
+          token: ${{ secrets.GELLY_READ_TOKEN }}
+          persist-credentials: false
+
+      # After gelly: a checkout at the root empties the workspace first.
+      - name: Checkout the template
+        id: checkout_template
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          ref: ${{ env.TEMPLATE_SHA }}
+          path: template
+          persist-credentials: false
+
+      # What the CLI would download from GitHub at that commit: a tarball whose single top folder
+      # is `GELLIFY-acme-app-<sha7>`, which the CLI checks against `--template-ref`.
+      - name: Archive the template
+        id: archive
+        run: |
+          set -euo pipefail
+          git -C template archive --format=tar.gz --prefix="GELLIFY-acme-app-${TEMPLATE_SHA::7}/" \
+            -o "${RUNNER_TEMP}/template.tgz" "$TEMPLATE_SHA"
+          echo "path=${RUNNER_TEMP}/template.tgz" >> "$GITHUB_OUTPUT"
+
+      # gelly's own composite action (`./` is gelly now): pnpm, Node, bun, frozen install. Not this
+      # repository's `setup`, which installs acme-app.
+      - name: Install dependencies & tooling (gelly)
+        id: setup_gelly
+        uses: ./.github/workflows/setup
+
+      # On PATH before the smoke, which runs it on every generated project's workflows when it
+      # finds it: the ones scaffolding rewrites or copies up from `cd/aws/pipelines/`.
+      - name: Install actionlint
+        id: install_actionlint
+        run: |
+          set -euo pipefail
+          dir="${RUNNER_TEMP}/actionlint"
+          mkdir -p "$dir"
+          curl -fsSL -o "${dir}/actionlint.tar.gz" \
+            "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          echo "${ACTIONLINT_SHA256}  ${dir}/actionlint.tar.gz" | sha256sum -c -
+          tar -xzf "${dir}/actionlint.tar.gz" -C "$dir" actionlint
+          echo "$dir" >> "$GITHUB_PATH"
+
+      - name: Build create-gellify-app
+        id: build_cli
+        run: pnpm --filter @gellify/create-gellify-app build
+
+      - name: Smoke (reduced matrix)
+        id: smoke
+        env:
+          TEMPLATE_ARCHIVE: ${{ steps.archive.outputs.path }}
+        run: |
+          pnpm --filter @gellify/create-gellify-app smoke \
+            --matrix reduced \
+            --template-archive "$TEMPLATE_ARCHIVE" \
+            --template-ref "$TEMPLATE_SHA" \
+            --skip-db-tests
