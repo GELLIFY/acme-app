@@ -17,7 +17,12 @@ type Manifest = {
   templateOnly: string[];
   modules: Record<
     string,
-    { dir: string; files?: string[]; dependencies?: string[] }
+    {
+      dir?: string;
+      requires?: string[];
+      files?: string[];
+      dependencies?: string[];
+    }
   >;
 };
 const manifest = JSON.parse(
@@ -32,7 +37,7 @@ const folders = readdirSync(MODULES, { withFileTypes: true })
 describe("gellify.template.json", () => {
   test("every module folder of src/modules/ has an entry, and every entry a folder", () => {
     const owned = Object.values(manifest.modules)
-      .map((module) => module.dir)
+      .flatMap((module) => (module.dir ? [module.dir] : []))
       .sort();
     expect(owned).toEqual(folders);
   });
@@ -42,6 +47,19 @@ describe("gellify.template.json", () => {
     for (const module of Object.values(manifest.modules)) {
       for (const file of module.files ?? []) {
         expect(existsSync(join(ROOT, file)), file).toBe(true);
+      }
+    }
+  });
+
+  // `example+rest`: what goes when either module is off, such as the REST
+  // routes of the example domain.
+  test("a combined entry requires modules the manifest has, by its own name", () => {
+    for (const [key, module] of Object.entries(manifest.modules)) {
+      if (!module.requires) continue;
+      expect(module.requires.join("+")).toBe(key);
+      expect(module.dir).toBeUndefined();
+      for (const id of module.requires) {
+        expect(manifest.modules[id], `${key} requires ${id}`).toBeDefined();
       }
     }
   });

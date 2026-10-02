@@ -1,29 +1,29 @@
-import { z } from "@hono/zod-openapi";
+import * as z from "zod";
 
 export const listMembersSchema = z.object({
   organizationId: z.uuid().optional(),
   limit: z.number().optional(),
   offset: z.number().optional(),
-  sortBy: z.string().optional().openapi({
+  sortBy: z.string().optional().meta({
     description: "Field to sort by",
     example: "createdAt",
   }),
-  sortDirection: z.enum(["asc", "desc"]).optional().openapi({
+  sortDirection: z.enum(["asc", "desc"]).optional().meta({
     description: "Direction to sort by",
     example: "desc",
   }),
-  filterField: z.string().optional().openapi({
+  filterField: z.string().optional().meta({
     description: "Field to filter by",
     example: "createdAt",
   }),
   filterOperator: z
     .enum(["eq", "ne", "gt", "gte", "lt", "lte", "contains"])
     .optional()
-    .openapi({
+    .meta({
       description: "Operator to filter by",
       example: "eq",
     }),
-  filterValue: z.string().optional().openapi({
+  filterValue: z.string().optional().meta({
     description: "Value to filter by",
     example: "value",
   }),

@@ -13,6 +13,7 @@
     "src/modules/nav.ts",
     "src/modules/permissions.ts",
     "src/modules/seed.ts",
+    "src/modules/health.ts",
     "src/modules/locales.ts"
   ],
   "regenerate": [
@@ -53,6 +54,43 @@
       ],
       "dependencies": [
         "react-error-boundary"
+      ]
+    },
+    "rest": {
+      "dir": "rest",
+      "files": [
+        "src/server/api/rest",
+        "src/app/api/rest",
+        "src/modules/rest.ts",
+        "src/modules/rest-auth.ts",
+        "src/tests/http.ts",
+        "src/tests/http.test.ts"
+      ],
+      "dependencies": [
+        "hono",
+        "@hono/zod-openapi",
+        "@scalar/hono-api-reference",
+        "hono-rate-limiter"
+      ]
+    },
+    "example+rest": {
+      "requires": [
+        "example",
+        "rest"
+      ],
+      "files": [
+        "src/modules/todo/rest.ts",
+        "src/modules/todo/server/rest-routes.ts",
+        "src/modules/todo/server/rest-routes.test.ts"
+      ]
+    },
+    "auth.apiKey+rest": {
+      "requires": [
+        "auth.apiKey",
+        "rest"
+      ],
+      "files": [
+        "src/modules/api-key/rest-auth.ts"
       ]
     }
   },

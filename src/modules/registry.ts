@@ -196,6 +196,16 @@ export function seedsOf(
   return modules;
 }
 
+/** A health check a module adds to the home page: a URL answering `{ status: "ok" }`. */
+export type HealthContribution = { id: string; label: string; url: string };
+
+/** A registry of `health.ts` files, widened like `slotsOf`. */
+export function healthOf(
+  modules: readonly HealthContribution[],
+): readonly HealthContribution[] {
+  return modules;
+}
+
 /** Who a REST request is made for, once a credential is verified. */
 export type RestIdentity = { userId: string; permissions: Permissions };
 

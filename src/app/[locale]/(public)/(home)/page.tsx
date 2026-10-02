@@ -4,29 +4,42 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useTRPC } from "@/libs/trpc/client";
+import { healthModules } from "@/modules/health";
+import { healthOf } from "@/modules/registry";
 import { useScopedI18n } from "@/shared/locales/client";
+
+/** The status of an endpoint answering `{ status: "ok" }`. */
+function FetchStatus({ label, url }: { label: string; url: string }) {
+  const query = useQuery({
+    queryKey: ["health", url],
+    queryFn: async () => {
+      const res = await fetch(url);
+      return (await res.json()) as { status: "ok" | "error" };
+    },
+  });
+
+  return (
+    <div className="flex items-center gap-2">
+      <div
+        className={`h-2 w-2 rounded-full ${query.data ? "bg-green-500" : "bg-red-500"}`}
+      />
+      <span className="text-sm text-muted-foreground">
+        {label}{" "}
+        {query.isLoading
+          ? "Checking..."
+          : query.data
+            ? "Connected"
+            : "Disconnected"}
+      </span>
+    </div>
+  );
+}
 
 export default function Home() {
   const t = useScopedI18n("home");
 
   const trpc = useTRPC();
   const trpcHealthCheck = useQuery(trpc.health.queryOptions());
-
-  const restHealthQuery = useQuery({
-    queryKey: ["rest-health"],
-    queryFn: async () => {
-      const res = await fetch("/api/rest/health");
-      return (await res.json()) as { status: "ok" | "error" };
-    },
-  });
-
-  const routeHealthQuery = useQuery({
-    queryKey: ["route-health"],
-    queryFn: async () => {
-      const res = await fetch("/api/health");
-      return (await res.json()) as { status: "ok" | "error" };
-    },
-  });
 
   return (
     <div className="flex min-h-[calc(100vh-65px)] flex-col">
@@ -50,32 +63,10 @@ export default function Home() {
                     : "Disconnected"}
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <div
-                className={`h-2 w-2 rounded-full ${restHealthQuery.data ? "bg-green-500" : "bg-red-500"}`}
-              />
-              <span className="text-sm text-muted-foreground">
-                REST{" "}
-                {restHealthQuery.isLoading
-                  ? "Checking..."
-                  : restHealthQuery.data
-                    ? "Connected"
-                    : "Disconnected"}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div
-                className={`h-2 w-2 rounded-full ${routeHealthQuery.data ? "bg-green-500" : "bg-red-500"}`}
-              />
-              <span className="text-sm text-muted-foreground">
-                Route handlers{" "}
-                {routeHealthQuery.isLoading
-                  ? "Checking..."
-                  : routeHealthQuery.data
-                    ? "Connected"
-                    : "Disconnected"}
-              </span>
-            </div>
+            {healthOf(healthModules).map(({ id, label, url }) => (
+              <FetchStatus key={id} label={label} url={url} />
+            ))}
+            <FetchStatus label="Route handlers" url="/api/health" />
           </div>
         </section>
         <div className="mx-auto max-w-3xl space-y-8 text-center">

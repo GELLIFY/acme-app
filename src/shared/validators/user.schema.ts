@@ -1,11 +1,11 @@
-import { z } from "@hono/zod-openapi";
+import * as z from "zod";
 
 export const updateUserSchema = z.object({
-  name: z.string().min(2).max(32).optional().openapi({
+  name: z.string().min(2).max(32).optional().meta({
     description: "Name of the user. Must be between 2 and 32 characters",
     example: "John Doe",
   }),
-  image: z.url().optional().openapi({
+  image: z.url().optional().meta({
     description: "URL to the user's avatar image",
     example: "https://cdn.badget.ai/avatars/johndoe.png",
   }),

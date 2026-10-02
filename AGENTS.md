@@ -78,6 +78,7 @@ each exporting `{ id, ... }` `as const`:
 | `nav.ts` | `href`, `icon`, `label`: a link of the navigation bar, before the app's own | `src/modules/nav.ts` | `src/components/navbar-components/navbar.tsx` |
 | `permissions.ts` | `statements`: access-control resources; `grants`: what `user`, `admin` and a new API key (`apiKey`) get | `src/modules/permissions.ts` | `src/libs/better-auth/permissions.ts`, `src/modules/api-key/auth.ts` |
 | `seed.ts` | `seed(db, user)`: seed data for the default user | `src/modules/seed.ts` | `src/server/db/seed.ts` |
+| `health.ts` | `label`, `url`: a health check on the home page, a URL answering `{ status: "ok" }` | `src/modules/health.ts` | `src/app/[locale]/(public)/(home)/page.tsx` |
 | `locales.ts` | `messages`: `{ en, it }`, merged at the path they declare | `src/modules/locales.ts` | `src/shared/locales/{en,it}.ts` |
 
 A module's tables live in its own `tables.ts`, apart from the `schema.ts` that exports them to the
@@ -105,6 +106,9 @@ a router of a module is in `AppRouter`, a plugin's endpoints are on `auth.api` a
   primitive in `src/components/ui/` only the module uses (`input-otp.tsx`). Both are listed among the
   module's `files` in `gellify.template.json`; a route is also in the `includes` of Biome's override,
   so it may import its own module.
+- **Validators import plain `zod`**, with OpenAPI details in `.meta({ ... })`: `@hono/zod-openapi`
+  reads them from there, and it belongs to the REST module, which a project may not have. Only
+  REST files import `@hono/zod-openapi` or `hono`.
 - **Better Auth plugins stay a tuple** (`pluginsOf`): Better Auth reads what each plugin adds to
   the user (`twoFactorEnabled`) by walking `plugins` head to tail, and an array spread in the
   middle ends the walk.
@@ -171,7 +175,9 @@ Two consequences for anyone changing this repository:
   `regenerate` (paths removed from every project and rebuilt by a command: the migrations, which
   `pnpm db:generate` rewrites for the modules that are left), `templateOnly` (the template's
   files about itself, such as `src/modules/manifest.test.ts`, which checks this manifest), `modules` (for each module id: its
-  folder under `src/modules/`, its other files such as its route files under `src/app/`, its `package.json` dependencies and scripts), `sharedDependencies` (a dependency kept while any of
+  folder under `src/modules/`, its other files such as its route files under `src/app/`, its `package.json` dependencies and scripts; and
+  combined entries such as `example+rest`, `{ requires, files }`, for what goes when either module is
+  off: the REST routes of the example domain, the REST credential of the API keys), `sharedDependencies` (a dependency kept while any of
   its modules is on) and `flags` (the same, for `deployVercel`, `deployAws`, `useWorker`). A file
   of a module or a flag goes in there, in the same pull request that adds it; a new flag also
   needs the generator to know it, or its `#if` blocks are dropped from every project.
