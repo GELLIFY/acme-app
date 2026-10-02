@@ -1,10 +1,10 @@
 "use client";
 
 import { useId } from "react";
-import { useTodoFilters } from "@/app/[locale]/(app)/todo/search-params";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { useScopedI18n } from "@/shared/locales/client";
-import { Checkbox } from "../ui/checkbox";
-import { Label } from "../ui/label";
+import { useTodoFilters } from "../search-params";
 
 export function TodoFilters() {
   const t = useScopedI18n("todo");

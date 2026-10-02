@@ -1,10 +1,14 @@
 import { describe, expect, test } from "bun:test";
 import {
   credentialsOf,
+  grantsOf,
   messagesWith,
+  navOf,
   pluginsOf,
   routersOf,
+  seedsOf,
   slotsOf,
+  statementsOf,
   tablesOf,
   tabsOf,
 } from "./registry";
@@ -77,18 +81,49 @@ describe("the registries' helpers", () => {
     expect(routersOf([])).toEqual({});
   });
 
+  test("statementsOf merges, grantsOf merges what each module grants to one name", () => {
+    const modules = [
+      {
+        id: "a",
+        statements: { a: ["read"] },
+        grants: { user: { a: ["read"] }, apiKey: { a: ["read"] } },
+      },
+      { id: "b", statements: { b: ["write"] }, grants: { user: { b: [] } } },
+    ] as const;
+    expect(statementsOf(modules)).toEqual({ a: ["read"], b: ["write"] });
+    expect(grantsOf(modules, "user")).toEqual({ a: ["read"], b: [] });
+    expect(grantsOf(modules, "apiKey")).toEqual({ a: ["read"] });
+    expect(grantsOf([], "user")).toEqual({});
+  });
+
   // A project without the modules of a slot has an empty registry, `[] as
   // const`: its elements must still be components, or the page does not
   // compile there (checked by tsc, not at run time).
-  test("an empty registry of slots, tabs or credentials keeps its element type", () => {
+  test("an empty registry of slots, tabs, credentials, links or seeds keeps its element type", () => {
     const empty = [] as const;
     const slots = slotsOf(empty);
     const tabs = tabsOf(empty);
     const credentials = credentialsOf(empty);
+    const links = navOf(empty);
+    const seeds = seedsOf(empty);
     const slot: IsNever<(typeof slots)[number]> = false;
     const tab: IsNever<(typeof tabs)[number]> = false;
     const credential: IsNever<(typeof credentials)[number]> = false;
-    expect([slot, tab, credential]).toEqual([false, false, false]);
-    expect([slots, tabs, credentials]).toEqual([[], [], []]);
+    const link: IsNever<(typeof links)[number]> = false;
+    const seed: IsNever<(typeof seeds)[number]> = false;
+    expect([slot, tab, credential, link, seed]).toEqual([
+      false,
+      false,
+      false,
+      false,
+      false,
+    ]);
+    expect([slots, tabs, credentials, links, seeds]).toEqual([
+      [],
+      [],
+      [],
+      [],
+      [],
+    ]);
   });
 });

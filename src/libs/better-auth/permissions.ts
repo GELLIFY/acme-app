@@ -4,28 +4,31 @@ import {
   defaultStatements,
   userAc,
 } from "better-auth/plugins/admin/access";
+import { permissionModules } from "@/modules/permissions";
+import { grantsOf, statementsOf } from "@/modules/registry";
 
 /**
  * A statement is a set of resource name and relative actions
- * We can expand the default statements and add our custom ones
+ * We can expand the default statements and add our custom ones; those of
+ * the optional modules come from their `permissions.ts`.
  *
  * For more informations on Access Control read the doc
  * @ref https://www.better-auth.com/docs/plugins/admin#access-control
  */
 export const ac = createAccessControl({
   ...defaultStatements,
-  todo: ["create", "list", "update", "delete"],
+  ...statementsOf(permissionModules),
 });
 
 // Here we define rosources and actions for the user role
 export const userRole = ac.newRole({
-  todo: ["create", "list", "update", "delete"],
+  ...grantsOf(permissionModules, "user"),
   ...userAc.statements,
 });
 
 // Here we define rosources and actions for the admin role
 export const adminRole = ac.newRole({
-  todo: ["create", "list", "update", "delete"],
+  ...grantsOf(permissionModules, "admin"),
   ...adminAc.statements,
 });
 

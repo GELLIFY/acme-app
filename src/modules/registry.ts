@@ -7,11 +7,12 @@
  * `auth-client.ts` (client plugins), `trpc.ts` (tRPC routers), `rest.ts`
  * (REST routes), `rest-auth.ts` (a credential of the REST API), `schema.ts`
  * (Drizzle tables), `sign-in.tsx` and `account-security.tsx` (a component
- * each, in a slot of the page), `account-tab.tsx` (a tab of the account page)
- * and `locales.ts` (messages). Each extension point has its
- * own registry, `src/modules/<point>.ts`, which only imports those files and
- * lists them in one `as const` array. The shared files of the app iterate the
- * registry and never name a module.
+ * each, in a slot of the page), `account-tab.tsx` (a tab of the account page),
+ * `nav.ts` (a link of the navigation bar), `permissions.ts` (access-control
+ * resources), `seed.ts` (seed data) and `locales.ts` (messages). Each
+ * extension point has its own registry, `src/modules/<point>.ts`, which only
+ * imports those files and lists them in one `as const` array. The shared
+ * files of the app iterate the registry and never name a module.
  *
  * One registry per extension point, not one for the whole module, because
  * the extension points depend on each other's types: Better Auth's server is
@@ -21,8 +22,10 @@
  * Removing a module is deleting its folder and its line in each registry.
  */
 
+import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import type { Permissions } from "@/libs/better-auth/permissions";
+import type { DBType } from "@/server/db";
 
 type UnionToIntersection<U> = (
   U extends unknown
@@ -90,6 +93,44 @@ export function tablesOf<const M extends readonly { tables: object }[]>(
   ) as RecordsOf<M, "tables">;
 }
 
+/** The access-control statements of a registry of `permissions.ts` files. */
+export function statementsOf<const M extends readonly { statements: object }[]>(
+  modules: M,
+): RecordsOf<M, "statements"> {
+  return Object.assign(
+    {},
+    ...modules.map((module) => module.statements),
+  ) as RecordsOf<M, "statements">;
+}
+
+type GrantsOfOne<M, R extends string> = M extends {
+  grants: { [K in R]: infer G };
+}
+  ? G
+  : never;
+
+/** What the modules of a registry grant to `R`, like `RecordsOf`. */
+export type GrantsOf<M extends readonly unknown[], R extends string> = [
+  GrantsOfOne<M[number], R>,
+] extends [never]
+  ? Record<never, never>
+  : UnionToIntersection<GrantsOfOne<M[number], R>>;
+
+/**
+ * What a registry of `permissions.ts` files grants to a role (`user`,
+ * `admin`) or to a new API key (`apiKey`): a module that grants it nothing
+ * leaves it out.
+ */
+export function grantsOf<
+  const M extends readonly { grants: Record<string, object> }[],
+  const R extends string,
+>(modules: M, to: R): GrantsOf<M, R> {
+  return Object.assign(
+    {},
+    ...modules.map((module) => module.grants[to] ?? {}),
+  ) as GrantsOf<M, R>;
+}
+
 /**
  * A component a module puts in a slot of a page. It may be async, a server
  * component that loads what it shows: the page knows nothing of the module.
@@ -124,6 +165,34 @@ export function slotsOf(
 export function tabsOf(
   modules: readonly TabContribution[],
 ): readonly TabContribution[] {
+  return modules;
+}
+
+/** A link a module adds to the navigation bar. */
+export type NavContribution = {
+  id: string;
+  href: string;
+  icon: LucideIcon;
+  label: string;
+};
+
+/** A registry of `nav.ts` files, widened like `slotsOf`. */
+export function navOf(
+  modules: readonly NavContribution[],
+): readonly NavContribution[] {
+  return modules;
+}
+
+/** The seed data of a module, for the user `src/server/db/seed.ts` creates. */
+export type SeedContribution = {
+  id: string;
+  seed: (db: DBType, user: { id: string }) => Promise<void>;
+};
+
+/** A registry of `seed.ts` files, widened like `slotsOf`. */
+export function seedsOf(
+  modules: readonly SeedContribution[],
+): readonly SeedContribution[] {
   return modules;
 }
 

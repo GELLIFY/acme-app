@@ -9,11 +9,11 @@ import { Trash2Icon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { useTodoFilters } from "@/app/[locale]/(app)/todo/search-params";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useTRPC } from "@/libs/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
-import { Button } from "../ui/button";
-import { Checkbox } from "../ui/checkbox";
+import { useTodoFilters } from "../search-params";
 
 export function TodoList() {
   const t = useScopedI18n("todo");

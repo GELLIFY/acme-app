@@ -75,6 +75,9 @@ each exporting `{ id, ... }` `as const`:
 | `sign-in.tsx` | `Component`: a component of the sign-in form | `src/modules/sign-in.ts` | `src/app/[locale]/(public)/(auth)/sign-in/` |
 | `account-security.tsx` | `Component`: a section of the account's Security tab, may be async | `src/modules/account-security.ts` | `src/app/[locale]/(app)/account/page.tsx` |
 | `account-tab.tsx` | `value`, `Trigger`, `Component`: a tab of the account page, before Danger | `src/modules/account-tab.ts` | `src/app/[locale]/(app)/account/page.tsx` |
+| `nav.ts` | `href`, `icon`, `label`: a link of the navigation bar, before the app's own | `src/modules/nav.ts` | `src/components/navbar-components/navbar.tsx` |
+| `permissions.ts` | `statements`: access-control resources; `grants`: what `user`, `admin` and a new API key (`apiKey`) get | `src/modules/permissions.ts` | `src/libs/better-auth/permissions.ts`, `src/modules/api-key/auth.ts` |
+| `seed.ts` | `seed(db, user)`: seed data for the default user | `src/modules/seed.ts` | `src/server/db/seed.ts` |
 | `locales.ts` | `messages`: `{ en, it }`, merged at the path they declare | `src/modules/locales.ts` | `src/shared/locales/{en,it}.ts` |
 
 A module's tables live in its own `tables.ts`, apart from the `schema.ts` that exports them to the
@@ -84,7 +87,9 @@ needs a relation on a core table (`user.passkeys`) declares a second `relations(
 merges them by key. A slot component loads its own data (`account-security.tsx` and
 `account-tab.tsx` are server components), so the page that hosts the slot knows nothing of the
 module. A REST credential takes the request's headers, not Hono's context, and answers `null` when
-the request does not carry it.
+the request does not carry it. A page of a module cannot leave `src/app/`: the module keeps the
+page's component, and the route file only re-exports it (with a `biome-ignore` for the import) and
+goes with the module.
 
 A registry only imports those files and lists them in one `as const` array; the shared files read
 it through the helpers of `src/modules/registry.ts` and never name a module. That keeps the types:
@@ -166,7 +171,7 @@ Two consequences for anyone changing this repository:
   `regenerate` (paths removed from every project and rebuilt by a command: the migrations, which
   `pnpm db:generate` rewrites for the modules that are left), `templateOnly` (the template's
   files about itself, such as `src/modules/manifest.test.ts`, which checks this manifest), `modules` (for each module id: its
-  folder under `src/modules/`, its other files, its `package.json` dependencies and scripts), `sharedDependencies` (a dependency kept while any of
+  folder under `src/modules/`, its other files such as its route files under `src/app/`, its `package.json` dependencies and scripts), `sharedDependencies` (a dependency kept while any of
   its modules is on) and `flags` (the same, for `deployVercel`, `deployAws`, `useWorker`). A file
   of a module or a flag goes in there, in the same pull request that adds it; a new flag also
   needs the generator to know it, or its `#if` blocks are dropped from every project.

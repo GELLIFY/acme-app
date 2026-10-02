@@ -18,16 +18,16 @@ describe("expandRoles", () => {
     expect(result).toEqual({});
   });
 
-  it("returns permissions with todo resource for ADMIN role", () => {
+  it("returns permissions with user resource for ADMIN role", () => {
     const result = expandRoles(ROLES.ADMIN);
-    expect(result).toHaveProperty("todo");
-    expect(Array.isArray(result.todo)).toBe(true);
+    expect(result).toHaveProperty("user");
+    expect(Array.isArray(result.user)).toBe(true);
   });
 
-  it("returns permissions with todo resource for USER role", () => {
+  it("returns permissions with user resource for USER role", () => {
     const result = expandRoles(ROLES.USER);
-    expect(result).toHaveProperty("todo");
-    expect(Array.isArray(result.todo)).toBe(true);
+    expect(result).toHaveProperty("user");
+    expect(Array.isArray(result.user)).toBe(true);
   });
 
   it("returns different permissions for ADMIN vs USER roles", () => {

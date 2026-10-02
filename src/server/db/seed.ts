@@ -1,11 +1,12 @@
 import "@/load-env";
 
-import { reset, seed } from "drizzle-seed";
+import { reset } from "drizzle-seed";
 import { auth } from "@/libs/better-auth/auth";
+import { seedsOf } from "@/modules/registry";
+import { seedModules } from "@/modules/seed";
 import { db } from ".";
 import { schema } from "./schema";
 import { account, user } from "./schema/auth-schema";
-import { todoTable } from "./schema/todos";
 
 async function main() {
   await reset(db, schema);
@@ -32,15 +33,10 @@ async function main() {
     password: hash,
   });
 
-  await seed(db, { todo_table: todoTable }).refine((f) => ({
-    todo_table: {
-      columns: {
-        text: f.loremIpsum(),
-        userId: f.default({ defaultValue: createdUser.id }),
-      },
-      count: 5,
-    },
-  }));
+  // the seed data of the optional modules (`seed.ts`)
+  for (const module of seedsOf(seedModules)) {
+    await module.seed(db, createdUser);
+  }
 
   await db.$client.end();
 }

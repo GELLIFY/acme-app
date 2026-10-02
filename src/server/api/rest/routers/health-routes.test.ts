@@ -5,7 +5,7 @@ import { db } from "@/server/db";
 import type { Context } from "../init";
 import { healthRouter } from "./health-routes";
 
-describe("todos routes", () => {
+describe("health routes", () => {
   test("get /health should return 500 if no DB", async () => {
     // Mocking db impletation to simulate an error
     const dbMock = mock();

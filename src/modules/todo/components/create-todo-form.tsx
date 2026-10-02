@@ -4,15 +4,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import type z from "zod";
-import { useTodoFilters } from "@/app/[locale]/(app)/todo/search-params";
 import { Button } from "@/components/ui/button";
+import { Field, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { browserLogger } from "@/libs/logger/browser-logger";
 import { useTRPC } from "@/libs/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
-import { createTodoSchema } from "@/shared/validators/todo.schema";
-import { Field, FieldError } from "../ui/field";
-import { Spinner } from "../ui/spinner";
+import { useTodoFilters } from "../search-params";
+import { createTodoSchema } from "../validators";
 
 export function CreateTodoForm() {
   const t = useScopedI18n("todo");

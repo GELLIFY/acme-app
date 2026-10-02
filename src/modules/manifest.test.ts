@@ -37,6 +37,15 @@ describe("gellify.template.json", () => {
     expect(owned).toEqual(folders);
   });
 
+  // `[locale]` and `(app)` in a path are literal, not glob syntax.
+  test("every other file of a module exists", () => {
+    for (const module of Object.values(manifest.modules)) {
+      for (const file of module.files ?? []) {
+        expect(existsSync(join(ROOT, file)), file).toBe(true);
+      }
+    }
+  });
+
   test("every registry it lists exists", () => {
     for (const registry of manifest.registries) {
       expect(existsSync(join(ROOT, registry))).toBe(true);

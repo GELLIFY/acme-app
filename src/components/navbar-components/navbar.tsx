@@ -1,4 +1,4 @@
-import { FileTextIcon, ListTodoIcon } from "lucide-react";
+import { FileTextIcon } from "lucide-react";
 import Link from "next/link";
 import Logo from "@/components/navbar-components/logo";
 import { Button } from "@/components/ui/button";
@@ -20,13 +20,16 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import type { authClient } from "@/libs/better-auth/auth-client";
+import { navModules } from "@/modules/nav";
+import { navOf } from "@/modules/registry";
 import { UserMenu } from "../auth/user-menu";
 import LanguageSelector from "./language-selector";
 import ThemeToggle from "./theme-toggle";
 
-// Navigation links with icons for desktop icon-only navigation
+// Navigation links with icons for desktop icon-only navigation: those of the
+// optional modules (`nav.ts`), then the app's own
 const navigationLinks = [
-  { href: "/todo", icon: ListTodoIcon, label: "Todos" },
+  ...navOf(navModules),
   { href: "#", icon: FileTextIcon, label: "Documentation" },
 ];
 

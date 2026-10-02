@@ -2,10 +2,10 @@ import { describe, expect, expectTypeOf, test } from "bun:test";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { testClient } from "hono/testing";
 import { expandRoles, type Permissions } from "@/libs/better-auth/permissions";
+import type { Context } from "@/server/api/rest/init";
 import { db } from "@/server/db";
-import { todoTable } from "@/server/db/schema/todos";
-import type { Context } from "../init";
-import { todosRouter } from "./todos-routes";
+import { todoTable } from "../tables";
+import { todosRouter } from "./rest-routes";
 
 const userId = "00000000-0000-0000-0000-000000000000";
 const permissions = expandRoles("user");

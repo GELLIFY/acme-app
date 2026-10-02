@@ -254,16 +254,6 @@ const base = {
       confirm_continue: "Continua",
     },
   },
-
-  // todo feature
-  "todo.title": "List todo",
-  "todo.subtitle": "Gestisci i tuoi task in modo efficiente",
-  "todo.placeholder": "Aggiungi un nuovo task...",
-  "todo.add": "Aggiungi",
-  "todo.filter": "Mostra completati",
-  "todo.items#zero": "Nessun todo",
-  "todo.items#one": "Un todo",
-  "todo.items#other": "{count} todo",
 } as const;
 
 export default messagesWith(base, localeModules, "it");

@@ -1,11 +1,13 @@
 import { createRoute } from "@hono/zod-openapi";
+import { withRequiredPermissions } from "@/server/api/rest/middleware/required-permissions";
+import { createErrorSchema } from "@/server/api/rest/utils/create-error-schema";
+import { createRouter } from "@/server/api/rest/utils/create-router";
 import {
-  createTodo,
-  deleteTodo,
-  getTodoById,
-  getTodos,
-  updateTodo,
-} from "@/server/domains/todo/todo-service";
+  forbiddenSchema,
+  internalServerErrorSchema,
+  notFoundSchema,
+  unauthorizedSchema,
+} from "@/server/api/rest/utils/not-found-schema";
 import {
   createTodoSchema,
   getTodoByIdSchema,
@@ -13,16 +15,14 @@ import {
   todoResponseSchema,
   todosResponseSchema,
   updateTodoSchema,
-} from "@/shared/validators/todo.schema";
-import { withRequiredPermissions } from "../middleware/required-permissions";
-import { createErrorSchema } from "../utils/create-error-schema";
-import { createRouter } from "../utils/create-router";
+} from "../validators";
 import {
-  forbiddenSchema,
-  internalServerErrorSchema,
-  notFoundSchema,
-  unauthorizedSchema,
-} from "../utils/not-found-schema";
+  createTodo,
+  deleteTodo,
+  getTodoById,
+  getTodos,
+  updateTodo,
+} from "./todo-service";
 
 const tags = ["Todos"];
 

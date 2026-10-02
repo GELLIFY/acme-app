@@ -39,7 +39,7 @@ describe("withRequiredPermissions middleware", () => {
   };
 
   test("returns 401 when no permissions are set on context", async () => {
-    const app = createPermissionsApp({ todo: ["create"] });
+    const app = createPermissionsApp({ user: ["create"] });
 
     const response = await requestPermissionsRoute(app);
 
@@ -54,8 +54,8 @@ describe("withRequiredPermissions middleware", () => {
 
   test("returns 403 when user lacks required permissions", async () => {
     const app = createPermissionsApp(
-      { todo: ["delete"] },
-      { todo: ["create"] },
+      { user: ["delete"] },
+      { user: ["create"] },
     );
 
     const response = await requestPermissionsRoute(app);
@@ -72,8 +72,8 @@ describe("withRequiredPermissions middleware", () => {
 
   test("allows request when user has required permissions", async () => {
     const app = createPermissionsApp(
-      { todo: ["delete"] },
-      { todo: ["create", "delete"] },
+      { user: ["delete"] },
+      { user: ["create", "delete"] },
     );
 
     const response = await requestPermissionsRoute(app);
@@ -85,6 +85,6 @@ describe("withRequiredPermissions middleware", () => {
     };
 
     expect(body.ok).toBe(true);
-    expect(body.permissions.todo).toEqual(["create", "delete"]);
+    expect(body.permissions.user).toEqual(["create", "delete"]);
   });
 });

@@ -1,16 +1,11 @@
-import {
-  createTodo,
-  deleteTodo,
-  getTodos,
-  updateTodo,
-} from "@/server/domains/todo/todo-service";
+import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc/init";
 import {
   createTodoSchema,
   getTodoByIdSchema,
   getTodosSchema,
   updateTodoSchema,
-} from "@/shared/validators/todo.schema";
-import { createTRPCRouter, protectedProcedure } from "../init";
+} from "../validators";
+import { createTodo, deleteTodo, getTodos, updateTodo } from "./todo-service";
 
 export const todoRouter = createTRPCRouter({
   get: protectedProcedure

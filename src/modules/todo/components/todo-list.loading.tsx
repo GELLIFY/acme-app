@@ -1,6 +1,6 @@
 "use client";
 
-import { Spinner } from "../ui/spinner";
+import { Spinner } from "@/components/ui/spinner";
 
 export function TodoListLoading() {
   return (

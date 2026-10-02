@@ -10,6 +10,9 @@
     "src/modules/account-security.ts",
     "src/modules/account-tab.ts",
     "src/modules/rest-auth.ts",
+    "src/modules/nav.ts",
+    "src/modules/permissions.ts",
+    "src/modules/seed.ts",
     "src/modules/locales.ts"
   ],
   "regenerate": [
@@ -40,6 +43,16 @@
       "dir": "passkey",
       "dependencies": [
         "@better-auth/passkey"
+      ]
+    },
+    "example": {
+      "dir": "todo",
+      "files": [
+        "src/app/[locale]/(app)/todo",
+        "src/components/error-fallback.tsx"
+      ],
+      "dependencies": [
+        "react-error-boundary"
       ]
     }
   },

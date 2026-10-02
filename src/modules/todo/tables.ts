@@ -1,8 +1,8 @@
 import { relations, sql } from "drizzle-orm";
 import { index } from "drizzle-orm/pg-core";
-import { timestamps } from "../utils";
-import { createTable } from "./_table";
-import { user } from "./auth-schema";
+import { createTable } from "@/server/db/schema/_table";
+import { user } from "@/server/db/schema/auth-schema";
+import { timestamps } from "@/server/db/utils";
 
 export const todoTable = createTable(
   "todo_table",

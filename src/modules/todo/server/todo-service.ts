@@ -4,14 +4,14 @@ import { and, desc, eq, ilike } from "drizzle-orm";
 import type z from "zod";
 
 import type { DBClient } from "@/server/db";
-import type { DB_TodoType } from "@/server/db/schema/todos";
-import { todoTable } from "@/server/db/schema/todos";
+import type { DB_TodoType } from "../tables";
+import { todoTable } from "../tables";
 import type {
   createTodoSchema,
   getTodoByIdSchema,
   getTodosSchema,
   updateTodoSchema,
-} from "@/shared/validators/todo.schema";
+} from "../validators";
 import { shuffleTodos } from "./helpers";
 
 // The projection every list/detail read returns. Exported so domain logic
