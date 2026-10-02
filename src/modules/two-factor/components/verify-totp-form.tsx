@@ -7,19 +7,24 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type z from "zod";
-import { authClient } from "@/libs/better-auth/auth-client";
-import { browserLogger as logger } from "@/libs/logger/browser-logger";
-import { useScopedI18n } from "@/shared/locales/client";
-import { verifyTotpSchema } from "@/shared/validators/user.schema";
-import { Button } from "../ui/button";
-import { Field, FieldDescription, FieldError, FieldLabel } from "../ui/field";
+import { Button } from "@/components/ui/button";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/field";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from "../ui/input-otp";
-import { Spinner } from "../ui/spinner";
+} from "@/components/ui/input-otp";
+import { Spinner } from "@/components/ui/spinner";
+import { authClient } from "@/libs/better-auth/auth-client";
+import { browserLogger as logger } from "@/libs/logger/browser-logger";
+import { useScopedI18n } from "@/shared/locales/client";
+import { verifyTotpSchema } from "../validators";
 
 export function VerifyTotpForm() {
   const [loading, setLoading] = useState(false);

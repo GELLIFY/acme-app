@@ -1,5 +1,6 @@
 import { apiKey } from "./api-key/schema";
 import { passkey } from "./passkey/schema";
+import { twoFactor } from "./two-factor/schema";
 
 /**
  * The Drizzle tables of the optional modules: one `schema.ts` per module,
@@ -8,4 +9,4 @@ import { passkey } from "./passkey/schema";
  * A registry only imports and lists: the generator removes a declined module
  * by deleting its import and its entry here (see `registry.ts`).
  */
-export const schemaModules = [apiKey, passkey] as const;
+export const schemaModules = [apiKey, passkey, twoFactor] as const;

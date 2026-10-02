@@ -72,7 +72,7 @@
   },
   "overrides": [
     {
-      "includes": ["src/modules/**"],
+      "includes": ["src/modules/**", "src/app/**/(auth)/2fa/**"],
       "linter": {
         "rules": {
           "style": {

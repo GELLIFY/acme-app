@@ -1,4 +1,5 @@
 import { passkey } from "./passkey/account-security";
+import { twoFactor } from "./two-factor/account-security";
 
 /**
  * The sections the optional modules add to the Security tab of the account page:
@@ -8,4 +9,4 @@ import { passkey } from "./passkey/account-security";
  * A registry only imports and lists: the generator removes a declined module
  * by deleting its import and its entry here (see `registry.ts`).
  */
-export const accountSecurityModules = [passkey] as const;
+export const accountSecurityModules = [twoFactor, passkey] as const;

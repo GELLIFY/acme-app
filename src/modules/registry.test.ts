@@ -55,6 +55,17 @@ describe("the registries' helpers", () => {
     expect(pluginsOf([])).toEqual([]);
   });
 
+  // Better Auth walks `plugins` as a tuple to infer what each plugin adds to
+  // the user: an array of their union would lose them (checked by tsc).
+  test("pluginsOf keeps each plugin in its place, as a tuple", () => {
+    const plugins = pluginsOf([
+      { id: "a", plugins: [1, 2] },
+      { id: "b", plugins: ["x"] },
+    ] as const);
+    const tuple: [1, 2, "x"] = plugins;
+    expect(tuple).toEqual([1, 2, "x"]);
+  });
+
   test("routersOf and tablesOf merge a record per module", () => {
     expect(
       routersOf([

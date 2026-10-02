@@ -8,12 +8,12 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/libs/better-auth/auth-client";
 import { browserLogger as logger } from "@/libs/logger/browser-logger";
 import { useScopedI18n } from "@/shared/locales/client";
-import { Field, FieldError, FieldLabel } from "../ui/field";
-import { Spinner } from "../ui/spinner";
 
 const formSchema = z.object({
   code: z.string().min(1),

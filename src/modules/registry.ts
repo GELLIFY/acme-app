@@ -32,18 +32,22 @@ type UnionToIntersection<U> = (
   ? I
   : never;
 
-type PluginsOfOne<M> = M extends { plugins: readonly (infer P)[] } ? P : never;
-
 /**
- * The plugins of a registry, as an array of their union. An empty registry
- * is the empty tuple, not `never[]`: spreading a `never[]` into Better Auth's
- * `plugins` breaks the inference of the session's user.
+ * The plugins of a registry, as a tuple in registry order. Not an array of
+ * their union: Better Auth reads the fields a plugin adds to the user (and
+ * its `$Infer`) by walking `plugins` as a tuple, head to tail, and a spread
+ * array in the middle of it ends the walk, so every plugin from there on
+ * (`twoFactorEnabled` of the two-factor plugin) is lost. An empty registry
+ * is the empty tuple, not `never[]`, for the same reason.
  */
-export type PluginsOf<M extends readonly unknown[]> = [
-  PluginsOfOne<M[number]>,
-] extends [never]
-  ? []
-  : PluginsOfOne<M[number]>[];
+export type PluginsOf<M extends readonly unknown[]> = M extends readonly [
+  infer Head,
+  ...infer Tail,
+]
+  ? Head extends { plugins: readonly unknown[] }
+    ? [...Head["plugins"], ...PluginsOf<Tail>]
+    : PluginsOf<Tail>
+  : [];
 
 /** Every plugin of a registry of `auth.ts` or `auth-client.ts` files. */
 export function pluginsOf<

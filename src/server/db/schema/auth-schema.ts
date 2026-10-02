@@ -151,34 +151,11 @@ export const invitation = createTable(
   ],
 );
 
-export const twoFactor = createTable(
-  "two_factor",
-  (d) => ({
-    id: d.uuid("id").default(sql`pg_catalog.gen_random_uuid()`).primaryKey(),
-
-    userId: d
-      .uuid("user_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
-
-    secret: d.text("secret").notNull(),
-    backupCodes: d.text("backup_codes").notNull(),
-    verified: d.boolean("verified").default(true),
-    failedVerificationCount: d.integer("failed_verification_count").default(0),
-    lockedUntil: d.timestamp("locked_until"),
-  }),
-  (table) => [
-    index("twoFactor_secret_idx").on(table.secret),
-    index("twoFactor_userId_idx").on(table.userId),
-  ],
-);
-
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
   members: many(member),
   invitations: many(invitation),
-  twoFactors: many(twoFactor),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -218,13 +195,6 @@ export const invitationRelations = relations(invitation, ({ one }) => ({
   }),
   user: one(user, {
     fields: [invitation.inviterId],
-    references: [user.id],
-  }),
-}));
-
-export const twoFactorRelations = relations(twoFactor, ({ one }) => ({
-  user: one(user, {
-    fields: [twoFactor.userId],
     references: [user.id],
   }),
 }));

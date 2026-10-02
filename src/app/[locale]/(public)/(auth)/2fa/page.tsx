@@ -1,6 +1,4 @@
 import { redirect } from "next/navigation";
-import { BackupCodeForm } from "@/components/auth/backup-code-form";
-import { VerifyTotpForm } from "@/components/auth/verify-totp-form";
 import {
   Card,
   CardContent,
@@ -10,6 +8,8 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getCachedSession } from "@/libs/better-auth/get-cached-session";
+import { BackupCodeForm } from "@/modules/two-factor/components/backup-code-form";
+import { VerifyTotpForm } from "@/modules/two-factor/components/verify-totp-form";
 import { getScopedI18n } from "@/shared/locales/server";
 
 export default async function TwoFactorPage() {

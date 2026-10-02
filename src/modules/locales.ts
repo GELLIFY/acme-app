@@ -1,5 +1,6 @@
 import { apiKey } from "./api-key/locales";
 import { passkey } from "./passkey/locales";
+import { twoFactor } from "./two-factor/locales";
 
 /**
  * The messages of the optional modules: one `locales.ts` per module,
@@ -9,4 +10,4 @@ import { passkey } from "./passkey/locales";
  * A registry only imports and lists: the generator removes a declined module
  * by deleting its import and its entry here (see `registry.ts`).
  */
-export const localeModules = [apiKey, passkey] as const;
+export const localeModules = [apiKey, passkey, twoFactor] as const;

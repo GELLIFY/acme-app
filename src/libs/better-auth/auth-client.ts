@@ -3,7 +3,6 @@ import {
   inferAdditionalFields,
   lastLoginMethodClient,
   organizationClient,
-  twoFactorClient,
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import { authClientModules } from "@/modules/auth-client";
@@ -24,11 +23,6 @@ export const authClient = createAuthClient({
     }),
     organizationClient(),
     lastLoginMethodClient(),
-    twoFactorClient({
-      onTwoFactorRedirect() {
-        window.location.href = "/2fa";
-      },
-    }),
     ...pluginsOf(authClientModules),
     inferAdditionalFields<typeof auth>(),
   ],

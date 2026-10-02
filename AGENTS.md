@@ -96,6 +96,13 @@ a router of a module is in `AppRouter`, a plugin's endpoints are on `auth.api` a
 - **Nothing outside `src/modules/` imports `@/modules/<module>/...`** (Biome's
   `noRestrictedImports`); a registry, `@/modules/<point>`, is fine. That is what makes removing a
   module safe: delete its folder and its line in each registry.
+- **A route of a module stays under `src/app/`** (Next.js needs it there), and so does a UI
+  primitive in `src/components/ui/` only the module uses (`input-otp.tsx`). Both are listed among the
+  module's `files` in `gellify.template.json`; a route is also in the `includes` of Biome's override,
+  so it may import its own module.
+- **Better Auth plugins stay a tuple** (`pluginsOf`): Better Auth reads what each plugin adds to
+  the user (`twoFactorEnabled`) by walking `plugins` head to tail, and an array spread in the
+  middle ends the walk.
 
 <!-- #if isTemplate -->
 ## This repository is also a template

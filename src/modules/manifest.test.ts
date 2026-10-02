@@ -67,10 +67,8 @@ describe("gellify.template.json", () => {
 
   // A shared file that imports a module's own package breaks every project
   // without the module, and with the module it registers it a second time.
-  test("only a module's folder imports the packages the module owns", () => {
-    const owned = Object.values(manifest.modules).flatMap(
-      (module) => module.dependencies ?? [],
-    );
+  // The module's other files (`files`: a route, a UI primitive) go with it.
+  test("only a module's own files import the packages the module owns", () => {
     const offenders: string[] = [];
     const visit = (dir: string) => {
       for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -78,13 +76,20 @@ describe("gellify.template.json", () => {
         if (entry.isDirectory()) {
           if (path !== MODULES) visit(path);
         } else if (/\.tsx?$/.test(entry.name)) {
+          const file = path.slice(ROOT.length + 1).replaceAll("\\", "/");
           const source = readFileSync(path, "utf8");
-          for (const name of owned) {
-            if (
-              source.includes(`from "${name}"`) ||
-              source.includes(`from "${name}/`)
-            ) {
-              offenders.push(`${path.slice(ROOT.length + 1)} imports ${name}`);
+          for (const module of Object.values(manifest.modules)) {
+            const own = (module.files ?? []).some(
+              (owned) => file === owned || file.startsWith(`${owned}/`),
+            );
+            if (own) continue;
+            for (const name of module.dependencies ?? []) {
+              if (
+                source.includes(`from "${name}"`) ||
+                source.includes(`from "${name}/`)
+              ) {
+                offenders.push(`${file} imports ${name}`);
+              }
             }
           }
         }

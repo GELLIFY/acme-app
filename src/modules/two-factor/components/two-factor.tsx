@@ -57,10 +57,7 @@ import { authClient } from "@/libs/better-auth/auth-client";
 import { browserLogger as logger } from "@/libs/logger/browser-logger";
 import { useTRPC } from "@/libs/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
-import {
-  twoFactorSchema,
-  verifyTotpSchema,
-} from "@/shared/validators/user.schema";
+import { twoFactorSchema, verifyTotpSchema } from "../validators";
 
 type TwoFactorData = {
   totpURI: string;

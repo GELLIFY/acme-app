@@ -25,6 +25,17 @@
         "@better-auth/api-key"
       ]
     },
+    "auth.twoFactor": {
+      "dir": "two-factor",
+      "files": [
+        "src/app/[locale]/(public)/(auth)/2fa",
+        "src/components/ui/input-otp.tsx"
+      ],
+      "dependencies": [
+        "input-otp",
+        "react-qr-code"
+      ]
+    },
     "auth.passkey": {
       "dir": "passkey",
       "dependencies": [
