@@ -58,6 +58,31 @@ Two rules keep that boundary intact, and both are easy to break by accident:
   take a `GIT_BRANCH` they do not use, and the Vercel actions a `PR_NUMBER` they do not use, so that
   the call site is identical whichever target is active. Declare the input and say it is unused.
 
+## Optional modules
+
+An optional piece of the app (a Better Auth plugin, the example domain, the REST API) is a module:
+a folder `src/modules/<module>/` that contributes to the app through one file per extension point,
+each exporting `{ id, ... }` `as const`:
+
+| file | contributes | registry | read by |
+|---|---|---|---|
+| `auth.ts` | `plugins`: Better Auth server plugins | `src/modules/auth.ts` | `src/libs/better-auth/auth.ts` |
+| `auth-client.ts` | `plugins`: Better Auth client plugins | `src/modules/auth-client.ts` | `src/libs/better-auth/auth-client.ts` |
+| `trpc.ts` | `routers`: tRPC routers, by key | `src/modules/trpc.ts` | `src/server/api/trpc/routers/_app.ts` |
+| `rest.ts` | `routes`: `{ path, router }`, behind the protected middleware | `src/modules/rest.ts` | `src/server/api/rest/routers/_app.ts` |
+| `schema.ts` | `tables`: Drizzle tables and relations | `src/modules/schema.ts` | `src/server/db/schema/index.ts` |
+
+A registry only imports those files and lists them in one `as const` array; the shared files read
+it through the helpers of `src/modules/registry.ts` and never name a module. That keeps the types:
+a router of a module is in `AppRouter`, a plugin's endpoints are on `auth.api` and `authClient`.
+
+- **One registry per extension point**, not one per module: Better Auth is part of the tRPC
+  context, so one file importing both a plugin and a router is a type cycle, which TypeScript
+  breaks with `any`.
+- **Nothing outside `src/modules/` imports `@/modules/<module>/...`** (Biome's
+  `noRestrictedImports`); a registry, `@/modules/<point>`, is fine. That is what makes removing a
+  module safe: delete its folder and its line in each registry.
+
 <!-- #if isTemplate -->
 ## This repository is also a template
 
@@ -114,6 +139,14 @@ Two consequences for anyone changing this repository:
   `processJob` are TODOs for the project's own queue. `configuredTaskRunner()` in
   `src/server/services/jobs/ecs-task-runner.ts` is what the code that enqueues a job calls to start
   the task under `JOB_DRIVER=ecs`.
+
+- **What a declined module or flag removes is in `gellify.template.json`**, the generator's
+  manifest (it never reaches a project): `registries` (the registry files of the table above),
+  `modules` (for each module id: its folder under `src/modules/`, its other files, its
+  `package.json` dependencies and scripts), `sharedDependencies` (a dependency kept while any of
+  its modules is on) and `flags` (the same, for `deployVercel`, `deployAws`, `useWorker`). A file
+  of a module or a flag goes in there, in the same pull request that adds it; a new flag also
+  needs the generator to know it, or its `#if` blocks are dropped from every project.
 
 This section never reaches a generated project: it sits behind an `#if isTemplate` marker, and no
 generated project sets that flag.

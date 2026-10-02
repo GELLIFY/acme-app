@@ -7,6 +7,8 @@ import { lastLoginMethod, openAPI, organization } from "better-auth/plugins";
 import type { Statements } from "better-auth/plugins/access";
 import { admin } from "better-auth/plugins/admin";
 import { twoFactor } from "better-auth/plugins/two-factor";
+import { authModules } from "@/modules/auth";
+import { pluginsOf } from "@/modules/registry";
 import { db } from "@/server/db";
 import { schema } from "@/server/db/schema";
 import {
@@ -107,6 +109,8 @@ export const auth = betterAuth({
       issuer: "Acme App",
     }),
     openAPI({ disableDefaultReference: true }),
+    ...pluginsOf(authModules),
+    // Last: it sets the cookies of what the plugins before it answered.
     nextCookies(),
   ],
 });

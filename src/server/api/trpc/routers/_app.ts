@@ -1,5 +1,7 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { serverLogger } from "@/libs/logger/pino-logger";
+import { routersOf } from "@/modules/registry";
+import { trpcModules } from "@/modules/trpc";
 import { checkHealth } from "@/server/services/health-service";
 import {
   createCallerFactory,
@@ -13,12 +15,14 @@ import { userRouter } from "./user";
 /**
  * This is the primary router for your server.
  *
- * All routers added in /api/routers should be manually added here.
+ * The routers of the app are added here by hand; those of an optional module
+ * come from its `trpc.ts`, through `src/modules/trpc.ts`.
  */
 export const appRouter = createTRPCRouter({
   user: userRouter,
   organization: organizationRouter,
   todo: todoRouter,
+  ...routersOf(trpcModules),
   health: publicProcedure.query(async ({ ctx: { db } }) => {
     try {
       await checkHealth(db);

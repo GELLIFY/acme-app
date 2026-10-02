@@ -8,6 +8,8 @@ import {
   twoFactorClient,
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
+import { authClientModules } from "@/modules/auth-client";
+import { pluginsOf } from "@/modules/registry";
 import type { auth } from "./auth";
 import { ac, adminRole, userRole } from "./permissions";
 
@@ -31,6 +33,7 @@ export const authClient = createAuthClient({
         window.location.href = "/2fa";
       },
     }),
+    ...pluginsOf(authClientModules),
     inferAdditionalFields<typeof auth>(),
   ],
   fetchOptions: {

@@ -1,0 +1,32 @@
+{
+  "$comment": "What create-gellify-app removes from this repository when a project declines a module or a flag. Read by the generator, never copied into a project. See AGENTS.md, section 'This repository is also a template'.",
+  "registries": [
+    "src/modules/auth.ts",
+    "src/modules/auth-client.ts",
+    "src/modules/trpc.ts",
+    "src/modules/rest.ts",
+    "src/modules/schema.ts"
+  ],
+  "modules": {},
+  "sharedDependencies": {},
+  "flags": {
+    "deployVercel": {
+      "files": [".github/workflows/cd/vercel"]
+    },
+    "deployAws": {
+      "files": [".github/workflows/cd/aws"]
+    },
+    "useWorker": {
+      "files": [
+        "Dockerfile.worker",
+        "scripts/worker.ts",
+        "scripts/direct-database-url.ts",
+        "scripts/direct-database-url.test.ts",
+        "src/server/services/jobs",
+        ".github/workflows/cd/aws/*-worker"
+      ],
+      "scripts": ["worker"],
+      "dependencies": ["@aws-sdk/client-ecs"]
+    }
+  }
+}

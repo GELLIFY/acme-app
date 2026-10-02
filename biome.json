@@ -43,7 +43,13 @@
                 "importNames": ["z"],
                 "message": "Use `import * as z from \"zod\"` instead of `import { z }`."
               }
-            }
+            },
+            "patterns": [
+              {
+                "group": ["@/modules/*/**", "**/modules/*/**"],
+                "message": "An optional module is reached through its registry (`@/modules/<point>`), never directly: removing the module must not break this file. See src/modules/registry.ts."
+              }
+            ]
           },
           "level": "error"
         }
@@ -64,6 +70,28 @@
       }
     }
   },
+  "overrides": [
+    {
+      "includes": ["src/modules/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "options": {
+                "paths": {
+                  "zod": {
+                    "importNames": ["z"],
+                    "message": "Use `import * as z from \"zod\"` instead of `import { z }`."
+                  }
+                }
+              },
+              "level": "error"
+            }
+          }
+        }
+      }
+    }
+  ],
   "css": {
     "parser": {
       "tailwindDirectives": true
