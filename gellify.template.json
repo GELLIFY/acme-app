@@ -5,16 +5,36 @@
     "src/modules/auth-client.ts",
     "src/modules/trpc.ts",
     "src/modules/rest.ts",
-    "src/modules/schema.ts"
+    "src/modules/schema.ts",
+    "src/modules/sign-in.ts",
+    "src/modules/account-security.ts",
+    "src/modules/locales.ts"
   ],
-  "modules": {},
+  "regenerate": [
+    "src/server/db/migrations"
+  ],
+  "templateOnly": [
+    "src/modules/manifest.test.ts"
+  ],
+  "modules": {
+    "auth.passkey": {
+      "dir": "passkey",
+      "dependencies": [
+        "@better-auth/passkey"
+      ]
+    }
+  },
   "sharedDependencies": {},
   "flags": {
     "deployVercel": {
-      "files": [".github/workflows/cd/vercel"]
+      "files": [
+        ".github/workflows/cd/vercel"
+      ]
     },
     "deployAws": {
-      "files": [".github/workflows/cd/aws"]
+      "files": [
+        ".github/workflows/cd/aws"
+      ]
     },
     "useWorker": {
       "files": [
@@ -25,8 +45,12 @@
         "src/server/services/jobs",
         ".github/workflows/cd/aws/*-worker"
       ],
-      "scripts": ["worker"],
-      "dependencies": ["@aws-sdk/client-ecs"]
+      "scripts": [
+        "worker"
+      ],
+      "dependencies": [
+        "@aws-sdk/client-ecs"
+      ]
     }
   }
 }

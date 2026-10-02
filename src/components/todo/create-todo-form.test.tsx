@@ -10,8 +10,9 @@ describe("CreateTodoForm component", () => {
       render(<CreateTodoForm />);
     });
 
-    // 2. Act
-    await userEvent.click(screen.getByRole("button"));
+    // 2. Act — `findByRole`: the provider loads the locale with a dynamic
+    // import, so the form appears once it has, not right after the render.
+    await userEvent.click(await screen.findByRole("button"));
 
     // 3. Assert
     expect(screen.getByRole("textbox")).toHaveValue("");

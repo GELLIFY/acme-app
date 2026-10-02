@@ -5,7 +5,9 @@
  * `src/modules/<module>/`, and contributes to the app through one small file
  * per extension point: `auth.ts` (Better Auth server plugins),
  * `auth-client.ts` (client plugins), `trpc.ts` (tRPC routers), `rest.ts`
- * (REST routes), `schema.ts` (Drizzle tables). Each extension point has its
+ * (REST routes), `schema.ts` (Drizzle tables), `sign-in.tsx` and
+ * `account-security.tsx` (a component each, in a slot of the page) and
+ * `locales.ts` (messages). Each extension point has its
  * own registry, `src/modules/<point>.ts`, which only imports those files and
  * lists them in one `as const` array. The shared files of the app iterate the
  * registry and never name a module.
@@ -17,6 +19,8 @@
  *
  * Removing a module is deleting its folder and its line in each registry.
  */
+
+import type { ReactNode } from "react";
 
 type UnionToIntersection<U> = (
   U extends unknown
@@ -78,4 +82,86 @@ export function tablesOf<const M extends readonly { tables: object }[]>(
     {},
     ...modules.map((module) => module.tables),
   ) as RecordsOf<M, "tables">;
+}
+
+/**
+ * A component a module puts in a slot of a page. It may be async, a server
+ * component that loads what it shows: the page knows nothing of the module.
+ */
+export type SlotContribution = {
+  id: string;
+  Component: () => ReactNode | Promise<ReactNode>;
+};
+
+/**
+ * A registry of slot contributions, widened to a plain array: an empty
+ * registry is the empty tuple, whose elements are `never` and cannot be
+ * destructured.
+ */
+export function slotsOf(
+  modules: readonly SlotContribution[],
+): readonly SlotContribution[] {
+  return modules;
+}
+
+type Messages = { [key: string]: string | Messages };
+
+type DeepMerge<A, B> = A extends Messages
+  ? B extends Messages
+    ? {
+        [K in keyof A | keyof B]: K extends keyof A
+          ? K extends keyof B
+            ? DeepMerge<A[K], B[K]>
+            : A[K]
+          : K extends keyof B
+            ? B[K]
+            : never;
+      }
+    : B
+  : B;
+
+type MessagesOfOne<M, L extends string> = M extends {
+  messages: Record<L, infer R>;
+}
+  ? R
+  : never;
+
+/** The messages of the base, with those of every module of the registry. */
+export type MessagesWith<
+  Base,
+  M extends readonly unknown[],
+  L extends string,
+> = [MessagesOfOne<M[number], L>] extends [never]
+  ? Base
+  : DeepMerge<Base, UnionToIntersection<MessagesOfOne<M[number], L>>>;
+
+function isMessages(value: unknown): value is Messages {
+  return typeof value === "object" && value !== null;
+}
+
+function mergeInto(target: Messages, source: Messages): Messages {
+  for (const [key, value] of Object.entries(source)) {
+    const current = target[key];
+    target[key] =
+      isMessages(current) && isMessages(value)
+        ? mergeInto({ ...current }, value)
+        : value;
+  }
+  return target;
+}
+
+/**
+ * The app's messages for one language, with those of the modules merged in
+ * at the paths they declare. The literal types of the messages are kept:
+ * `next-international` reads the parameters of a message from its text.
+ */
+export function messagesWith<
+  const Base extends Messages,
+  const M extends readonly { messages: Record<L, Messages> }[],
+  const L extends string,
+>(base: Base, modules: M, language: L): MessagesWith<Base, M, L> {
+  return modules.reduce(
+    (messages, module) => mergeInto(messages, module.messages[language]),
+    { ...base } as Messages,
+  ) as MessagesWith<Base, M, L>;
 }

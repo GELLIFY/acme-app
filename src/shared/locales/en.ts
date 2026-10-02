@@ -1,4 +1,7 @@
-export default {
+import { localeModules } from "@/modules/locales";
+import { messagesWith } from "@/modules/registry";
+
+const base = {
   // home page
   "home.welcome": "Hello {name}!",
   "home.doc": "Read Documentation",
@@ -96,30 +99,6 @@ export default {
           code_fld: "Backup Code",
           submit_btn: "Verify",
           error: "Failed to verify code",
-        },
-      },
-
-      passkey: {
-        title: "Passkeys",
-        description:
-          "Manage your passkeys for secure, passwordless authentication.",
-        info: "Learn more about passkeys",
-        new_btn: "New Passkey",
-        new_title: "Add New Passkey",
-        new_description:
-          "Create a new passkey for secure, passwordless authentication.",
-        new_submit: "Add Passkey",
-        created: "Created {value}",
-        delete_title: "Are you absolutely sure?",
-        delete_decription:
-          "This action cannot be undone. This will permanently delete your passkey.",
-        delete_cancel: "Cancel",
-        delete_confirm: "Delete Passkey",
-
-        empty: {
-          title: "No Passkeys Yet",
-          description:
-            "You haven'&apos;'t created any passkeys yet. Get started by creating your first passkey.",
         },
       },
     },
@@ -364,3 +343,5 @@ export default {
   "todo.items#one": "One todo",
   "todo.items#other": "{count} todos",
 } as const;
+
+export default messagesWith(base, localeModules, "en");

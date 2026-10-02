@@ -3,9 +3,9 @@
 import { FingerprintIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { authClient } from "@/libs/better-auth/auth-client";
-import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
 
 export function PasskeyButton() {
   const router = useRouter();

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { PasskeyButton } from "@/components/auth/passkey-button";
 import { SignInForm } from "@/components/auth/sign-in-form";
 import { TermsPrivacyLinks } from "@/components/auth/terms privacy-links";
 import {
@@ -13,6 +12,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getCachedSession } from "@/libs/better-auth/get-cached-session";
+import { slotsOf } from "@/modules/registry";
+import { signInModules } from "@/modules/sign-in";
 import { getScopedI18n } from "@/shared/locales/server";
 
 export const metadata: Metadata = {
@@ -38,7 +39,9 @@ export default async function SignIn() {
         </CardHeader>
         <CardContent className="space-y-4">
           <SignInForm />
-          <PasskeyButton />
+          {slotsOf(signInModules).map(({ id, Component }) => (
+            <Component key={id} />
+          ))}
         </CardContent>
         <CardFooter className="flex justify-center">
           <span className="text-sm text-muted-foreground">

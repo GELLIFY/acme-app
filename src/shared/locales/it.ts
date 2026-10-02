@@ -1,4 +1,7 @@
-export default {
+import { localeModules } from "@/modules/locales";
+import { messagesWith } from "@/modules/registry";
+
+const base = {
   // home page
   "home.welcome": "Benvenuto {name}!",
   "home.doc": "Leggi la documentazione",
@@ -100,30 +103,6 @@ export default {
           code_fld: "Codici di Backup",
           submit_btn: "Verifica",
           error: "Verifica del codice non riuscita",
-        },
-      },
-
-      passkey: {
-        title: "Passkeys",
-        description:
-          "Gestisci le tue passkey per un'autenticazione sicura e senza password.",
-        info: "Scopri di più sulle passkey",
-        new_btn: "Nuova Passkey",
-        new_title: "Aggiungi Nuova Passkey",
-        new_description:
-          "Crea una nuova passkey per un'autenticazione sicura e senza password.",
-        new_submit: "Aggiungi Passkey",
-        created: "Creata il {value}",
-        delete_title: "Sei assolutamente sicuro?",
-        delete_decription:
-          "Questa azione non può essere annullata. Questo eliminerà definitivamente la tua passkey.",
-        delete_cancel: "Annulla",
-        delete_confirm: "Elimina Passkey",
-
-        empty: {
-          title: "Nessuna Passkey",
-          description:
-            "Non hai ancora creato nessuna passkey. Inizia creando la tua prima passkey.",
         },
       },
     },
@@ -372,3 +351,5 @@ export default {
   "todo.items#one": "Un todo",
   "todo.items#other": "{count} todo",
 } as const;
+
+export default messagesWith(base, localeModules, "it");

@@ -71,6 +71,16 @@ each exporting `{ id, ... }` `as const`:
 | `trpc.ts` | `routers`: tRPC routers, by key | `src/modules/trpc.ts` | `src/server/api/trpc/routers/_app.ts` |
 | `rest.ts` | `routes`: `{ path, router }`, behind the protected middleware | `src/modules/rest.ts` | `src/server/api/rest/routers/_app.ts` |
 | `schema.ts` | `tables`: Drizzle tables and relations | `src/modules/schema.ts` | `src/server/db/schema/index.ts` |
+| `sign-in.tsx` | `Component`: a component of the sign-in form | `src/modules/sign-in.ts` | `src/app/[locale]/(public)/(auth)/sign-in/` |
+| `account-security.tsx` | `Component`: a section of the account's Security tab, may be async | `src/modules/account-security.ts` | `src/app/[locale]/(app)/account/page.tsx` |
+| `locales.ts` | `messages`: `{ en, it }`, merged at the path they declare | `src/modules/locales.ts` | `src/shared/locales/{en,it}.ts` |
+
+A module's tables live in its own `tables.ts`, apart from the `schema.ts` that exports them to the
+registry: Drizzle's config reads `src/modules/*/tables.ts` (`drizzle.config.ts`), because drizzle-kit
+reads the tables of the files it is pointed at, not the `schema` object of the index. A module that
+needs a relation on a core table (`user.passkeys`) declares a second `relations(user, ...)`: Drizzle
+merges them by key. A slot component loads its own data (`account-security.tsx` is a server
+component), so the page that hosts the slot knows nothing of the module.
 
 A registry only imports those files and lists them in one `as const` array; the shared files read
 it through the helpers of `src/modules/registry.ts` and never name a module. That keeps the types:
@@ -142,8 +152,10 @@ Two consequences for anyone changing this repository:
 
 - **What a declined module or flag removes is in `gellify.template.json`**, the generator's
   manifest (it never reaches a project): `registries` (the registry files of the table above),
-  `modules` (for each module id: its folder under `src/modules/`, its other files, its
-  `package.json` dependencies and scripts), `sharedDependencies` (a dependency kept while any of
+  `regenerate` (paths removed from every project and rebuilt by a command: the migrations, which
+  `pnpm db:generate` rewrites for the modules that are left), `templateOnly` (the template's
+  files about itself, such as `src/modules/manifest.test.ts`, which checks this manifest), `modules` (for each module id: its
+  folder under `src/modules/`, its other files, its `package.json` dependencies and scripts), `sharedDependencies` (a dependency kept while any of
   its modules is on) and `flags` (the same, for `deployVercel`, `deployAws`, `useWorker`). A file
   of a module or a flag goes in there, in the same pull request that adds it; a new flag also
   needs the generator to know it, or its `#if` blocks are dropped from every project.

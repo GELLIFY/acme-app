@@ -1,6 +1,5 @@
 import { apiKey } from "@better-auth/api-key";
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
-import { passkey } from "@better-auth/passkey";
 import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
 import { lastLoginMethod, openAPI, organization } from "better-auth/plugins";
@@ -104,7 +103,6 @@ export const auth = betterAuth({
       },
     }),
     lastLoginMethod(),
-    passkey(),
     twoFactor({
       issuer: "Acme App",
     }),
