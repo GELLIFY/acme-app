@@ -70,17 +70,21 @@ each exporting `{ id, ... }` `as const`:
 | `auth-client.ts` | `plugins`: Better Auth client plugins | `src/modules/auth-client.ts` | `src/libs/better-auth/auth-client.ts` |
 | `trpc.ts` | `routers`: tRPC routers, by key | `src/modules/trpc.ts` | `src/server/api/trpc/routers/_app.ts` |
 | `rest.ts` | `routes`: `{ path, router }`, behind the protected middleware | `src/modules/rest.ts` | `src/server/api/rest/routers/_app.ts` |
+| `rest-auth.ts` | `securitySchemes` and `authenticate(headers)`: a credential of the REST API, next to the session cookie | `src/modules/rest-auth.ts` | `src/server/api/rest/middleware/auth.ts`, `init.ts` (OpenAPI) |
 | `schema.ts` | `tables`: Drizzle tables and relations | `src/modules/schema.ts` | `src/server/db/schema/index.ts` |
 | `sign-in.tsx` | `Component`: a component of the sign-in form | `src/modules/sign-in.ts` | `src/app/[locale]/(public)/(auth)/sign-in/` |
 | `account-security.tsx` | `Component`: a section of the account's Security tab, may be async | `src/modules/account-security.ts` | `src/app/[locale]/(app)/account/page.tsx` |
+| `account-tab.tsx` | `value`, `Trigger`, `Component`: a tab of the account page, before Danger | `src/modules/account-tab.ts` | `src/app/[locale]/(app)/account/page.tsx` |
 | `locales.ts` | `messages`: `{ en, it }`, merged at the path they declare | `src/modules/locales.ts` | `src/shared/locales/{en,it}.ts` |
 
 A module's tables live in its own `tables.ts`, apart from the `schema.ts` that exports them to the
 registry: Drizzle's config reads `src/modules/*/tables.ts` (`drizzle.config.ts`), because drizzle-kit
 reads the tables of the files it is pointed at, not the `schema` object of the index. A module that
 needs a relation on a core table (`user.passkeys`) declares a second `relations(user, ...)`: Drizzle
-merges them by key. A slot component loads its own data (`account-security.tsx` is a server
-component), so the page that hosts the slot knows nothing of the module.
+merges them by key. A slot component loads its own data (`account-security.tsx` and
+`account-tab.tsx` are server components), so the page that hosts the slot knows nothing of the
+module. A REST credential takes the request's headers, not Hono's context, and answers `null` when
+the request does not carry it.
 
 A registry only imports those files and lists them in one `as const` array; the shared files read
 it through the helpers of `src/modules/registry.ts` and never name a module. That keeps the types:

@@ -1,9 +1,7 @@
-import { apiKey } from "@better-auth/api-key";
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
 import { lastLoginMethod, openAPI, organization } from "better-auth/plugins";
-import type { Statements } from "better-auth/plugins/access";
 import { admin } from "better-auth/plugins/admin";
 import { twoFactor } from "better-auth/plugins/two-factor";
 import { authModules } from "@/modules/auth";
@@ -86,20 +84,6 @@ export const auth = betterAuth({
           teamName: data.organization.name,
           inviteLink,
         });
-      },
-    }),
-    apiKey({
-      permissions: {
-        defaultPermissions: async (_referenceId) => {
-          // Fetch user role or other data to determine permissions
-          const permissions: Statements = {
-            todo: ["create"],
-          };
-
-          return {
-            ...permissions,
-          };
-        },
       },
     }),
     lastLoginMethod(),

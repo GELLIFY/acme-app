@@ -1,10 +1,23 @@
 import { describe, expect, test } from "bun:test";
-import { messagesWith, pluginsOf, routersOf, tablesOf } from "./registry";
+import {
+  credentialsOf,
+  messagesWith,
+  pluginsOf,
+  routersOf,
+  slotsOf,
+  tablesOf,
+  tabsOf,
+} from "./registry";
+
+type IsNever<T> = [T] extends [never] ? true : false;
 
 describe("messagesWith", () => {
   const base = {
     title: "Hello",
-    account: { security: { password: { title: "Password" } }, danger: "Danger" },
+    account: {
+      security: { password: { title: "Password" } },
+      danger: "Danger",
+    },
   } as const;
   const module = {
     id: "x",
@@ -51,5 +64,20 @@ describe("the registries' helpers", () => {
     ).toEqual({ one: 1, two: 2 });
     expect(tablesOf([{ id: "a", tables: { t: "x" } }])).toEqual({ t: "x" });
     expect(routersOf([])).toEqual({});
+  });
+
+  // A project without the modules of a slot has an empty registry, `[] as
+  // const`: its elements must still be components, or the page does not
+  // compile there (checked by tsc, not at run time).
+  test("an empty registry of slots, tabs or credentials keeps its element type", () => {
+    const empty = [] as const;
+    const slots = slotsOf(empty);
+    const tabs = tabsOf(empty);
+    const credentials = credentialsOf(empty);
+    const slot: IsNever<(typeof slots)[number]> = false;
+    const tab: IsNever<(typeof tabs)[number]> = false;
+    const credential: IsNever<(typeof credentials)[number]> = false;
+    expect([slot, tab, credential]).toEqual([false, false, false]);
+    expect([slots, tabs, credentials]).toEqual([[], [], []]);
   });
 });

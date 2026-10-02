@@ -4,6 +4,8 @@ import { cors } from "hono/cors";
 import { type RequestIdVariables, requestId } from "hono/request-id";
 import { secureHeaders } from "hono/secure-headers";
 import type { Permissions } from "@/libs/better-auth/permissions";
+import { credentialsOf, type RestCredential } from "@/modules/registry";
+import { restAuthModules } from "@/modules/rest-auth";
 import type { db } from "@/server/db";
 import { getBaseUrl } from "@/shared/helpers/get-url";
 import { routers } from "./routers/_app";
@@ -16,6 +18,12 @@ export type Context = {
     wideEvent: Record<string, unknown>;
   };
 };
+
+/** The OpenAPI security schemes of the optional modules' credentials, by name. */
+const moduleSecuritySchemes = Object.assign(
+  {},
+  ...credentialsOf(restAuthModules).map((module) => module.securitySchemes),
+) as Record<string, RestCredential["securitySchemes"][string]>;
 
 const app = new OpenAPIHono<Context>()
   .doc31("/openapi", {
@@ -40,7 +48,10 @@ const app = new OpenAPIHono<Context>()
         description: "Production API",
       },
     ],
-    security: [{ cookieAuth: [] }, { apiKeyAuth: [] }],
+    security: [
+      { cookieAuth: [] },
+      ...Object.keys(moduleSecuritySchemes).map((name) => ({ [name]: [] })),
+    ],
   })
   .use("*", requestId())
   .use(secureHeaders())
@@ -76,13 +87,9 @@ app.openAPIRegistry.registerComponent("securitySchemes", "cookieAuth", {
     "Authentication via a session token stored in the 'better-auth.session_token' cookie.",
 });
 
-// @ts-expect-error override of types between OpenAPIHono and Hono
-app.openAPIRegistry.registerComponent("securitySchemes", "apiKeyAuth", {
-  type: "apiKey",
-  in: "header",
-  name: "x-api-key",
-  description:
-    "Authentication using the x-api-key header. Example: 'x-api-key: <your-api-key>'",
-});
+for (const [name, scheme] of Object.entries(moduleSecuritySchemes)) {
+  // @ts-expect-error override of types between OpenAPIHono and Hono
+  app.openAPIRegistry.registerComponent("securitySchemes", name, scheme);
+}
 
 export { app as routers };

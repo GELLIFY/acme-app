@@ -5,9 +5,10 @@
  * `src/modules/<module>/`, and contributes to the app through one small file
  * per extension point: `auth.ts` (Better Auth server plugins),
  * `auth-client.ts` (client plugins), `trpc.ts` (tRPC routers), `rest.ts`
- * (REST routes), `schema.ts` (Drizzle tables), `sign-in.tsx` and
- * `account-security.tsx` (a component each, in a slot of the page) and
- * `locales.ts` (messages). Each extension point has its
+ * (REST routes), `rest-auth.ts` (a credential of the REST API), `schema.ts`
+ * (Drizzle tables), `sign-in.tsx` and `account-security.tsx` (a component
+ * each, in a slot of the page), `account-tab.tsx` (a tab of the account page)
+ * and `locales.ts` (messages). Each extension point has its
  * own registry, `src/modules/<point>.ts`, which only imports those files and
  * lists them in one `as const` array. The shared files of the app iterate the
  * registry and never name a module.
@@ -21,6 +22,7 @@
  */
 
 import type { ReactNode } from "react";
+import type { Permissions } from "@/libs/better-auth/permissions";
 
 type UnionToIntersection<U> = (
   U extends unknown
@@ -94,13 +96,61 @@ export type SlotContribution = {
 };
 
 /**
+ * A tab a module adds to the account page, after the app's own: `value` is
+ * the tab's key, `Trigger` what its button shows, `Component` its content.
+ */
+export type TabContribution = SlotContribution & {
+  value: string;
+  Trigger: () => ReactNode | Promise<ReactNode>;
+};
+
+/**
  * A registry of slot contributions, widened to a plain array: an empty
  * registry is the empty tuple, whose elements are `never` and cannot be
- * destructured.
+ * destructured. Not generic on purpose: inferred from the empty tuple, the
+ * element type would be `never` again.
  */
 export function slotsOf(
   modules: readonly SlotContribution[],
 ): readonly SlotContribution[] {
+  return modules;
+}
+
+/** A registry of `account-tab.tsx` files, widened like `slotsOf`. */
+export function tabsOf(
+  modules: readonly TabContribution[],
+): readonly TabContribution[] {
+  return modules;
+}
+
+/** Who a REST request is made for, once a credential is verified. */
+export type RestIdentity = { userId: string; permissions: Permissions };
+
+/**
+ * A credential a module adds to the REST API, next to the session cookie.
+ * `authenticate` answers `null` when the request does not carry it, the
+ * reason when it carries an invalid one, else the identity. It takes the
+ * headers, not Hono's context, so a module knows nothing of the server.
+ */
+export type RestCredential = {
+  id: string;
+  /** The OpenAPI security schemes the credential is sent with, by name. */
+  securitySchemes: Record<
+    string,
+    {
+      type: "apiKey";
+      in: "header" | "query" | "cookie";
+      name: string;
+      description?: string;
+    }
+  >;
+  authenticate: (headers: Headers) => Promise<RestIdentity | string | null>;
+};
+
+/** A registry of `rest-auth.ts` files, widened like `slotsOf`. */
+export function credentialsOf(
+  modules: readonly RestCredential[],
+): readonly RestCredential[] {
   return modules;
 }
 

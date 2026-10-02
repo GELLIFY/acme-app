@@ -1,4 +1,3 @@
-import { apiKeyClient } from "@better-auth/api-key/client";
 import {
   adminClient,
   inferAdditionalFields,
@@ -23,7 +22,6 @@ export const authClient = createAuthClient({
         user: userRole,
       },
     }),
-    apiKeyClient(),
     organizationClient(),
     lastLoginMethodClient(),
     twoFactorClient({

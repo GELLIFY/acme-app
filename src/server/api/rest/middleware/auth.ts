@@ -3,13 +3,16 @@ import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import { auth } from "@/libs/better-auth/auth";
 import { expandRoles, type Role } from "@/libs/better-auth/permissions";
+import { credentialsOf } from "@/modules/registry";
+import { restAuthModules } from "@/modules/rest-auth";
 import type { Context } from "../init";
 
 /**
- * Authenticates the request using either a session cookie or a Bearer token.
+ * Authenticates the request using either a session cookie or a credential of
+ * the optional modules (`src/modules/rest-auth.ts`, e.g. an API key).
  *
  * - If a valid session cookie is present, retrieves and validates the session.
- * - If not, attempts to authenticate using a Bearer token in the Authorization header.
+ * - If not, tries the modules' credentials in order; the first one the request carries decides.
  * - On successful authentication, attaches the session to the request context as "session".
  * - Throws HTTP 401 Unauthorized if authentication fails or required tokens are missing.
  *
@@ -36,29 +39,20 @@ export const withAuth = createMiddleware<Context>(async (c, next) => {
     return await next();
   }
 
-  // 2. Handle authentication with api-key
-  const apiKey = c.req.header("x-api-key");
-
-  if (apiKey) {
-    const data = await auth.api.verifyApiKey({
-      body: {
-        key: apiKey,
-      },
-    });
-
-    if (!data.valid || data.error || !data.key) {
-      throw new HTTPException(401, {
-        message:
-          (data.error?.message as string) ?? "Invalid or expired api-key",
-      });
+  // 2. Handle authentication with the credentials of the optional modules
+  for (const credential of credentialsOf(restAuthModules)) {
+    const result = await credential.authenticate(c.req.raw.headers);
+    if (result === null) continue;
+    if (typeof result === "string") {
+      throw new HTTPException(401, { message: result });
     }
 
     // Set session on context
-    c.set("userId", data.key.referenceId);
-    c.set("permissions", data.key.permissions ?? {});
+    c.set("userId", result.userId);
+    c.set("permissions", result.permissions);
     return await next();
   }
 
-  // 4. No authentication provided
+  // 3. No authentication provided
   throw new HTTPException(401, { message: "Invalid authorization" });
 });

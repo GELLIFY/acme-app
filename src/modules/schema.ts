@@ -1,3 +1,4 @@
+import { apiKey } from "./api-key/schema";
 import { passkey } from "./passkey/schema";
 
 /**
@@ -7,4 +8,4 @@ import { passkey } from "./passkey/schema";
  * A registry only imports and lists: the generator removes a declined module
  * by deleting its import and its entry here (see `registry.ts`).
  */
-export const schemaModules = [passkey] as const;
+export const schemaModules = [apiKey, passkey] as const;

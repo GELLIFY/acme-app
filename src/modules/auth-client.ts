@@ -1,3 +1,4 @@
+import { apiKey } from "./api-key/auth-client";
 import { passkey } from "./passkey/auth-client";
 
 /**
@@ -7,4 +8,4 @@ import { passkey } from "./passkey/auth-client";
  * A registry only imports and lists: the generator removes a declined module
  * by deleting its import and its entry here (see `registry.ts`).
  */
-export const authClientModules = [passkey] as const;
+export const authClientModules = [apiKey, passkey] as const;

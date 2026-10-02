@@ -8,6 +8,8 @@
     "src/modules/schema.ts",
     "src/modules/sign-in.ts",
     "src/modules/account-security.ts",
+    "src/modules/account-tab.ts",
+    "src/modules/rest-auth.ts",
     "src/modules/locales.ts"
   ],
   "regenerate": [
@@ -17,6 +19,12 @@
     "src/modules/manifest.test.ts"
   ],
   "modules": {
+    "auth.apiKey": {
+      "dir": "api-key",
+      "dependencies": [
+        "@better-auth/api-key"
+      ]
+    },
     "auth.passkey": {
       "dir": "passkey",
       "dependencies": [
@@ -24,7 +32,12 @@
       ]
     }
   },
-  "sharedDependencies": {},
+  "sharedDependencies": {
+    "date-fns": [
+      "auth.apiKey",
+      "auth.admin"
+    ]
+  },
   "flags": {
     "deployVercel": {
       "files": [
