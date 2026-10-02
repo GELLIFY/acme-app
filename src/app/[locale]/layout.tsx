@@ -3,11 +3,12 @@ import "@/globals.css";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { ImpersonationIndicator } from "@/components/auth/admin/impersonation-indicator";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TRPCReactProvider } from "@/libs/trpc/client";
+import { overlayModules } from "@/modules/overlay";
+import { slotsOf } from "@/modules/registry";
 import { I18nProviderClient } from "@/shared/locales/client";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -54,7 +55,9 @@ export default async function RootLayout({
                 <TooltipProvider>
                   {children}
                   <Toaster />
-                  <ImpersonationIndicator />
+                  {slotsOf(overlayModules).map(({ id, Component }) => (
+                    <Component key={id} />
+                  ))}
                 </TooltipProvider>
               </ThemeProvider>
             </NuqsAdapter>

@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  Building2Icon,
-  LogOutIcon,
-  ShieldUserIcon,
-  UserIcon,
-} from "lucide-react";
+import { LogOutIcon, UserIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -19,13 +14,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/libs/better-auth/auth-client";
-import { useScopedI18n } from "@/shared/locales/client";
+import { slotsOf } from "@/modules/registry";
+import { userMenuModules } from "@/modules/user-menu";
 
 type User = typeof authClient.$Infer.Session.user;
 
 export function UserMenu({ user }: { user: User }) {
   const router = useRouter();
-  const t = useScopedI18n("organization");
 
   return (
     <DropdownMenu>
@@ -68,25 +63,9 @@ export function UserMenu({ user }: { user: User }) {
         <DropdownMenuSeparator />
 
         <DropdownMenuGroup>
-          {user.role === "admin" && (
-            <DropdownMenuItem
-              render={
-                <Link href="/admin">
-                  <ShieldUserIcon />
-                  Admin
-                </Link>
-              }
-            ></DropdownMenuItem>
-          )}
-
-          <DropdownMenuItem
-            render={
-              <Link href="/organization">
-                <Building2Icon />
-                {t("menu")}
-              </Link>
-            }
-          ></DropdownMenuItem>
+          {slotsOf(userMenuModules).map(({ id, Component }) => (
+            <Component key={id} />
+          ))}
 
           <DropdownMenuItem
             render={

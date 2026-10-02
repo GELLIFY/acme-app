@@ -18,7 +18,8 @@ export function authPlugin() {
       // Add user context
       wideEvent.user = {
         id: session.user.id,
-        role: session.user.role,
+        // The admin module adds the role
+        role: "role" in session.user ? session.user.role : undefined,
         // TODO: add more user properties here
         // subscription: user.subscription,
         // account_age_days: daysSince(user.createdAt),

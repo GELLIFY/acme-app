@@ -8,7 +8,6 @@ import {
   createTRPCRouter,
   publicProcedure,
 } from "../init";
-import { organizationRouter } from "./organization";
 import { userRouter } from "./user";
 
 /**
@@ -19,7 +18,6 @@ import { userRouter } from "./user";
  */
 export const appRouter = createTRPCRouter({
   user: userRouter,
-  organization: organizationRouter,
   ...routersOf(trpcModules),
   health: publicProcedure.query(async ({ ctx: { db } }) => {
     try {

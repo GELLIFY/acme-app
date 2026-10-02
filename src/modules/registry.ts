@@ -8,11 +8,13 @@
  * (REST routes), `rest-auth.ts` (a credential of the REST API), `schema.ts`
  * (Drizzle tables), `sign-in.tsx` and `account-security.tsx` (a component
  * each, in a slot of the page), `account-tab.tsx` (a tab of the account page),
- * `nav.ts` (a link of the navigation bar), `permissions.ts` (access-control
- * resources), `seed.ts` (seed data) and `locales.ts` (messages). Each
- * extension point has its own registry, `src/modules/<point>.ts`, which only
- * imports those files and lists them in one `as const` array. The shared
- * files of the app iterate the registry and never name a module.
+ * `nav.ts` (a link of the navigation bar), `user-menu.tsx` (an item of the
+ * user menu), `overlay.tsx` (a component over every page), `permissions.ts`
+ * (access-control resources), `seed.ts` (seed data) and `locales.ts`
+ * (messages). Each extension point has its own registry,
+ * `src/modules/<point>.ts`, which only imports those files and lists them in
+ * one `as const` array. The shared files of the app iterate the registry and
+ * never name a module.
  *
  * One registry per extension point, not one for the whole module, because
  * the extension points depend on each other's types: Better Auth's server is

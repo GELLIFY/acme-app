@@ -1,5 +1,8 @@
 import { initTRPC, TRPCError } from "@trpc/server";
-import type { createTRPCContext } from "../init";
+import {
+  type createTRPCContext,
+  protectedProcedure,
+} from "@/server/api/trpc/init";
 
 export function adminPlugin() {
   // When creating a plugin for tRPC, you use the same API as creating any other tRPC-app
@@ -28,3 +31,12 @@ export function adminPlugin() {
     }),
   };
 }
+
+/**
+ * Admin procedure: an authenticated procedure for a user whose role is
+ * `admin`. A router of this module uses it; the app's own routers cannot,
+ * since the module may be removed.
+ */
+export const adminProcedure = protectedProcedure.concat(
+  adminPlugin().pluginProc,
+);

@@ -1,15 +1,15 @@
 import { auth } from "@/libs/better-auth/auth";
-import {
-  listInvitations,
-  listMembers,
-  listUserInvitations,
-} from "@/server/domains/auth/organization-service";
+import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc/init";
 import {
   listInvitationsSchema,
   listMembersSchema,
   listUserInvitationsSchema,
-} from "@/shared/validators/organization.schema";
-import { createTRPCRouter, protectedProcedure } from "../init";
+} from "../validators";
+import {
+  listInvitations,
+  listMembers,
+  listUserInvitations,
+} from "./organization-service";
 
 export const organizationRouter = createTRPCRouter({
   active: protectedProcedure.query(async ({ ctx: { session, headers } }) => {

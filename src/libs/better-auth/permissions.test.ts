@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { adminRole, ROLES, userRole } from "@/libs/better-auth/permissions";
-import { expandRoles } from "./permissions";
+import { expandRoles, permissionsOf } from "./permissions";
 
 describe("expandRoles", () => {
   it("returns admin permissions for ADMIN role", () => {
@@ -37,5 +37,17 @@ describe("expandRoles", () => {
     // Admin should have at least the same permissions as user, but potentially more
     // This test verifies they are different objects (not the same reference)
     expect(adminPermissions).not.toBe(userPermissions);
+  });
+});
+
+describe("permissionsOf", () => {
+  it("reads the role of the user", () => {
+    expect(permissionsOf({ role: ROLES.ADMIN })).toEqual(adminRole.statements);
+  });
+
+  // Without the admin module a user has no role, and is a user.
+  it("gives the user role to a user without one", () => {
+    expect(permissionsOf({})).toEqual(userRole.statements);
+    expect(permissionsOf({ role: null })).toEqual(userRole.statements);
   });
 });

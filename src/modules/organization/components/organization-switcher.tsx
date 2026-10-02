@@ -7,7 +7,6 @@ import {
   LogOutIcon,
   PlusIcon,
   SettingsIcon,
-  ShieldUserIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -32,13 +31,21 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useOrganizationQuery } from "@/hooks/use-organization";
 import { authClient } from "@/libs/better-auth/auth-client";
 import { useTRPC } from "@/libs/trpc/client";
 import { cn } from "@/libs/utils";
+import { slotsOf } from "@/modules/registry";
+import { userMenuModules } from "@/modules/user-menu";
 import type { RouterOutput } from "@/server/api/trpc/routers/_app";
 import { useScopedI18n } from "@/shared/locales/client";
+import { useOrganizationQuery } from "../hooks/use-organization";
 import { CreateOrganizationForm } from "./create-organization-form";
+
+// The items the other modules add to the user menu (the admin link): the
+// switcher replaces the user menu, and links to this module's page itself.
+const otherMenuItems = slotsOf(userMenuModules).filter(
+  ({ id }) => id !== "auth.organization",
+);
 
 export function OrganizationSwitcher({
   user,
@@ -294,17 +301,12 @@ export function OrganizationSwitcher({
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
 
-          {user.role === "admin" && (
+          {otherMenuItems.length > 0 && (
             <>
               <DropdownMenuGroup>
-                <DropdownMenuItem
-                  render={
-                    <Link href="/admin">
-                      <ShieldUserIcon />
-                      Admin
-                    </Link>
-                  }
-                />
+                {otherMenuItems.map(({ id, Component }) => (
+                  <Component key={id} />
+                ))}
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
             </>

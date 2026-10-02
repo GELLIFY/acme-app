@@ -27,9 +27,9 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/libs/better-auth/auth-client";
-import { ORGANIZATION_ROLES } from "@/libs/better-auth/permissions";
 import { useTRPC } from "@/libs/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
+import { ORGANIZATION_ROLES } from "../../roles";
 
 const inviteMemberSchema = z.object({
   email: z.email(),

@@ -3,13 +3,13 @@
 import { SearchIcon } from "lucide-react";
 import { debounce } from "nuqs";
 import { useTransition } from "react";
-import { useFilters } from "@/app/[locale]/(app)/admin/search-params";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Spinner } from "@/components/ui/spinner";
+import { useFilters } from "../search-params";
 
 export function Filters() {
   const [isPending, startTransition] = useTransition();

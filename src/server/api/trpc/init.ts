@@ -13,7 +13,6 @@ import superjson from "superjson";
 import * as z from "zod";
 import { auth } from "@/libs/better-auth/auth";
 import { db } from "../../db";
-import { adminPlugin } from "./middleware/admin-plugin";
 import { authPlugin } from "./middleware/auth-plugin";
 import { otelPlugin } from "./middleware/otel-plugin";
 import { wideEventPlugin } from "./middleware/wide-event-plugin";
@@ -105,14 +104,3 @@ export const protectedProcedure = t.procedure
   .concat(otelPlugin().pluginProc)
   .concat(wideEventPlugin().pluginProc)
   .concat(authPlugin().pluginProc);
-
-/**
- * Private (authenticated) procedure
- *
- * Use this when you need to guarantee that a user querying is authorized.
- */
-export const adminProcedure = t.procedure
-  .concat(otelPlugin().pluginProc)
-  .concat(wideEventPlugin().pluginProc)
-  .concat(authPlugin().pluginProc)
-  .concat(adminPlugin().pluginProc);

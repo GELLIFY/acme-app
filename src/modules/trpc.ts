@@ -1,3 +1,4 @@
+import { organization } from "./organization/trpc";
 import { todo } from "./todo/trpc";
 
 /**
@@ -7,4 +8,4 @@ import { todo } from "./todo/trpc";
  * A registry only imports and lists: the generator removes a declined module
  * by deleting its import and its entry here (see `registry.ts`).
  */
-export const trpcModules = [todo] as const;
+export const trpcModules = [organization, todo] as const;

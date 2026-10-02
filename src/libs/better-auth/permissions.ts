@@ -43,14 +43,6 @@ export const ROLES = {
 } as const;
 export type Role = (typeof ROLES)[keyof typeof ROLES];
 
-export const ORGANIZATION_ROLES = {
-  OWNER: "owner",
-  ADMIN: "admin",
-  MEMBER: "member",
-} as const;
-export type OrganizationRole =
-  (typeof ORGANIZATION_ROLES)[keyof typeof ORGANIZATION_ROLES];
-
 export type AccessControlStatements = typeof ac.statements;
 
 export type Permissions = {
@@ -59,8 +51,12 @@ export type Permissions = {
     : never;
 };
 
-export function expandRoles(role: Role): Permissions {
-  switch (role) {
+/**
+ * The permissions of a role. No role is the user role, as Better Auth's
+ * `defaultRole`: a user has none without the admin module, which adds it.
+ */
+export function expandRoles(role: Role | null | undefined): Permissions {
+  switch (role ?? ROLES.USER) {
     case ROLES.ADMIN:
       return adminRole.statements;
     case ROLES.USER:
@@ -68,6 +64,14 @@ export function expandRoles(role: Role): Permissions {
     default:
       return {};
   }
+}
+
+/**
+ * The permissions of a user of a session. The user has a `role` only with
+ * the admin module, so it is read without naming the module.
+ */
+export function permissionsOf(user: object): Permissions {
+  return expandRoles("role" in user ? (user.role as Role | null) : undefined);
 }
 
 export function formatPermissions(permissions: Permissions) {

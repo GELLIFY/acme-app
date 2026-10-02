@@ -1,27 +1,16 @@
 import {
-  adminClient,
   inferAdditionalFields,
   lastLoginMethodClient,
-  organizationClient,
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import { authClientModules } from "@/modules/auth-client";
 import { pluginsOf } from "@/modules/registry";
 import type { auth } from "./auth";
-import { ac, adminRole, userRole } from "./permissions";
 
 export const authClient = createAuthClient({
   /** The base URL of the server (optional if you're using the same domain) */
   // baseURL: "http://localhost:3000"
   plugins: [
-    adminClient({
-      ac,
-      roles: {
-        admin: adminRole,
-        user: userRole,
-      },
-    }),
-    organizationClient(),
     lastLoginMethodClient(),
     ...pluginsOf(authClientModules),
     inferAdditionalFields<typeof auth>(),

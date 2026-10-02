@@ -75,7 +75,9 @@
       "includes": [
         "src/modules/**",
         "src/app/**/(auth)/2fa/**",
-        "src/app/**/(app)/todo/**"
+        "src/app/**/(app)/todo/**",
+        "src/app/**/(app)/admin/**",
+        "src/app/**/(app)/organization/**"
       ],
       "linter": {
         "rules": {

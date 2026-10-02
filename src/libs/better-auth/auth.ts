@@ -1,8 +1,7 @@
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
-import { lastLoginMethod, openAPI, organization } from "better-auth/plugins";
-import { admin } from "better-auth/plugins/admin";
+import { lastLoginMethod, openAPI } from "better-auth/plugins";
 import { authModules } from "@/modules/auth";
 import { pluginsOf } from "@/modules/registry";
 import { db } from "@/server/db";
@@ -11,10 +10,8 @@ import {
   sendChangeEmailConfirmationEmail,
   sendDeleteAccountVerificationEmail,
   sendEmailVerificationEmail,
-  sendOrganizationInvitationEmail,
   sendResetPasswordEmail,
 } from "@/server/services/email-service";
-import { ac, adminRole, userRole } from "./permissions";
 
 export const auth = betterAuth({
   appName: "Acme App",
@@ -64,27 +61,6 @@ export const auth = betterAuth({
     },
   },
   plugins: [
-    admin({
-      ac,
-      roles: {
-        admin: adminRole,
-        user: userRole,
-      },
-    }),
-    organization({
-      organizationLimit: 5,
-      cancelPendingInvitationsOnReInvite: true,
-      async sendInvitationEmail(data) {
-        const inviteLink = `https://example.com/accept-invitation/${data.id}`;
-        sendOrganizationInvitationEmail({
-          email: data.email,
-          invitedByUsername: data.inviter.user.name,
-          invitedByEmail: data.inviter.user.email,
-          teamName: data.organization.name,
-          inviteLink,
-        });
-      },
-    }),
     lastLoginMethod(),
     openAPI({ disableDefaultReference: true }),
     ...pluginsOf(authModules),
@@ -95,6 +71,3 @@ export const auth = betterAuth({
 
 export type Session = typeof auth.$Infer.Session;
 export type User = typeof auth.$Infer.Session.user;
-export type ActiveOrganization = typeof auth.$Infer.ActiveOrganization;
-export type Organization = typeof auth.$Infer.Organization;
-export type OrganizationRole = ActiveOrganization["members"][number]["role"];

@@ -2,7 +2,7 @@ import { getSessionCookie } from "better-auth/cookies";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import { auth } from "@/libs/better-auth/auth";
-import { expandRoles, type Role } from "@/libs/better-auth/permissions";
+import { permissionsOf } from "@/libs/better-auth/permissions";
 import { credentialsOf } from "@/modules/registry";
 import { restAuthModules } from "@/modules/rest-auth";
 import type { Context } from "../init";
@@ -35,7 +35,7 @@ export const withAuth = createMiddleware<Context>(async (c, next) => {
 
     // Set session on context
     c.set("userId", session.user.id);
-    c.set("permissions", expandRoles(session.user.role as Role));
+    c.set("permissions", permissionsOf(session.user));
     return await next();
   }
 

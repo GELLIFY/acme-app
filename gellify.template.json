@@ -14,7 +14,9 @@
     "src/modules/permissions.ts",
     "src/modules/seed.ts",
     "src/modules/health.ts",
-    "src/modules/locales.ts"
+    "src/modules/locales.ts",
+    "src/modules/user-menu.ts",
+    "src/modules/overlay.ts"
   ],
   "regenerate": [
     "src/server/db/migrations"
@@ -23,6 +25,12 @@
     "src/modules/manifest.test.ts"
   ],
   "modules": {
+    "auth.admin": {
+      "dir": "admin",
+      "files": [
+        "src/app/[locale]/(app)/admin"
+      ]
+    },
     "auth.apiKey": {
       "dir": "api-key",
       "dependencies": [
@@ -38,6 +46,13 @@
       "dependencies": [
         "input-otp",
         "react-qr-code"
+      ]
+    },
+    "auth.organization": {
+      "dir": "organization",
+      "files": [
+        "src/app/[locale]/(app)/organization",
+        "src/emails/organization-invitation-email.tsx"
       ]
     },
     "auth.passkey": {
@@ -95,6 +110,10 @@
     }
   },
   "sharedDependencies": {
+    "@tanstack/react-table": [
+      "auth.admin",
+      "auth.organization"
+    ],
     "date-fns": [
       "auth.apiKey",
       "auth.admin"

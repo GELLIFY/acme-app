@@ -4,7 +4,7 @@ import type {
   listInvitationsSchema,
   listMembersSchema,
   listUserInvitationsSchema,
-} from "@/shared/validators/organization.schema";
+} from "../validators";
 
 export async function listMembers(
   headers: Headers,

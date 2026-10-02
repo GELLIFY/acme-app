@@ -15,12 +15,12 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { useOrganizationQuery } from "@/hooks/use-organization";
 import { authClient } from "@/libs/better-auth/auth-client";
 import { browserLogger } from "@/libs/logger/browser-logger";
 import { useTRPC } from "@/libs/trpc/client";
 import { convertImageToBase64 } from "@/shared/helpers/image";
 import { useScopedI18n } from "@/shared/locales/client";
+import { useOrganizationQuery } from "../hooks/use-organization";
 
 export function OrganizationLogo({
   canUpdateOrganization,

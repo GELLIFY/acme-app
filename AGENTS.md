@@ -79,6 +79,8 @@ each exporting `{ id, ... }` `as const`:
 | `permissions.ts` | `statements`: access-control resources; `grants`: what `user`, `admin` and a new API key (`apiKey`) get | `src/modules/permissions.ts` | `src/libs/better-auth/permissions.ts`, `src/modules/api-key/auth.ts` |
 | `seed.ts` | `seed(db, user)`: seed data for the default user | `src/modules/seed.ts` | `src/server/db/seed.ts` |
 | `health.ts` | `label`, `url`: a health check on the home page, a URL answering `{ status: "ok" }` | `src/modules/health.ts` | `src/app/[locale]/(public)/(home)/page.tsx` |
+| `user-menu.tsx` | `Component`: a client item of the user menu, before Account, shown or not by itself | `src/modules/user-menu.ts` | `src/components/auth/user-menu.tsx` |
+| `overlay.tsx` | `Component`: a client component laid over every page | `src/modules/overlay.ts` | `src/app/[locale]/layout.tsx` |
 | `locales.ts` | `messages`: `{ en, it }`, merged at the path they declare | `src/modules/locales.ts` | `src/shared/locales/{en,it}.ts` |
 
 A module's tables live in its own `tables.ts`, apart from the `schema.ts` that exports them to the
@@ -90,7 +92,11 @@ merges them by key. A slot component loads its own data (`account-security.tsx` 
 module. A REST credential takes the request's headers, not Hono's context, and answers `null` when
 the request does not carry it. A page of a module cannot leave `src/app/`: the module keeps the
 page's component, and the route file only re-exports it (with a `biome-ignore` for the import) and
-goes with the module.
+goes with the module. Only the admin module gives a user a `role`: shared code reads it as
+`"role" in user` or through `permissionsOf(user)` (no role is the `user` role), never as
+`user.role`. Two modules may augment the same package's types (`@tanstack/react-table`'s
+`ColumnMeta` and `TableMeta`), each in its own `react-table.d.ts`, with the package's own type
+parameter names.
 
 A registry only imports those files and lists them in one `as const` array; the shared files read
 it through the helpers of `src/modules/registry.ts` and never name a module. That keeps the types:
@@ -116,11 +122,19 @@ a router of a module is in `AppRouter`, a plugin's endpoints are on `auth.api` a
 <!-- #if isTemplate -->
 ## This repository is also a template
 
-It is a working application *and* the template new ones are scaffolded from. The generator lives in
-its own repository, `GELLIFY/create-acme-app`, and it scaffolds this repository together with the
-infrastructure repository `GELLIFY/acme-app-aws` when the deployment target is AWS.
+It is a working application *and* the template new ones are scaffolded from. The generator is
+`create-gellify-app`, in `GELLIFY/gelly` (`packages/create-gellify-app`; `GELLIFY/create-acme-app`
+is deprecated): it downloads this repository at the commit pinned in its `TEMPLATE_SOURCE` and
+removes what a project declines, and `create-gellify-infra` does the same with
+`GELLIFY/acme-app-aws` when the deployment target is AWS. A change here reaches new projects only
+once that commit is moved forward in `gelly` (and the App's vendored CLI is refreshed).
 
-Two consequences for anyone changing this repository:
+Consequences for anyone changing this repository:
+
+- **No `#if` marker in code.** A module is removed through the registries and the manifest (see
+  "Optional modules" and the last point below). Markers remain only where there is no code: the
+  workflow and action YAML, `.env.example`, `docker-compose.yml` and Markdown. The generator
+  refuses a marker whose flag it does not know.
 
 - **The steps are not marked per target, and must not be.** Two `#if`-marked copies of a step are
   both live in *this* repository -- the same step twice in one job, which GitHub refuses to load
@@ -139,10 +153,10 @@ Two consequences for anyone changing this repository:
   two are never both off. Nothing outside `deploy-preview.yml` and `cleanup-preview.yml` knows
   which is which -- the application talks to plain Postgres through `node-postgres` either way,
   and no Neon package is a dependency -- so keep it that way.
-- **Adding a deployment target is three things**, and two of them live in `create-acme-app`: the
-  `cd/<target>/` directory here with its actions (all five for `vercel`; `aws` has its own set); the target listed in that generator's
-  `featureFiles`, so declining it removes the directory; and the path rewrite plus a row in its
-  `scaffold` matrix. Forgetting any of the last two produces a generator that emits projects whose
+- **Adding a deployment target is three things**: the `cd/<target>/` directory here with its
+  actions (all five for `vercel`; `aws` has its own set) and its flag in `gellify.template.json`
+  (`flags`, so declining it removes the directory); the flag, the path rewrite and a smoke
+  combination in `create-gellify-app`. Forgetting the generator's part produces projects whose
   workflows reference a directory that is not there.
 - **The AWS pipeline lives in `cd/aws/pipelines/`.** Those workflows (`deploy-preview`,
   `deploy-production`, `cleanup-preview`, `deploy-test`, `reconcile-previews`) are inert here:
@@ -158,11 +172,11 @@ Two consequences for anyone changing this repository:
     `WORKER_*` variables). Keep a `needs` list that mentions a worker job as a block list (one item
     per line), so the marked item can be dropped on its own;
   - in the application: `src/env.ts`, `.env.example` and `docker-compose.yml` (the `worker` service);
-  - as whole files, for the generator's `featureFiles`: `Dockerfile.worker`, `scripts/worker.ts`,
+  - as whole files, under the `useWorker` flag of `gellify.template.json`: `Dockerfile.worker`, `scripts/worker.ts`,
     `scripts/direct-database-url.ts` (+ test), `src/server/services/jobs/`, and the
     `build-worker`, `build-{test,prod,preview}-worker`, `deploy-worker` and
     `deploy-{test,prod,preview}-worker` actions;
-  - as JSON, which has no comments, so the generator removes the keys: the `worker` script and the
+  - as JSON, which has no comments, so the manifest lists the keys: the `worker` script and the
     `@aws-sdk/client-ecs` dependency in `package.json`.
 
   `scripts/worker.ts` is a skeleton: the advisory lock and the poll loop are real, `findNextJob` and
@@ -179,8 +193,9 @@ Two consequences for anyone changing this repository:
   combined entries such as `example+rest`, `{ requires, files }`, for what goes when either module is
   off: the REST routes of the example domain, the REST credential of the API keys), `sharedDependencies` (a dependency kept while any of
   its modules is on) and `flags` (the same, for `deployVercel`, `deployAws`, `useWorker`). A file
-  of a module or a flag goes in there, in the same pull request that adds it; a new flag also
-  needs the generator to know it, or its `#if` blocks are dropped from every project.
+  of a module or a flag goes in there, in the same pull request that adds it. The generator
+  validates the manifest against its own list of modules and flags and refuses what it does not
+  know, so a new module or flag also needs a change in `create-gellify-app`.
 
 This section never reaches a generated project: it sits behind an `#if isTemplate` marker, and no
 generated project sets that flag.

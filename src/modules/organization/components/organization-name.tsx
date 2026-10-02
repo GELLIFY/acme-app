@@ -17,11 +17,11 @@ import {
 import { Field, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { useOrganizationQuery } from "@/hooks/use-organization";
 import { authClient } from "@/libs/better-auth/auth-client";
 import { browserLogger } from "@/libs/logger/browser-logger";
 import { useTRPC } from "@/libs/trpc/client";
 import { useScopedI18n } from "@/shared/locales/client";
+import { useOrganizationQuery } from "../hooks/use-organization";
 
 const formSchema = z.object({
   name: z.string().min(1).max(32).optional(),

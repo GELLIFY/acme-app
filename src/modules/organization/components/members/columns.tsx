@@ -22,15 +22,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useOrganizationQuery } from "@/hooks/use-organization";
 import { authClient } from "@/libs/better-auth/auth-client";
-import {
-  ORGANIZATION_ROLES,
-  type OrganizationRole,
-} from "@/libs/better-auth/permissions";
 import { useTRPC } from "@/libs/trpc/client";
 import type { RouterOutput } from "@/server/api/trpc/routers/_app";
 import { useScopedI18n } from "@/shared/locales/client";
+import { useOrganizationQuery } from "../../hooks/use-organization";
+import { ORGANIZATION_ROLES, type OrganizationRole } from "../../roles";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
