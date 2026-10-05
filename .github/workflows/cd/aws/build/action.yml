@@ -1,7 +1,7 @@
 name: Build and Push Image to AWS
 
 description: >
-  Builds the application image and pushes it to the single ECR repository `ecr-acme-app` shared by every base environment (provisioned by acme-app-aws). Images are told apart by tag, `<sha>-<environment>[-worker]`.
+  Builds the application image and pushes it to the single ECR repository `ecr-acme-app` shared by every base environment (provisioned by acme-app-aws). Images are told apart by tag, `<sha>-<environment>`.
   Split out of `deploy` so the image is built and pushed once migrations have not run yet --
   a build failure is caught before anything touches the database, and the push itself never waits
   on `run_migrations`. `deploy` (the ECS redeploy) runs after migrations instead and just
@@ -15,7 +15,7 @@ inputs:
     description: IAM role assumed via OIDC to push the image
     required: true
   IMAGE_TAG:
-    description: The deploying commit SHA; the pushed tag is `<sha>-<ENVIRONMENT>[-worker]` (ECR is immutable-tagged)
+    description: The deploying commit SHA; the pushed tag is `<sha>-<ENVIRONMENT>` (ECR is immutable-tagged)
     required: true
 
 runs:

@@ -9,7 +9,7 @@ inputs:
     description: IAM role assumed via OIDC (the "prod" GitHub environment's own AWS_ROLE_ARN)
     required: true
   IMAGE_TAG:
-    description: The deploying commit SHA; the image tag is `<sha>-prod[-worker]`
+    description: The deploying commit SHA; the image tag is `<sha>-prod`
     required: true
 
 runs:

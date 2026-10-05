@@ -23,7 +23,7 @@ inputs:
     description: IAM role assumed via OIDC to push the image and update the ECS service
     required: true
   IMAGE_TAG:
-    description: The deploying commit SHA; the pushed tag is `<sha>-<ENVIRONMENT>[-worker]` (ECR is immutable-tagged)
+    description: The deploying commit SHA; the pushed tag is `<sha>-<ENVIRONMENT>` (ECR is immutable-tagged)
     required: true
 
 runs:

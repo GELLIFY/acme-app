@@ -9,7 +9,7 @@ inputs:
     description: IAM role assumed via OIDC (the "test" GitHub environment's own AWS_ROLE_ARN)
     required: true
   IMAGE_TAG:
-    description: The deploying commit SHA; the image tag is `<sha>-test[-worker]`
+    description: The deploying commit SHA; the image tag is `<sha>-test`
     required: true
 
 runs:

@@ -37,11 +37,6 @@ jobs:
   # other. Runs alongside provision_and_migrate rather than after it for the same reason: the
   # build depends on nothing that job produces, and a build failure is caught without having
   # provisioned (or migrated) anything for a preview that would then need tearing down anyway.
-  # #if useWorker
-  # Split into its own job -- rather than a step alongside build_worker's -- for the same reason
-  # deploy_app/deploy_worker are split below: two parallel jobs run concurrently, two steps in one
-  # job would not.
-  # #endif
 
   build_app:
     if: ${{ !startsWith(github.head_ref, 'renovate/') }}
@@ -59,24 +54,6 @@ jobs:
 
       - name: Build and push image to AWS
         uses: ./.github/workflows/cd/aws/build-preview
-
-  # #if useWorker
-  build_worker:
-    if: ${{ !startsWith(github.head_ref, 'renovate/') }}
-    name: Build Preview (worker)
-    environment: Preview
-    # The worker's task definition targets X86_64 Fargate, same as the app -- see build_app's own
-    # comment on why that means an x86 runner, not arm64.
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
-
-      - name: Build and push worker image to AWS
-        uses: ./.github/workflows/cd/aws/build-preview-worker
-  # #endif
 
   provision_and_migrate:
     if: ${{ !startsWith(github.head_ref, 'renovate/') }}
@@ -171,14 +148,6 @@ jobs:
           echo "DATABASE_URL=$DATABASE_URL" >> .env
           pnpm run db:migrate
 
-  # #if useWorker
-  # Split into its own job -- rather than a step alongside deploy_worker's -- because a job is the
-  # unit GitHub Actions actually schedules concurrently: two `needs: [provision_and_migrate,
-  # build_app]` jobs run in parallel and show as parallel branches in the workflow graph, where two
-  # steps (or two backgrounded shell processes) inside one job would not. The two deploy jobs share
-  # nothing at runtime -- see deploy-preview/action.yml's own comment -- so there is nothing to
-  # serialize.
-  # #endif
   # Needs `build_app` too, not just `provision_and_migrate`: the image it deploys has to
   # exist in the registry before this can reference it.
   deploy_app:
@@ -208,31 +177,6 @@ jobs:
           PR_NUMBER: ${{ github.event.number }}
           GIT_BRANCH: ${{ needs.provision_and_migrate.outputs.current_branch }}
 
-  # #if useWorker
-  # Runs alongside deploy_app rather than after it: the app service only ever needs the worker task
-  # definition's ARN, a predictable string it builds itself, never a live handle to what this job
-  # produces (see deploy-preview-worker/action.yml's own comment). Needs `build_worker` too, not
-  # just `provision_and_migrate`: the image it registers has to exist in the registry first.
-  deploy_worker:
-    if: ${{ !startsWith(github.head_ref, 'renovate/') }}
-    name: Deploy Preview (worker)
-    environment: Preview
-    # The worker's task definition targets X86_64 Fargate, same as the app -- see deploy_app's own
-    # comment on why that means an x86 runner, not arm64.
-    runs-on: ubuntu-24.04
-    needs: [provision_and_migrate, build_worker]
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
-
-      - name: Deploy worker to Preview
-        uses: ./.github/workflows/cd/aws/deploy-preview-worker
-        with:
-          PR_NUMBER: ${{ github.event.number }}
-  # #endif
-
   comment:
     if: ${{ !startsWith(github.head_ref, 'renovate/') }}
     name: Comment on Pull Request
@@ -240,9 +184,6 @@ jobs:
     needs:
       - provision_and_migrate
       - deploy_app
-      # #if useWorker
-      - deploy_worker
-      # #endif
     permissions:
       pull-requests: write
       issues: write

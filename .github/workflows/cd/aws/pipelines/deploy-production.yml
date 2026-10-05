@@ -15,14 +15,6 @@ jobs:
     name: Code quality
     uses: ./.github/workflows/ci.yml
 
-  # #if useWorker
-  # Split into its own job -- rather than a step alongside build_worker's -- because a job is the
-  # unit GitHub Actions actually schedules concurrently: two `needs: [code_quality]` jobs run in
-  # parallel and show as parallel branches in the workflow graph, where two steps inside one job
-  # would not. The two builds share nothing at runtime, so there is nothing to serialize.
-  #
-  # #endif
-
   # Runs before migrations on purpose: a build failure is caught here, before anything touches the
   # database, and the image is ready and waiting by the time migrations clear it to deploy.
   build_app:
@@ -47,41 +39,12 @@ jobs:
           AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
           IMAGE_TAG: ${{ github.sha }}
 
-  # #if useWorker
-  build_worker:
-    name: Build Production (worker)
-    # The worker's task definition targets X86_64 Fargate, same as the app -- see build_app's own
-    # comment on why that means an x86 runner, not arm64.
-    runs-on: ubuntu-24.04
-    environment: prod
-    needs: [code_quality]
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
-
-      - name: Build and push worker image to AWS
-        uses: ./.github/workflows/cd/aws/build-prod-worker
-        with:
-          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
-          IMAGE_TAG: ${{ github.sha }}
-  # #endif
-
-  # #if useWorker
-  # Runs after both images are built and pushed, not before: migrating against a schema no pushed
-  # image exists for yet would be wasted work the moment either build fails.
-  # #endif
-
   run_migrations:
     name: Run Migrations
     runs-on: ubuntu-24.04
     environment: prod
     needs:
       - build_app
-      # #if useWorker
-      - build_worker
-      # #endif
     permissions:
       contents: read
       id-token: write
@@ -103,14 +66,6 @@ jobs:
           echo SKIP_ENV_VALIDATION=1 >> .env
           pnpm run db:migrate
 
-  # #if useWorker
-  # Split into its own job -- rather than a step alongside deploy_worker's -- because a job is the
-  # unit GitHub Actions actually schedules concurrently: two `needs: [run_migrations]` jobs run in
-  # parallel and show as parallel branches in the workflow graph, where two steps inside one job
-  # would not. The two deploy jobs share nothing at runtime, so there is nothing to serialize (see
-  # deploy-preview.yml's own comment on the same split).
-  # #endif
-
   deploy_app:
     name: Deploy Production (app)
     runs-on: ubuntu-24.04
@@ -128,24 +83,3 @@ jobs:
           AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
           IMAGE_TAG: ${{ github.sha }}
 
-  # #if useWorker
-  # Runs alongside deploy_app rather than after it: the app service only ever needs the worker task
-  # definition's ARN, a predictable string it builds itself, never a live handle to what this job
-  # produces (see deploy-worker/action.yml's own comment).
-  deploy_worker:
-    name: Deploy Production (worker)
-    runs-on: ubuntu-24.04
-    environment: prod
-    needs: [run_migrations]
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
-
-      - name: Deploy worker image to AWS
-        uses: ./.github/workflows/cd/aws/deploy-prod-worker
-        with:
-          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
-          IMAGE_TAG: ${{ github.sha }}
-  # #endif

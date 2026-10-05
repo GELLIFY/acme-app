@@ -23,24 +23,5 @@ services:
         max-size: "20m"
         max-file: "5"
 
-  # #if useWorker
-  # The background worker, run locally the same way it runs on ECS (see acme-app-aws's
-  # EcsFargateTask invocation contract): `docker compose --profile worker up worker` runs the poll
-  # loop, exactly what `ecs:RunTask` starts in production -- it drains whatever is queued, then
-  # exits. Not started by default (`docker compose up db` alone, or `pnpm dev`, never brings this
-  # up): opt in explicitly when testing the queueing path locally.
-  worker:
-    build:
-      context: .
-      dockerfile: Dockerfile.worker
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/main
-    depends_on:
-      db:
-        condition: service_healthy
-    profiles:
-      - worker
-  # #endif
-
 volumes:
   postgres_data:

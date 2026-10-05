@@ -7,12 +7,6 @@ description: >
   and the image itself is `build-preview`'s job, not this one -- that way a build failure is
   caught before anything is provisioned or migrated, and this step never repeats work
   `build-preview` already did.
-  # #if useWorker
-  Runs in parallel with `deploy-preview-worker`: the two share
-  nothing at deploy time (the service only ever needs the worker's task definition *ARN*, a
-  predictable string, never a live handle to it), so there is nothing to gain from serializing
-  them.
-  # #endif
 
   A preview provisions as little as possible: the registry and the Express Mode infrastructure role
   belong to the base environment and are reused as they are. What is actually per-pull-request is
@@ -51,12 +45,6 @@ runs:
     # The names every step below builds on, in one place. They follow acme-app-aws's
     # `resourceName()` convention -- `{aws-service-acronym}-{project}-{environment}` -- because
     # these resources sit alongside the ones Pulumi owns and are found by the same naming rules.
-    # #if useWorker
-    # `worker_task_definition_arn` is reproduced here too: it is a predictable string built from the
-    # PR number alone, so this job can reference it without waiting on (or even knowing whether)
-    # `deploy-preview-worker` has registered it yet -- `ecs:RunTask` always resolves the family ARN
-    # to whichever revision exists when the app actually calls it, at runtime.
-    # #endif
     - name: Resolve the preview's names
       id: names
       env:
@@ -74,9 +62,6 @@ runs:
           echo "cluster=$PROJECT_NAME-cluster"
           echo "log_group=/aws/ecs/$PROJECT_NAME-cluster/ecs-$PROJECT_NAME-pr-$PR_NUMBER"
           echo "service_arn=arn:aws:ecs:$AWS_REGION:$account:service/$PROJECT_NAME-cluster/ecs-$PROJECT_NAME-pr-$PR_NUMBER"
-          # #if useWorker
-          echo "worker_task_definition_arn=arn:aws:ecs:$AWS_REGION:$account:task-definition/ecs-$PROJECT_NAME-pr-$PR_NUMBER-worker"
-          # #endif
         } >> "$GITHUB_OUTPUT"
       shell: bash
 
@@ -106,32 +91,6 @@ runs:
         aws logs put-retention-policy --log-group-name "$LOG_GROUP" --retention-in-days 7
       shell: bash
 
-    # #if useWorker
-    # The worker's security group belongs to the base environment (its `EcsFargateTask`,
-    # acme-app-aws), published there as a plain (non-secret) SSM parameter specifically so a preview
-    # can read it with a bare `aws ssm get-parameter`, no Pulumi CLI or backend access needed in this
-    # workflow. Read here rather than from `deploy-preview-worker` because the app service is what
-    # actually needs it (baked into its WORKER_SECURITY_GROUP_ID env var, for when it calls
-    # ecs:RunTask), and because it lets this job stay fully independent of that one.
-    - name: Read the base environment's shared worker security group
-      id: worker_config
-      run: |
-        set -euo pipefail
-        echo "security_group_id=$(aws ssm get-parameter --name "/$BASE_ENV/worker_security_group_id" --query 'Parameter.Value' --output text)" >> "$GITHUB_OUTPUT"
-      shell: bash
-
-    # Same default VPC / default subnets `EcsFargateTask` uses in acme-app-aws -- public subnets,
-    # no NAT Gateway, relying on `assignPublicIp` for egress.
-    - name: Discover the default VPC's subnets
-      id: subnets
-      run: |
-        set -euo pipefail
-        vpc_id=$(aws ec2 describe-vpcs --filters Name=isDefault,Values=true --query 'Vpcs[0].VpcId' --output text)
-        ids=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$vpc_id" --query 'Subnets[].SubnetId' --output text | tr '\t' ',')
-        echo "ids=$ids" >> "$GITHUB_OUTPUT"
-      shell: bash
-    # #endif
-
     # This runs on every push to the pull request, so it has to handle both the first deployment
     # and every one after it. On an existing service only the image changes: the rest of the
     # container configuration is read back and reused, exactly as deploy-test does, so that a
@@ -147,11 +106,6 @@ runs:
         PR_NUMBER: ${{ inputs.PR_NUMBER }}
         SERVICE: ${{ steps.names.outputs.service }}
         SERVICE_ARN: ${{ steps.names.outputs.service_arn }}
-        # #if useWorker
-        WORKER_TASK_DEFINITION: ${{ steps.names.outputs.worker_task_definition_arn }}
-        WORKER_SECURITY_GROUP_ID: ${{ steps.worker_config.outputs.security_group_id }}
-        WORKER_SUBNET_IDS: ${{ steps.subnets.outputs.ids }}
-        # #endif
       run: |
         set -euo pipefail
 
@@ -162,13 +116,6 @@ runs:
         # `set -e` is suspended inside a function called as an `if` condition, so every step here
         # returns explicitly instead of relying on it: a failed describe must not fall through to
         # an update built from empty JSON.
-        #
-        # #if useWorker
-        # JOB_DRIVER/ECS_CLUSTER/WORKER_* are rewritten here too, not just read back and preserved:
-        # a preview created before the worker existed (or before one of its settings changed) must
-        # pick up the current values on its very next redeploy, rather than staying pinned to
-        # whatever was present when its service was first created.
-        # #endif
         set_container() {
           local active_config endpoint primary_container
 
@@ -192,31 +139,13 @@ runs:
           primary_container=$(echo "$active_config" | jq \
             --arg image "$IMAGE" \
             --arg url "https://${endpoint#*://}" \
-            # #if useWorker
-            --arg cluster "$CLUSTER" \
-            --arg worker_task_definition "$WORKER_TASK_DEFINITION" \
-            --arg worker_security_group_id "$WORKER_SECURITY_GROUP_ID" \
-            --arg worker_subnet_ids "$WORKER_SUBNET_IDS" \
-            # #endif
             '.primaryContainer
              | .command = []
              | .image = $image
              | .environment = ((.environment // [])
-                 | map(select(.name | IN("BETTER_AUTH_URL"
-                     # #if useWorker
-                     , "JOB_DRIVER", "ECS_CLUSTER", "WORKER_TASK_DEFINITION", "WORKER_CONTAINER_NAME", "WORKER_SECURITY_GROUP_ID", "WORKER_SUBNET_IDS"
-                     # #endif
-                     ) | not))
+                 | map(select(.name | IN("BETTER_AUTH_URL") | not))
                  + [
                      {name: "BETTER_AUTH_URL", value: $url}
-                     # #if useWorker
-                     , {name: "JOB_DRIVER", value: "ecs"}
-                     , {name: "ECS_CLUSTER", value: $cluster}
-                     , {name: "WORKER_TASK_DEFINITION", value: $worker_task_definition}
-                     , {name: "WORKER_CONTAINER_NAME", value: "worker"}
-                     , {name: "WORKER_SECURITY_GROUP_ID", value: $worker_security_group_id}
-                     , {name: "WORKER_SUBNET_IDS", value: $worker_subnet_ids}
-                     # #endif
                    ])' ) || return 1
 
           aws ecs update-express-gateway-service \
@@ -246,13 +175,6 @@ runs:
         # The member names here are the API's, which are singular (`environment`,
         # `awsLogsConfiguration`) where the Pulumi provider pluralises them. Reading them off
         # acme-app-aws's component would produce JSON the CLI rejects.
-        # #if useWorker
-        # JOB_DRIVER/ECS_CLUSTER/WORKER_* mirror what acme-app-aws wires into the base
-        # environment's own app container once `withFargateTask` is on -- here assembled by hand
-        # since a preview has no Pulumi stack of its own. Set only at creation: none of these
-        # values change between redeploys of the same pull request, and `set_container` above
-        # reads back and preserves whatever the active configuration already has.
-        # #endif
         primary_container=$(jq -n \
           --arg image "$IMAGE" \
           --arg db "$ssm/$BASE_ENV/pr-$PR_NUMBER/database_url" \
@@ -263,26 +185,12 @@ runs:
           --arg aws_secret_access_key "$ssm/$BASE_ENV/aws_secret_access_key" \
           --arg reconcile_secret "$ssm/$BASE_ENV/internal_reconcile_secret" \
           --arg log_group "$LOG_GROUP" \
-          # #if useWorker
-          --arg cluster "$CLUSTER" \
-          --arg worker_task_definition "$WORKER_TASK_DEFINITION" \
-          --arg worker_security_group_id "$WORKER_SECURITY_GROUP_ID" \
-          --arg worker_subnet_ids "$WORKER_SUBNET_IDS" \
-          # #endif
           '{
             image: $image,
             containerPort: 3000,
             environment: [
               { name: "HOSTNAME", value: "0.0.0.0" },
               { name: "PORT", value: "3000" }
-              # #if useWorker
-              , { name: "JOB_DRIVER", value: "ecs" }
-              , { name: "ECS_CLUSTER", value: $cluster }
-              , { name: "WORKER_TASK_DEFINITION", value: $worker_task_definition }
-              , { name: "WORKER_CONTAINER_NAME", value: "worker" }
-              , { name: "WORKER_SECURITY_GROUP_ID", value: $worker_security_group_id }
-              , { name: "WORKER_SUBNET_IDS", value: $worker_subnet_ids }
-              # #endif
             ],
             secrets: [
               { name: "DATABASE_URL", valueFrom: $db },

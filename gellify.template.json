@@ -130,22 +130,6 @@
       "files": [
         ".github/workflows/cd/aws"
       ]
-    },
-    "useWorker": {
-      "files": [
-        "Dockerfile.worker",
-        "scripts/worker.ts",
-        "scripts/direct-database-url.ts",
-        "scripts/direct-database-url.test.ts",
-        "src/server/services/jobs",
-        ".github/workflows/cd/aws/*-worker"
-      ],
-      "scripts": [
-        "worker"
-      ],
-      "dependencies": [
-        "@aws-sdk/client-ecs"
-      ]
     }
   }
 }
