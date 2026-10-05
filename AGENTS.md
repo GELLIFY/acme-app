@@ -157,7 +157,7 @@ Consequences for anyone changing this repository:
   combination in `create-gellify-app`. Forgetting the generator's part produces projects whose
   workflows reference a directory that is not there.
 - **The AWS pipeline lives in `cd/aws/pipelines/`.** Those workflows (`deploy-preview`,
-  `deploy-production`, `cleanup-preview`, `deploy-test`, `reconcile-previews`) are inert here:
+  `deploy-production`, `cleanup-preview`, `deploy-test`) are inert here:
   GitHub only loads `.yml` files directly under `.github/workflows/`. Scaffolding for AWS copies
   them up, replacing the Vercel ones, instead of rewriting the `cd/vercel/` paths -- their job
   structure differs, so the path rewrite alone is not enough. Their `PROJECT_NAME` is `acme-app`

@@ -183,7 +183,6 @@ runs:
           --arg aws_s3_bucket "$ssm/$BASE_ENV/aws_s3_bucket" \
           --arg aws_access_key_id "$ssm/$BASE_ENV/aws_access_key_id" \
           --arg aws_secret_access_key "$ssm/$BASE_ENV/aws_secret_access_key" \
-          --arg reconcile_secret "$ssm/$BASE_ENV/internal_reconcile_secret" \
           --arg log_group "$LOG_GROUP" \
           '{
             image: $image,
@@ -198,8 +197,7 @@ runs:
               { name: "AWS_REGION", valueFrom: $aws_region },
               { name: "AWS_S3_BUCKET", valueFrom: $aws_s3_bucket },
               { name: "AWS_ACCESS_KEY_ID", valueFrom: $aws_access_key_id },
-              { name: "AWS_SECRET_ACCESS_KEY", valueFrom: $aws_secret_access_key },
-              { name: "INTERNAL_RECONCILE_SECRET", valueFrom: $reconcile_secret }
+              { name: "AWS_SECRET_ACCESS_KEY", valueFrom: $aws_secret_access_key }
             ],
             awsLogsConfiguration: { logGroup: $log_group, logStreamPrefix: "ecs" }
           }')
